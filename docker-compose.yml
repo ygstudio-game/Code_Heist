@@ -1,0 +1,60 @@
+services:
+  # --- THE VAULT BACKEND (Node.js + TS) ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: heist-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+    # Hot-reload mapping (Optional for development)
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - heist-network
+
+  # --- THE AEGIS FRONTEND (Next.js 16) ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: heist-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env
+    # Note: Next.js build-time envs usually need to be in the Dockerfile, 
+    # but for runtime API calls, this works perfectly.
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    depends_on:
+      - backend
+    networks:
+      - heist-network
+
+  # --- THE MONOLITH DATABASE (MongoDB) ---
+  mongodb:
+    image: mongo:latest
+    container_name: heist-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - heist-data:/data/db
+    networks:
+      - heist-network
+
+# Persistence for your Database
+volumes:
+  heist-data:
+
+# Internal network so containers can talk to each other securely
+networks:
+  heist-network:
+    driver: bridge

@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "#models/*": ["./models/*"],
+      "#controllers/*": ["./controllers/*"],
+      "#routes/*": ["./routes/*"],
+      "#lib/*": ["./lib/*"],
+      "#utils/*": ["./utils/*"],
+      "#config/*": ["./config/*"]
+    },
+    "outDir": "./dist",
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}
