@@ -1,13 +1,19 @@
-import mongoose from 'mongoose';
+import pkg from 'pg';
+import dotenv from 'dotenv';
+import path from 'path';
 
-const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI || "");
-        console.log(`📡 Monolith Database Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error(`❌ Database Failure: ${error}`);
-        process.exit(1); // Exit process with failure
-    }
-};
+dotenv.config();
 
-export default connectDB;
+const { Pool } = pkg;
+
+// Determine Postgres Pool connection string natively via process.env
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+});
+
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+    process.exit(-1);
+});
+
+export default pool;

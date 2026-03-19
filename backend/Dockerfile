@@ -8,11 +8,12 @@ RUN apk add --no-cache \
       freetype \
       harfbuzz \
       ca-certificates \
-      ttf-freefont
+      ttf-freefont \
+      # Added openssl for Prisma 7 compatibility
+      openssl 
 
 # Set Puppeteer to use the installed Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-# This allows TS to find Node types
 ENV NODE_PATH=/app/node_modules
 
 WORKDIR /app
@@ -23,16 +24,20 @@ RUN npm install -g pnpm
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# 1. Install dependencies (frozen-lockfile is safer for Docker)
+# 1. Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# 2. CRITICAL: Approve the build scripts for dependencies (fix for your error)
+# 2. Approve builds (Fixes the error you mentioned)
 RUN pnpm approve-builds
 
-# Copy the rest of the code
+# 3. Copy the rest of the code (including prisma folder)
 COPY . .
 
-# Build the TypeScript code
+# 4. GENERATE PRISMA CLIENT (CRITICAL STEP)
+# This creates the types inside node_modules before building TS
+RUN pnpm exec prisma generate
+
+# 5. Build the TypeScript code
 RUN pnpm build
 
 EXPOSE 5000

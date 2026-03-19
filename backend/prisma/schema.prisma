@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Category {
+  C
+  Python
+  DSA
+  Web
+}
+
+model Team {
+  id               String       @id @default(uuid())
+  teamId           String       @unique // Access Key
+  teamName         String
+  password         String
+  credits          Int          @default(1000)
+  antiCheatStrikes Int          @default(0)
+  isEliminated     Boolean      @default(false)
+  vaultTime        Int          @default(0)
+  penalties        Int          @default(0)
+  
+  wonProblems      WonProblem[]
+  logs             Log[]
+  
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model Problem {
+  id            String       @id @default(uuid())
+  title         String
+  category      Category
+  description   String       @db.Text
+  buggyCode     String       @db.Text
+  language      String
+  testCases     Json         // Array of {input, output}
+  basePrice     Int          @default(100)
+  isSold        Boolean      @default(false)
+  
+  wonBy         WonProblem[]
+}
+
+model WonProblem {
+  id             String   @id @default(uuid())
+  team           Team     @relation(fields: [teamId], references: [id])
+  teamId         String
+  problem        Problem  @relation(fields: [problemId], references: [id])
+  problemId      String
+  status         String   @default("ACQUIRED") // ACQUIRED, TESTING, VERIFIED
+  codeSubmitted  String?  @db.Text
+  timeTaken      Int      @default(0)
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  type      String   // 'BID', 'SECURITY', 'SYSTEM'
+  message   String
+  team      Team?    @relation(fields: [teamId], references: [id])
+  teamId    String?
+  createdAt DateTime @default(now())
+}
