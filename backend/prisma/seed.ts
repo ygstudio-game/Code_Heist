@@ -1,57 +1,79 @@
-import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import pkg from 'pg';
+import pg from 'pg';
+import bcrypt from 'bcryptjs';
+import 'dotenv/config';
 
-const { Pool } = pkg;
-
-// Create connection pool
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-});
-
-// Create Prisma adapter
+const connectionString = process.env.DATABASE_URL;
+const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
-
-// 1. Keep the constructor empty. 
-// Prisma 7.5.0 reads your prisma.config.ts automatically.
-const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
-  adapter,
-});
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("🔓 Aegis Vault: Initializing Seed...");
+  const teamPassword = await bcrypt.hash('team123', 10);
+  
+  // 1. Create Admins
+  const admins = [
+    { name: 'Aegis Command', key: 'AEGIS_ADMIN', pass: 'admin123' },
+    { name: 'Root Override', key: 'admin', pass: 'admin123' },
+  ];
 
-  const team = await prisma.team.upsert({
-    where: { teamId: 'HEIST-001' },
-    update: {},
-    create: {
-      teamId: 'HEIST-001',
-      teamName: 'The Shadow Coders',
-      password: 'password123',
-      credits: 1000,
+  for (const a of admins) {
+    const pass = await bcrypt.hash(a.pass, 10);
+    await prisma.team.upsert({
+      where: { accessKey: a.key },
+      update: {},
+      create: {
+        name: a.name,
+        accessKey: a.key,
+        password: pass,
+        role: 'ADMIN',
+        credits: 99999,
+      },
+    });
+  }
+
+  // 2. Create 3 Test Teams
+  const teams = [
+    { name: 'Phantom Unit', key: 'PHANTOM_77' },
+    { name: 'Zero Day', key: 'ZERO_DAY_01' },
+    { name: 'Ghost Protocol', key: 'GHOST_PROTO' },
+  ];
+
+  for (const t of teams) {
+    await prisma.team.upsert({
+      where: { accessKey: t.key },
+      update: {},
+      create: {
+        name: t.name,
+        accessKey: t.key,
+        password: teamPassword,
+        credits: 1000,
+        members: {
+          create: [{ name: 'Operator 1' }, { name: 'Operator 2' }],
+        },
+      },
+    });
+  }
+
+  // 3. Create Sample Snippets
+  await prisma.snippet.create({
+    data: {
+      title: 'Buffer Overflow Vulnerability',
+      category: 'C',
+      buggyCode: `void hack(char *input) {\n  char buffer[64];\n  strcpy(buffer, input);\n}`,
+      solution: `void hack(char *input) {\n  char buffer[64];\n  strncpy(buffer, input, sizeof(buffer) - 1);\n  buffer[sizeof(buffer) - 1] = '\\0';\n}`,
+      isActive: true,
+      order: 1,
     },
   });
-  console.log(`✅ Team Ghost Infiltrated: ${team.teamName}`);
 
-  const problem = await prisma.problem.create({
-    data: {
-      title: "The C-Buffer Overflow",
-      category: 'C',
-      description: "Fix the memory leak in this string copy function.",
-      buggyCode: "void hack() { char buf[8]; strcpy(buf, input); }",
-      language: "c",
-      testCases: [{ input: "short", expectedOutput: "success" }],
-      basePrice: 200
-    }
-  });
-  console.log(`✅ Buggy Target Locked: ${problem.title}`);
+  console.log('✅ Seeding complete.');
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Seed Failed:", e);
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
