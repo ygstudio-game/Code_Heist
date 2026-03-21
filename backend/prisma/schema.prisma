@@ -1,66 +1,103 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../prisma/generated-client"
 }
 
 datasource db {
   provider = "postgresql"
+  // url removed for Prisma v7, handled in prisma.config.ts
+}
+
+enum Role {
+  ADMIN
+  TEAM
+  SPECTATOR
 }
 
 enum Category {
+  CP
+  WEB
   C
-  Python
-  DSA
-  Web
+  PYTHON
+}
+
+enum SubmissionStatus {
+  ACQUIRED
+  TESTING
+  VERIFIED
+  FAILED
 }
 
 model Team {
-  id               String       @id @default(uuid())
-  teamId           String       @unique // Access Key
-  teamName         String
-  password         String
-  credits          Int          @default(1000)
-  antiCheatStrikes Int          @default(0)
-  isEliminated     Boolean      @default(false)
-  vaultTime        Int          @default(0)
-  penalties        Int          @default(0)
-  
-  wonProblems      WonProblem[]
-  logs             Log[]
-  
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  id           String       @id @default(uuid())
+  name         String       @unique
+  accessKey    String       @unique
+  password     String
+  credits      Int          @default(1000)
+  role         Role         @default(TEAM)
+  isEliminated Boolean      @default(false)
+  strikes      Int          @default(0)
+  lastStrikeAt DateTime?
+  members      Member[]
+  creditLogs   CreditLog[]
+  bids         Bid[]
+  submissions  Submission[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
-model Problem {
-  id            String       @id @default(uuid())
-  title         String
-  category      Category
-  description   String       @db.Text
-  buggyCode     String       @db.Text
-  language      String
-  testCases     Json         // Array of {input, output}
-  basePrice     Int          @default(100)
-  isSold        Boolean      @default(false)
-  
-  wonBy         WonProblem[]
+model Member {
+  id     String @id @default(uuid())
+  name   String
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
-model WonProblem {
-  id             String   @id @default(uuid())
-  team           Team     @relation(fields: [teamId], references: [id])
-  teamId         String
-  problem        Problem  @relation(fields: [problemId], references: [id])
-  problemId      String
-  status         String   @default("ACQUIRED") // ACQUIRED, TESTING, VERIFIED
-  codeSubmitted  String?  @db.Text
-  timeTaken      Int      @default(0)
-}
-
-model Log {
+model CreditLog {
   id        String   @id @default(uuid())
-  type      String   // 'BID', 'SECURITY', 'SYSTEM'
-  message   String
-  team      Team?    @relation(fields: [teamId], references: [id])
-  teamId    String?
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  amount    Int
+  reason    String
   createdAt DateTime @default(now())
+}
+
+model Snippet {
+  id           String       @id @default(uuid())
+  title        String
+  category     Category
+  buggyCode    String       @db.Text
+  solution     String       @db.Text
+  hiddenInput  String?      @db.Text
+  expected     String?      @db.Text
+  isActive     Boolean      @default(true)
+  order        Int          @default(0)
+  bids         Bid[]
+  submissions  Submission[]
+}
+
+model Bid {
+  id        String   @id @default(uuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  snippetId String
+  snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  amount    Int
+  won       Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Submission {
+  id         String           @id @default(uuid())
+  teamId     String
+  team       Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  snippetId  String
+  snippet    Snippet          @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  code       String           @db.Text
+  status     SubmissionStatus @default(ACQUIRED)
+  stdout     String?          @db.Text
+  stderr     String?          @db.Text
+  solverName String?
+  solverRole String?
+  createdAt  DateTime         @default(now())
 }

@@ -1,0 +1,59 @@
+DB: postgresql://postgres:piyusha123@127.0.0.1:5432/codeheist?sslmode=disable
+
+ALL TABLES:
+  public.Bid
+  public.CreditLog
+  public.Member
+  public.Snippet
+  public.Submission
+  public.Team
+  public._prisma_migrations
+
+RAW SQL Team:
+  Count: 12
+  55ab463c-782c-456c-94ef-2fea4703e10b | Aegis Command | AEGIS_ADMIN
+  77cdbe66-2604-437e-b476-1763e24361d0 | Phantom Unit | PHANTOM_77
+  e9e14192-8115-4e56-93c0-715230e9a6c0 | Zero Day | ZERO_DAY_01
+  da0b3a9a-68d5-48d5-a706-a144ac2c7772 | Ghost Protocol | GHOST_PROTO
+  2ffc1ac9-2805-476f-9440-f4f7d4b530e9 | CodeCraft Web team | WebTeam
+  a357d3b9-e6db-436c-ae49-63419a5723ea | Web Team | webteam
+  3d105f0f-dca5-4cfa-8ec5-530af8cee709 | Test Squad 1773998732017 | TEST_1773998732017
+  c1e8dee0-9626-427b-9928-58e9292d3c3b | Test Squad 1773998769705 | TEST_1773998769705
+  d123ff07-14bf-4168-9c0c-2e1845e77303 | DirectTest | DIRECT_TEST_1
+  575a936e-d21d-4159-8a84-5e0c3ca5559d | Shadow Unit | SHADOW_99
+  db5a6db3-7c07-49f8-b360-0c420a20f4ac | web team | webteam100
+  9b2f096a-9b2f-498e-9560-e534e6458eb3 | PrismaTestTeam | PRISMA_TEST_1
+
+PRISMA findMany:
+  Count: 12
+  55ab463c-782c-456c-94ef-2fea4703e10b | Aegis Command | AEGIS_ADMIN
+  77cdbe66-2604-437e-b476-1763e24361d0 | Phantom Unit | PHANTOM_77
+  e9e14192-8115-4e56-93c0-715230e9a6c0 | Zero Day | ZERO_DAY_01
+  da0b3a9a-68d5-48d5-a706-a144ac2c7772 | Ghost Protocol | GHOST_PROTO
+  2ffc1ac9-2805-476f-9440-f4f7d4b530e9 | CodeCraft Web team | WebTeam
+  a357d3b9-e6db-436c-ae49-63419a5723ea | Web Team | webteam
+  3d105f0f-dca5-4cfa-8ec5-530af8cee709 | Test Squad 1773998732017 | TEST_1773998732017
+  c1e8dee0-9626-427b-9928-58e9292d3c3b | Test Squad 1773998769705 | TEST_1773998769705
+  d123ff07-14bf-4168-9c0c-2e1845e77303 | DirectTest | DIRECT_TEST_1
+  575a936e-d21d-4159-8a84-5e0c3ca5559d | Shadow Unit | SHADOW_99
+  db5a6db3-7c07-49f8-b360-0c420a20f4ac | web team | webteam100
+  9b2f096a-9b2f-498e-9560-e534e6458eb3 | PrismaTestTeam | PRISMA_TEST_1
+
+PRISMA creating TestDiag...
+  Created: 7b73b187-6562-4ca8-a94c-9e49080fe54c | TestDiag_1773999801781
+
+RAW SQL after Prisma insert:
+  Count: 13
+  55ab463c-782c-456c-94ef-2fea4703e10b | Aegis Command | AEGIS_ADMIN
+  77cdbe66-2604-437e-b476-1763e24361d0 | Phantom Unit | PHANTOM_77
+  e9e14192-8115-4e56-93c0-715230e9a6c0 | Zero Day | ZERO_DAY_01
+  da0b3a9a-68d5-48d5-a706-a144ac2c7772 | Ghost Protocol | GHOST_PROTO
+  2ffc1ac9-2805-476f-9440-f4f7d4b530e9 | CodeCraft Web team | WebTeam
+  a357d3b9-e6db-436c-ae49-63419a5723ea | Web Team | webteam
+  3d105f0f-dca5-4cfa-8ec5-530af8cee709 | Test Squad 1773998732017 | TEST_1773998732017
+  c1e8dee0-9626-427b-9928-58e9292d3c3b | Test Squad 1773998769705 | TEST_1773998769705
+  d123ff07-14bf-4168-9c0c-2e1845e77303 | DirectTest | DIRECT_TEST_1
+  575a936e-d21d-4159-8a84-5e0c3ca5559d | Shadow Unit | SHADOW_99
+  db5a6db3-7c07-49f8-b360-0c420a20f4ac | web team | webteam100
+  9b2f096a-9b2f-498e-9560-e534e6458eb3 | PrismaTestTeam | PRISMA_TEST_1
+  7b73b187-6562-4ca8-a94c-9e49080fe54c | TestDiag_1773999801781 | DIAG_1773999801781
