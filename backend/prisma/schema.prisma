@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../prisma/generated-client"
 }
 
 datasource db {
@@ -87,14 +88,16 @@ model Bid {
 }
 
 model Submission {
-  id        String           @id @default(uuid())
-  teamId    String
-  team      Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  snippetId String
-  snippet   Snippet          @relation(fields: [snippetId], references: [id], onDelete: Cascade)
-  code      String           @db.Text
-  status    SubmissionStatus @default(ACQUIRED)
-  stdout    String?          @db.Text
-  stderr    String?          @db.Text
-  createdAt DateTime         @default(now())
+  id         String           @id @default(uuid())
+  teamId     String
+  team       Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  snippetId  String
+  snippet    Snippet          @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  code       String           @db.Text
+  status     SubmissionStatus @default(ACQUIRED)
+  stdout     String?          @db.Text
+  stderr     String?          @db.Text
+  solverName String?
+  solverRole String?
+  createdAt  DateTime         @default(now())
 }

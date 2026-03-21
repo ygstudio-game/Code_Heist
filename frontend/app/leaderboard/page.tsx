@@ -5,8 +5,10 @@ import { fetchWithAuth } from '@/lib/api';
 import { Trophy, TrendingUp, Users, Target, Shield, ArrowUpRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
+import { Team } from '@/types';
+
 export default function LeaderboardPage() {
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function LeaderboardPage() {
         if (res.ok) {
           const data = await res.json();
           // Sort teams by credits descending
-          const sorted = (Array.isArray(data) ? data : []).sort((a, b) => (b.credits || 0) - (a.credits || 0));
+          const sorted = (Array.isArray(data) ? data : []).sort((a: Team, b: Team) => (b.credits || 0) - (a.credits || 0));
           setTeams(sorted);
         }
       } catch (error) {
@@ -125,7 +127,7 @@ export default function LeaderboardPage() {
   );
 }
 
-function HighlightCard({ icon, label, value }: any) {
+function HighlightCard({ icon, label, value }: { icon: React.ReactNode, label: string, value: string | number }) {
   return (
     <div className="terminal-card border-white/5 flex flex-col gap-6 group hover:translate-y-[-2px] transition-all text-left">
       <div className="flex items-center justify-between relative z-10">

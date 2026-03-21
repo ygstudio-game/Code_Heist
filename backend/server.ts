@@ -7,6 +7,7 @@ import pool from './config/db';
 import authRoutes from './routes/authRoutes';
 import creditsRoutes from './routes/creditsRoutes';
 import teamRoutes from './routes/teamRoutes';
+import codeRoutes from './routes/codeRoutes';
 
 const app: Application = express();
 const httpServer = createServer(app);
@@ -29,6 +30,7 @@ app.set('io', io);
 app.use('/api/auth', authRoutes);
 app.use('/api/credits', creditsRoutes);
 app.use('/api/teams', teamRoutes);
+app.use('/api/code', codeRoutes);
 
 // 4. Start Sequence
 const PORT = process.env.PORT || 5000;

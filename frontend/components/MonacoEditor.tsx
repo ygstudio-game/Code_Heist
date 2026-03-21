@@ -16,7 +16,7 @@ export default function MonacoEditor({
   onCodeChange 
 }: MonacoEditorProps) {
   const [strikes, setStrikes] = useState(0);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<unknown>(null);
   const monacoRef = useRef<Monaco | null>(null);
 
   // Anti-Cheat: Tab Switching Detection

@@ -9,7 +9,7 @@ interface CreditDisplayProps {
 export default function CreditDisplay({ amount }: CreditDisplayProps) {
   const [displayValue, setDisplayValue] = useState(amount);
   const [isDropping, setIsDropping] = useState(false);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
   const startValueRef = useRef(amount);
 
   useEffect(() => {

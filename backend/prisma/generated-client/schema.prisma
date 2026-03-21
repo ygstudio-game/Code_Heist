@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../prisma/generated-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  // url removed for Prisma v7, handled in prisma.config.ts
+}
+
+enum Role {
+  ADMIN
+  TEAM
+  SPECTATOR
+}
+
+enum Category {
+  CP
+  WEB
+  C
+  PYTHON
+}
+
+enum SubmissionStatus {
+  ACQUIRED
+  TESTING
+  VERIFIED
+  FAILED
+}
+
+model Team {
+  id           String       @id @default(uuid())
+  name         String       @unique
+  accessKey    String       @unique
+  password     String
+  credits      Int          @default(1000)
+  role         Role         @default(TEAM)
+  isEliminated Boolean      @default(false)
+  strikes      Int          @default(0)
+  lastStrikeAt DateTime?
+  members      Member[]
+  creditLogs   CreditLog[]
+  bids         Bid[]
+  submissions  Submission[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Member {
+  id     String @id @default(uuid())
+  name   String
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+model CreditLog {
+  id        String   @id @default(uuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  amount    Int
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model Snippet {
+  id          String       @id @default(uuid())
+  title       String
+  category    Category
+  buggyCode   String       @db.Text
+  solution    String       @db.Text
+  hiddenInput String?      @db.Text
+  expected    String?      @db.Text
+  isActive    Boolean      @default(true)
+  order       Int          @default(0)
+  bids        Bid[]
+  submissions Submission[]
+}
+
+model Bid {
+  id        String   @id @default(uuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  snippetId String
+  snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  amount    Int
+  won       Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Submission {
+  id         String           @id @default(uuid())
+  teamId     String
+  team       Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  snippetId  String
+  snippet    Snippet          @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  code       String           @db.Text
+  status     SubmissionStatus @default(ACQUIRED)
+  stdout     String?          @db.Text
+  stderr     String?          @db.Text
+  solverName String?
+  solverRole String?
+  createdAt  DateTime         @default(now())
+}

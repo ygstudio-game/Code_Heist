@@ -52,7 +52,7 @@ export default function TeamCard({ team }: TeamCardProps) {
       </div>
 
       <div className="bg-[#0B0D14] p-3 flex justify-between items-center text-[8px] font-geist-mono text-text/30 uppercase tracking-[2px]">
-        <span>// Sector: {team.role === 'ADMIN' ? 'Command' : 'Infiltration'}</span>
+        <span>{`// Sector: ${team.role === 'ADMIN' ? 'Command' : 'Infiltration'}`}</span>
         <button className="text-primary/40 hover:text-primary transition-colors cursor-pointer">View Dossier</button>
       </div>
     </div>

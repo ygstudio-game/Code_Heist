@@ -6,14 +6,20 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Shield, LayoutDashboard, Trophy, LogOut, Terminal } from 'lucide-react';
 import { clearAuthToken } from '@/lib/api';
 
+import { Team } from '@/types';
+
 export default function Navbar() {
-  const [team, setTeam] = useState<any>(null);
+  const [team, setTeam] = useState<Team | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
     const savedTeam = localStorage.getItem('team');
-    if (savedTeam) setTeam(JSON.parse(savedTeam));
+    if (savedTeam && !team) {
+      setTimeout(() => {
+        setTeam(JSON.parse(savedTeam));
+      }, 0);
+    }
   }, []);
 
   const handleLogout = () => {
@@ -84,7 +90,7 @@ export default function Navbar() {
   );
 }
 
-function NavLink({ href, children, icon, active, variant = 'default' }: any) {
+function NavLink({ href, children, icon, active, variant = 'default' }: { href: string, children: React.ReactNode, icon: React.ReactNode, active: boolean, variant?: string }) {
   const baseStyles = "flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all rounded-sm border";
   const activeStyles = active 
     ? "bg-primary/10 border-primary/40 text-primary shadow-[0_0_10px_rgba(0,229,255,0.1)]" 

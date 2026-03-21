@@ -134,7 +134,7 @@ export default function RegisterPage() {
   );
 }
 
-function InputField({ label, value, onChange, type = 'text', placeholder }: any) {
+function InputField({ label, value, onChange, type = 'text', placeholder }: { label: string, value: string, onChange: (val: string) => void, type?: string, placeholder: string }) {
   return (
     <div className="space-y-2">
       <label className="text-primary/70 text-[9px] font-bold uppercase tracking-[3px]">{label}</label>

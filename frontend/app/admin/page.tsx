@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react';
 import TeamCard from '@/components/TeamCard';
 import { fetchWithAuth } from '@/lib/api';
-import { Terminal, Users, Play, Pause, RefreshCw, AlertTriangle, Shield, Activity, TrendingUp } from 'lucide-react';
+import { Users, RefreshCw, AlertTriangle, Activity, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import BootSequence from '@/components/BootSequence';
 
+import { Team } from '@/types';
+
 export default function AdminDashboard() {
-  const [teams, setTeams] = useState<any[]>([]);
-  const [systemAlert, setSystemAlert] = useState('ALL SYSTEMS OPERATIONAL');
+  const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,10 +19,10 @@ export default function AdminDashboard() {
       try {
         const res = await fetchWithAuth('/teams');
         if (res.ok) {
-          const data = await res.json();
+          const data: Team[] = await res.json();
           setTeams(data);
         }
-      } catch (error) {
+      } catch {
         toast.error('Failed to sync with Aegis network');
       } finally {
         setLoading(false);
@@ -31,7 +32,6 @@ export default function AdminDashboard() {
   }, []);
 
   const handleGlobalPause = () => {
-    setSystemAlert('COMPETITION SUSPENDED BY COMMAND');
     toast.warning('GLOBAL KILL-SWITCH ACTIVATED');
   };
 
@@ -97,8 +97,8 @@ export default function AdminDashboard() {
   );
 }
 
-function AdminStatCard({ icon, label, value, color }: any) {
-  const colorMap: any = {
+function AdminStatCard({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string | number, color: string }) {
+  const colorMap: Record<string, string> = {
     primary: 'text-primary border-primary/20 bg-primary/5',
     success: 'text-success border-success/20 bg-success/5',
     danger: 'text-danger border-danger/20 bg-danger/5',
