@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';  
+import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 
 export const getCredits = async (req: any, res: Response) => {

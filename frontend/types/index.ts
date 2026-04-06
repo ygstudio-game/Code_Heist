@@ -9,6 +9,11 @@ export interface Team {
   isEliminated: boolean;
   role: 'TEAM' | 'ADMIN';
   members?: string[];
+  createdAt: string;
+  _count?: {
+    submissions: number;
+    bids: number;
+  };
   error?: string;
 }
 

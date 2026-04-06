@@ -2,19 +2,20 @@
 
 import { useState, useEffect } from 'react';
 
+const manifest = [
+  "INITIALIZING HEIST PROTOCOL...",
+  "CONNECTING TO SYSTEM...",
+  "LOADING CHALLENGES...",
+  "VERIFYING TEAM ACCESS...",
+  "PREPARING WORKSPACE...",
+  "LOADING ASSETS...",
+  "SYSTEM READY. GOOD LUCK."
+];
+
 export default function BootSequence() {
   const [visible, setVisible] = useState(true);
   const [logs, setLogs] = useState<string[]>([]);
   
-  const manifest = [
-    "INITIALIZING AEGIS PROTOCOL...",
-    "ETABLISHING ENCRYPTED UPLINK...",
-    "DECRYPTING SECTOR MANIFEST...",
-    "AUTHORIZING SUPERVISOR ACCESS...",
-    "LOADING TACTICAL WORKSPACE...",
-    "SCANNING FOR INTRUSIONS...",
-    "SYSTEM READY. HAPPY HUNTING."
-  ];
 
   useEffect(() => {
     let current = 0;
@@ -29,7 +30,7 @@ export default function BootSequence() {
     }, 150);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [manifest]);
 
   if (!visible) return null;
 

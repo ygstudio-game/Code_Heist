@@ -1,49 +1,29 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import Editor, { OnMount, Monaco } from '@monaco-editor/react';
 import { toast } from 'sonner';
+import { useAntiCheat } from '../hooks/useAntiCheat';
 
 interface MonacoEditorProps {
   code: string;
   language?: string;
   onCodeChange?: (code: string) => void;
+  readOnly?: boolean;
 }
 
 export default function MonacoEditor({ 
   code, 
   language = 'typescript', 
-  onCodeChange 
-}: MonacoEditorProps) {
-  const [strikes, setStrikes] = useState(0);
-  const editorRef = useRef<unknown>(null);
+  onCodeChange,
+  readOnly = false,
+  teamId = 'default',
+  phase = 'AUCTION'
+}: MonacoEditorProps & { teamId?: string, phase?: string }) {
+  const { breaches } = useAntiCheat(teamId, phase);
+  const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
 
-  // Anti-Cheat: Tab Switching Detection
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        setStrikes((prev) => {
-          const newStrikes = prev + 1;
-          if (newStrikes >= 3) {
-            toast.error('STRIKE 3: SECURITY BREACH DETECTED. TIME PENALTY APPLIED.', {
-              duration: 5000,
-              style: { background: '#FF2A55', color: '#fff' }
-            });
-            // Here you would call an API to apply server-side penalty
-          } else {
-            toast.warning(`WARNING: TAB SWITCH DETECTED. STRIKE ${newStrikes}/3`, {
-              style: { border: '1px solid #FF2A55', color: '#FF2A55' }
-            });
-          }
-          return newStrikes;
-        });
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
 
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -77,7 +57,6 @@ export default function MonacoEditor({
       if (!model) return;
 
       const position = editor.getPosition();
-      const selection = editor.getSelection();
       const content = model.getValue();
       
       const startTag = '[EDITABLE ZONE START]';
@@ -144,35 +123,39 @@ export default function MonacoEditor({
         }
       }
     ]);
+
+    // Apply the noise and scanline overlays manually if not in CSS
   };
 
   return (
-    <div className={`w-full h-full relative group ${strikes > 0 ? 'glitch-active' : ''}`}>
-      <div className="absolute inset-0 pointer-events-none z-10 opacity-20 bg-gradient-to-b from-transparent via-primary/5 to-transparent animate-pulse"></div>
+    <div className={`w-full h-full relative group ${breaches > 0 ? 'glitch-active' : ''} clip-edge-tl`}>
+      <div className="absolute inset-0 pointer-events-none z-10 scanlines-overlay opacity-30"></div>
+      <div className="absolute inset-0 pointer-events-none z-10 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"></div>
       <Editor
         height="100%"
         language={language}
         value={code}
         theme="aegis-dark"
+        onChange={(val) => onCodeChange && onCodeChange(val || '')}
         onMount={handleEditorMount}
-        onChange={(val) => onCodeChange?.(val || '')}
         options={{
           minimap: { enabled: false },
           fontSize: 14,
-          fontFamily: 'Geist Mono',
-          lineHeight: 22,
+          fontFamily: 'JetBrains Mono, monospace',
+          lineHeight: 24,
+          padding: { top: 20, bottom: 20 },
           scrollBeyondLastLine: false,
-          cursorStyle: 'block',
+          smoothScrolling: true,
           cursorBlinking: 'smooth',
-          renderLineHighlight: 'all',
-          padding: { top: 20 },
+          cursorSmoothCaretAnimation: 'on',
+          readOnly: readOnly,
           contextmenu: false,
         }}
       />
       <div className="absolute top-2 right-4 z-20 flex gap-2">
-        {strikes > 0 && (
+        {breaches > 0 && (
           <div className="bg-danger/20 border border-danger text-danger px-2 py-0.5 text-[8px] font-bold uppercase animate-pulse">
-            Violation Detected (S-{strikes})
+            Violation Detected (S-{breaches})
           </div>
         )}
       </div>
