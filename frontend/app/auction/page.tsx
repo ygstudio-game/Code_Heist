@@ -3,18 +3,22 @@
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Timer, Gavel, Shield, Terminal as TerminalIcon, TrendingUp, Users } from 'lucide-react';
+import { useAuction, AuctionBid } from '@/hooks/useAuction';
+import { toast } from 'sonner';
+import MonacoEditor from '@/components/MonacoEditor';
 
 export default function AuctionPage() {
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes mock
-  const [currentBid] = useState(1500);
-  const [highestBidder] = useState("PHANTOM_77");
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const { 
+    active, 
+    auction, 
+    history, 
+    isLoading, 
+    inactivityTimeLeft,
+    placeBid 
+  } = useAuction();
+  
+  const [bidAmount, setBidAmount] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -22,159 +26,226 @@ export default function AuctionPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const currentBid = auction?.highestBid?.amount || 0;
+  const highestBidder = auction?.highestBid?.team.name || "NO BIDS YET";
+  const minIncrease = currentBid === 0 ? 250 : 50; 
+  const recommendedBid = currentBid === 0 ? 250 : currentBid + minIncrease;
+
+  const handleBidSubmit = async (customAmount?: number) => {
+    const amount = customAmount || parseInt(bidAmount);
+    if (isNaN(amount) || amount < recommendedBid) {
+      toast.error(`MINIMUM BID REQUIRED: ${recommendedBid} CR`);
+      return;
+    }
+    
+    setIsSubmitting(true);
+    const success = await placeBid(amount);
+    if (success) setBidAmount('');
+    setIsSubmitting(false);
+  };
+
+  useEffect(() => {
+    if (active && auction && !bidAmount) {
+      setBidAmount(recommendedBid.toString());
+    }
+  }, [active, auction, recommendedBid, bidAmount]);
+
   return (
-    <div className="min-h-screen bg-background text-text">
+    <div className="min-h-screen bg-background text-text font-space">
        <div className="scanline"></div>
        <Navbar />
        
-       <main className="max-w-7xl mx-auto px-6 py-12 space-y-12">
-          {/* Header Section */}
+       <main className="max-w-7xl mx-auto px-6 py-12 space-y-12 pt-32">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/5 pb-8">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-primary font-mono text-[10px] tracking-[4px] uppercase">
+              <div className="flex items-center gap-2 text-primary font-mono text-sm font-semibold uppercase">
                 <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                Uplink Active // Bidding War v4.0
+                Live Problem Auction
               </div>
-              <h1 className="text-5xl font-black uppercase tracking-tighter italic">
-                Aegis <span className="text-white/20">Auction</span>
+              <h1 className="text-4xl font-bold uppercase tracking-tight">
+                Problem <span className="text-white/20">Bidding</span>
               </h1>
             </div>
             
             <div className="flex gap-4">
-               <div className="terminal-card py-2 px-6 flex items-center gap-4">
-                  <Timer className="text-primary" size={20} />
+               <div className="terminal-card py-2 px-6 flex items-center gap-4 border-primary/20 bg-primary/5">
+                  <Timer className={active ? "text-primary animate-pulse" : "text-text/30"} size={20} />
                   <div>
                     <p className="text-[10px] text-white/30 uppercase font-mono leading-none">Time Remaining</p>
-                    <p className="text-2xl font-black text-primary font-mono">{formatTime(timeLeft)}</p>
-                  </div>
-               </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left: Current Snippet Info */}
-            <div className="lg:col-span-2 space-y-8">
-              <div className="terminal-card min-h-[400px] flex flex-col justify-between group">
-                <div className="space-y-6">
-                  <div className="flex justify-between items-start">
-                    <div className="inline-block px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-[10px] font-mono uppercase tracking-widest">
-                      Snippet #042 // High-Level Kernel Vulnerability
-                    </div>
-                    <Shield className="text-white/10" size={32} />
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h2 className="text-3xl font-bold uppercase tracking-tight text-white/90">
-                      Buffer Overflow Payload [C++]
-                    </h2>
-                    <p className="text-white/40 leading-relaxed max-w-xl">
-                      A critical exploit targeting the system&apos;s memory management. 
-                      Acquiring this fragment grants significant leverage in the upcoming Heist.
+                    <p className={`text-2xl font-black font-mono ${active && auction?.timeLeft && auction.timeLeft <= 10 ? 'text-danger animate-pulse' : 'text-primary'}`}>
+                      {active ? formatTime(auction?.timeLeft || 0) : '0:00'}
                     </p>
                   </div>
-                </div>
-
-                <div className="mt-12 bg-black/40 border border-white/5 p-6 rounded-sm font-geist-mono text-sm leading-relaxed overflow-x-auto">
-                   <pre className="text-primary/70">
-{`void exploit(char *target) {
-  char buffer[512];
-  // VULNERABILITY DETECTED
-  memcpy(buffer, target, strlen(target)); 
-  system(buffer);
-}`}
-                   </pre>
-                </div>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 <StatCard icon={<TrendingUp size={16} />} label="Total Bids" value="48" />
-                 <StatCard icon={<Users size={16} />} label="Active Cells" value="12" />
-                 <StatCard icon={<TerminalIcon size={16} />} label="Encryption" value="AES-256" />
-              </div>
-            </div>
-
-            {/* Right: Bidding Console */}
-            <div className="space-y-8">
-              <div className="terminal-card border-primary/20 space-y-8">
-                <div className="text-center space-y-2">
-                  <p className="text-[10px] text-white/40 uppercase font-mono tracking-[3px]">Current Valuation</p>
-                  <p className="text-6xl font-black text-white italic tracking-tighter">
-                    {currentBid}<span className="text-primary font-mono text-xl ml-2">CR</span>
-                  </p>
-                  <div className="flex items-center justify-center gap-2 text-[10px] text-success/60 font-mono uppercase bg-success/5 py-1 rounded-full">
-                     <TrendingUp size={12} /> +150 since last update
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                   <div className="flex justify-between items-center text-xs uppercase tracking-widest">
-                      <span className="text-white/30">High Bidder</span>
-                      <span className="text-primary font-bold">{highestBidder}</span>
-                   </div>
-                   <div className="flex justify-between items-center text-xs uppercase tracking-widest">
-                      <span className="text-white/30">Min Increase</span>
-                      <span className="text-white/90">100 CR</span>
-                   </div>
-                </div>
-
-                <div className="space-y-4 mt-8">
-                   <div className="relative">
-                      <input 
-                        type="number" 
-                        placeholder="ENTER BID AMOUNT..." 
-                        className="w-full bg-black/60 border border-white/10 p-4 text-center font-mono text-xl focus:border-primary/50 outline-none transition-all placeholder:text-white/10"
-                      />
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 font-mono text-[10px]">AMT</div>
-                   </div>
-                   <button className="terminal-button w-full py-4 text-xl flex items-center justify-center gap-3 group">
-                      <Gavel size={24} className="group-hover:rotate-[-45deg] transition-transform" />
-                      SUBMIT BID
-                   </button>
-                </div>
-              </div>
-
-              {/* History list */}
-              <div className="terminal-card p-0 overflow-hidden">
-                 <div className="px-6 py-4 border-b border-white/5 bg-white/5 text-[10px] font-mono uppercase tracking-[3px] text-white/40">
-                   Bidding History
+               </div>
+               {inactivityTimeLeft !== null && inactivityTimeLeft > 0 && (
+                 <div className="terminal-card py-2 px-6 flex items-center gap-4 border-danger/30 bg-danger/5 animate-pulse">
+                    <Gavel className="text-danger" size={20} />
+                    <div>
+                      <p className="text-[10px] text-danger/60 uppercase font-mono leading-none">Closing In</p>
+                      <p className="text-2xl font-black font-mono text-danger">
+                        {inactivityTimeLeft}s
+                      </p>
+                    </div>
                  </div>
-                 <div className="divide-y divide-white/5">
-                   <HistoryItem user="PHANTOM_77" amount={1500} time="2m ago" highlight />
-                   <HistoryItem user="ZERO_DAY" amount={1400} time="5m ago" />
-                   <HistoryItem user="GHOST_PROTO" amount={1350} time="8m ago" />
-                   <HistoryItem user="PHANTOM_77" amount={1200} time="12m ago" />
-                 </div>
-              </div>
+               )}
             </div>
           </div>
+
+          {isLoading ? (
+            <div className="h-64 flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : !active || !auction ? (
+            <div className="terminal-card min-h-[400px] flex items-center justify-center border-white/5 bg-white/[0.02]">
+              <div className="text-center space-y-6 max-w-lg">
+                <Shield className="w-16 h-16 text-white/10 mx-auto" />
+                <h2 className="text-2xl font-bold text-white/40">Waiting for Auction</h2>
+                <p className="text-text/60 text-base leading-relaxed">
+                  No active problem auction at the moment.<br/>
+                  Please wait for the admin to start the next round.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch pt-4">
+              {/* Left Column: Problem Details & Code Viewer */}
+              <div className="col-span-1 md:col-span-12 lg:col-span-7 flex flex-col gap-6">
+                <div className="space-y-6 relative z-10 animate-in fade-in slide-in-from-left-8 duration-500 delay-75">
+                  <div className="flex justify-between items-start">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-sm font-semibold uppercase">
+                        Problem ID: {auction.snippet.id.slice(0, 8)}
+                    </div>
+                    {auction.isPreview && (
+                      <div className="px-4 py-1 bg-warning/10 border border-warning/20 text-warning text-sm font-bold uppercase animate-pulse">
+                        Preview Round - Bidding Locked
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-12 p-4 bg-primary/5 border border-primary/10 flex items-center justify-between relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                        <Users size={14} />
+                      </div>
+                      <div>
+                        <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest">Active High Bidder</p>
+                        <p className="text-sm font-bold text-white uppercase">{highestBidder}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest">Global Current Bid</p>
+                       <p className="text-xl font-black text-primary font-mono lowercase">{currentBid} <span className="text-[10px]">cr</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Bidding Console & History */}
+              <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500 delay-150">
+                <div className={`terminal-card space-y-8 p-8 ${auction.isPreview ? 'border-warning/20 bg-warning/5' : 'border-primary/20 bg-primary/5'}`}>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-white uppercase">Bid on Problem</h3>
+                    <p className="text-sm text-text/60">Credits required to purchase this problem.</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="relative group">
+                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 font-mono text-sm">CR</div>
+                       <input 
+                         type="number"
+                         value={bidAmount}
+                         onChange={(e) => setBidAmount(e.target.value)}
+                         placeholder={recommendedBid.toString()}
+                         className="w-full bg-black/60 border border-white/10 p-5 pl-12 text-3xl font-black font-mono text-primary outline-none focus:border-primary/50 transition-all placeholder:text-white/10"
+                       />
+                       <div className="flex justify-between mt-2 font-mono text-[9px] uppercase tracking-widest opacity-40">
+                          <span>Min: {currentBid === 0 ? '250' : '+50'} Units</span>
+                          <span>Next: {recommendedBid} CR</span>
+                       </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <button 
+                         onClick={() => handleBidSubmit(recommendedBid)}
+                         disabled={isSubmitting || auction.isPreview}
+                         className="px-4 py-2 bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all text-white/60"
+                      >
+                         Min Bid ({recommendedBid})
+                      </button>
+                      <button 
+                         onClick={() => handleBidSubmit(recommendedBid + 100)}
+                         disabled={isSubmitting || auction.isPreview}
+                         className="px-4 py-2 bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all text-white/60"
+                      >
+                         Add +100
+                      </button>
+                    </div>
+
+                    <button 
+                      onClick={() => handleBidSubmit()}
+                      disabled={isSubmitting || auction.isPreview || !bidAmount || parseInt(bidAmount) < recommendedBid}
+                      className="terminal-button w-full py-5 text-xl flex items-center justify-center gap-3 group disabled:opacity-20 disabled:grayscale transition-all shadow-[0_0_30px_rgba(0,229,255,0.1)] hover:shadow-[0_0_40px_rgba(0,229,255,0.2)]"
+                    >
+                      <Gavel size={24} className="group-hover:rotate-[-45deg] transition-transform" />
+                      <span className="relative z-10 uppercase font-black italic tracking-wider">Place Bid</span>
+                    </button>
+                  </div>
+
+                  {auction.isPreview && (
+                    <div className="p-4 border border-warning/20 bg-warning/10 text-sm text-center text-warning/80 font-bold uppercase">
+                       Bidding is temporarily locked for preview
+                    </div>
+                  )}
+                </div>
+
+                {/* History Section */}
+                <div className="terminal-card p-0 border-white/5 overflow-hidden">
+                   <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                     <span className="text-sm font-bold uppercase text-white/60">Bid History</span>
+                     <TrendingUp size={16} className="text-primary/60" />
+                   </div>
+                   <div className="divide-y divide-white/5 max-h-[300px] overflow-y-auto custom-scrollbar">
+                     {history && history.length > 0 ? (
+                       history.map((bid: AuctionBid, idx: number) => (
+                         <div key={bid.id} className={`px-6 py-4 flex justify-between items-center group transition-colors ${idx === 0 ? 'bg-primary/[0.03]' : 'hover:bg-white/[0.01]'}`}>
+                           <div className="space-y-1">
+                             <p className={`text-sm font-bold uppercase italic tracking-tight ${idx === 0 ? 'text-primary' : 'text-white/80'}`}>{bid.team.name}</p>
+                             <p className="text-[8px] text-white/20 font-mono">{new Date(bid.createdAt).toLocaleTimeString()}</p>
+                           </div>
+                           <div className={`text-lg font-black font-mono ${idx === 0 ? 'text-primary glow-text' : 'text-white/40'}`}>
+                             {bid.amount} <span className="text-[9px]">CR</span>
+                           </div>
+                         </div>
+                       ))
+                     ) : (
+                       <div className="p-12 text-center text-xs text-text/20 font-mono uppercase tracking-widest italic">
+                         No Bids Synchronized...
+                       </div>
+                     )}
+                   </div>
+                </div>
+              </div>
+            </div>
+          )}
        </main>
+
+       <style jsx global>{`
+          .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+          .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+          .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); }
+       `}</style>
     </div>
   );
 }
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
   return (
-    <div className="terminal-card p-4 space-y-2 bg-white/5 border-white/5">
-       <div className="flex items-center gap-2 text-[10px] text-white/30 uppercase font-mono leading-none">
+    <div className="p-4 bg-white/[0.02] border border-white/5 space-y-3 hover:border-primary/20 transition-all">
+       <div className="flex items-center gap-2 text-[8px] text-text/40 uppercase font-mono tracking-[2px]">
           {icon}
           {label}
        </div>
-       <div className="text-2xl font-black text-white/80">{value}</div>
-    </div>
-  );
-}
-
-function HistoryItem({ user, amount, time, highlight = false }: { user: string, amount: number, time: string, highlight?: boolean }) {
-  return (
-    <div className={`px-6 py-3 flex justify-between items-center ${highlight ? 'bg-primary/5' : ''}`}>
-       <div className="space-y-1">
-          <p className={`text-xs font-bold leading-none ${highlight ? 'text-primary' : 'text-white/70'}`}>{user}</p>
-          <p className="text-[9px] text-white/20 uppercase font-mono">{time}</p>
-       </div>
-       <div className={`font-mono text-sm ${highlight ? 'text-primary glow-text' : 'text-white/50'}`}>
-          {amount} CR
-       </div>
+       <div className="text-xl font-bold text-white tracking-tight uppercase italic">{value}</div>
     </div>
   );
 }

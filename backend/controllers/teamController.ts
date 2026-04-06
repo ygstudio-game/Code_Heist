@@ -4,11 +4,22 @@ import prisma from '../lib/prisma';
 export const getAllTeams = async (req: Request, res: Response) => {
   try {
     const teams = await prisma.team.findMany({
+      where: { role: 'TEAM' },
       include: {
         members: true,
-      },
-      orderBy: {
-        credits: 'desc',
+        submissions: {
+          select: {
+            status: true,
+            createdAt: true,
+            snippetId: true,
+            snippet: {
+              select: {
+                id: true,
+                category: true,
+              }
+            }
+          }
+        }
       },
     });
 

@@ -42,7 +42,7 @@ export default function LoginPage() {
       } else {
         toast.error(data.error || 'ACCESS DENIED');
       }
-    } catch (error) {
+    } catch {
       toast.error('CONNECTION INTERRUPTED');
     } finally {
       setIsLoading(false);

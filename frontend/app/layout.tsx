@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Space_Grotesk } from "next/font/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const spaceGrotesk = Space_Grotesk({
+const jetbrainsMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  variable: "--font-space",
 });
 
 const geistMono = Geist_Mono({
@@ -25,6 +24,7 @@ export const metadata: Metadata = {
 
 import Cursor from "@/components/Cursor";
 import { Toaster } from 'sonner';
+import { SocketProvider } from '@/context/SocketContext';
 
 export default function RootLayout({
   children,
@@ -36,9 +36,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased selection:bg-primary/30`}
       >
-        <Cursor />
-        <Toaster position="top-center" expand={false} richColors theme="dark" />
-        {children}
+        <SocketProvider>
+          <Cursor />
+          <Toaster position="top-center" expand={false} richColors theme="dark" />
+          {children}
+        </SocketProvider>
       </body>
     </html>
   );

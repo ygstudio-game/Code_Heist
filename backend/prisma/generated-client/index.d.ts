@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type Team = $Result.DefaultSelection<Prisma.$TeamPayload>
 /**
+ * Model SystemState
+ * 
+ */
+export type SystemState = $Result.DefaultSelection<Prisma.$SystemStatePayload>
+/**
  * Model Member
  * 
  */
@@ -43,6 +48,11 @@ export type Bid = $Result.DefaultSelection<Prisma.$BidPayload>
  * 
  */
 export type Submission = $Result.DefaultSelection<Prisma.$SubmissionPayload>
+/**
+ * Model AuctionRound
+ * 
+ */
+export type AuctionRound = $Result.DefaultSelection<Prisma.$AuctionRoundPayload>
 
 /**
  * Enums
@@ -76,6 +86,26 @@ export const SubmissionStatus: {
 
 export type SubmissionStatus = (typeof SubmissionStatus)[keyof typeof SubmissionStatus]
 
+
+export const AuctionStatus: {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+export type AuctionStatus = (typeof AuctionStatus)[keyof typeof AuctionStatus]
+
+
+export const GlobalPhase: {
+  AUCTION: 'AUCTION',
+  CODING: 'CODING',
+  VAULT: 'VAULT',
+  FINISHED: 'FINISHED'
+};
+
+export type GlobalPhase = (typeof GlobalPhase)[keyof typeof GlobalPhase]
+
 }
 
 export type Role = $Enums.Role
@@ -89,6 +119,14 @@ export const Category: typeof $Enums.Category
 export type SubmissionStatus = $Enums.SubmissionStatus
 
 export const SubmissionStatus: typeof $Enums.SubmissionStatus
+
+export type AuctionStatus = $Enums.AuctionStatus
+
+export const AuctionStatus: typeof $Enums.AuctionStatus
+
+export type GlobalPhase = $Enums.GlobalPhase
+
+export const GlobalPhase: typeof $Enums.GlobalPhase
 
 /**
  * ##  Prisma Client ʲˢ
@@ -222,6 +260,16 @@ export class PrismaClient<
   get team(): Prisma.TeamDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.systemState`: Exposes CRUD operations for the **SystemState** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SystemStates
+    * const systemStates = await prisma.systemState.findMany()
+    * ```
+    */
+  get systemState(): Prisma.SystemStateDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.member`: Exposes CRUD operations for the **Member** model.
     * Example usage:
     * ```ts
@@ -270,6 +318,16 @@ export class PrismaClient<
     * ```
     */
   get submission(): Prisma.SubmissionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.auctionRound`: Exposes CRUD operations for the **AuctionRound** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AuctionRounds
+    * const auctionRounds = await prisma.auctionRound.findMany()
+    * ```
+    */
+  get auctionRound(): Prisma.AuctionRoundDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -705,11 +763,13 @@ export namespace Prisma {
 
   export const ModelName: {
     Team: 'Team',
+    SystemState: 'SystemState',
     Member: 'Member',
     CreditLog: 'CreditLog',
     Snippet: 'Snippet',
     Bid: 'Bid',
-    Submission: 'Submission'
+    Submission: 'Submission',
+    AuctionRound: 'AuctionRound'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -725,7 +785,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "team" | "member" | "creditLog" | "snippet" | "bid" | "submission"
+      modelProps: "team" | "systemState" | "member" | "creditLog" | "snippet" | "bid" | "submission" | "auctionRound"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -800,6 +860,80 @@ export namespace Prisma {
           count: {
             args: Prisma.TeamCountArgs<ExtArgs>
             result: $Utils.Optional<TeamCountAggregateOutputType> | number
+          }
+        }
+      }
+      SystemState: {
+        payload: Prisma.$SystemStatePayload<ExtArgs>
+        fields: Prisma.SystemStateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SystemStateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SystemStateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>
+          }
+          findFirst: {
+            args: Prisma.SystemStateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SystemStateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>
+          }
+          findMany: {
+            args: Prisma.SystemStateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>[]
+          }
+          create: {
+            args: Prisma.SystemStateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>
+          }
+          createMany: {
+            args: Prisma.SystemStateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SystemStateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>[]
+          }
+          delete: {
+            args: Prisma.SystemStateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>
+          }
+          update: {
+            args: Prisma.SystemStateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>
+          }
+          deleteMany: {
+            args: Prisma.SystemStateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SystemStateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SystemStateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>[]
+          }
+          upsert: {
+            args: Prisma.SystemStateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SystemStatePayload>
+          }
+          aggregate: {
+            args: Prisma.SystemStateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSystemState>
+          }
+          groupBy: {
+            args: Prisma.SystemStateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SystemStateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SystemStateCountArgs<ExtArgs>
+            result: $Utils.Optional<SystemStateCountAggregateOutputType> | number
           }
         }
       }
@@ -1173,6 +1307,80 @@ export namespace Prisma {
           }
         }
       }
+      AuctionRound: {
+        payload: Prisma.$AuctionRoundPayload<ExtArgs>
+        fields: Prisma.AuctionRoundFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AuctionRoundFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AuctionRoundFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>
+          }
+          findFirst: {
+            args: Prisma.AuctionRoundFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AuctionRoundFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>
+          }
+          findMany: {
+            args: Prisma.AuctionRoundFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>[]
+          }
+          create: {
+            args: Prisma.AuctionRoundCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>
+          }
+          createMany: {
+            args: Prisma.AuctionRoundCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AuctionRoundCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>[]
+          }
+          delete: {
+            args: Prisma.AuctionRoundDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>
+          }
+          update: {
+            args: Prisma.AuctionRoundUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>
+          }
+          deleteMany: {
+            args: Prisma.AuctionRoundDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AuctionRoundUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AuctionRoundUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>[]
+          }
+          upsert: {
+            args: Prisma.AuctionRoundUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuctionRoundPayload>
+          }
+          aggregate: {
+            args: Prisma.AuctionRoundAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAuctionRound>
+          }
+          groupBy: {
+            args: Prisma.AuctionRoundGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AuctionRoundGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AuctionRoundCountArgs<ExtArgs>
+            result: $Utils.Optional<AuctionRoundCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1282,11 +1490,13 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     team?: TeamOmit
+    systemState?: SystemStateOmit
     member?: MemberOmit
     creditLog?: CreditLogOmit
     snippet?: SnippetOmit
     bid?: BidOmit
     submission?: SubmissionOmit
+    auctionRound?: AuctionRoundOmit
   }
 
   /* Types for Logging */
@@ -1371,6 +1581,7 @@ export namespace Prisma {
     creditLogs: number
     bids: number
     submissions: number
+    auctionWins: number
   }
 
   export type TeamCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1378,6 +1589,7 @@ export namespace Prisma {
     creditLogs?: boolean | TeamCountOutputTypeCountCreditLogsArgs
     bids?: boolean | TeamCountOutputTypeCountBidsArgs
     submissions?: boolean | TeamCountOutputTypeCountSubmissionsArgs
+    auctionWins?: boolean | TeamCountOutputTypeCountAuctionWinsArgs
   }
 
   // Custom InputTypes
@@ -1419,6 +1631,13 @@ export namespace Prisma {
     where?: SubmissionWhereInput
   }
 
+  /**
+   * TeamCountOutputType without action
+   */
+  export type TeamCountOutputTypeCountAuctionWinsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuctionRoundWhereInput
+  }
+
 
   /**
    * Count Type SnippetCountOutputType
@@ -1427,11 +1646,13 @@ export namespace Prisma {
   export type SnippetCountOutputType = {
     bids: number
     submissions: number
+    auctionRounds: number
   }
 
   export type SnippetCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bids?: boolean | SnippetCountOutputTypeCountBidsArgs
     submissions?: boolean | SnippetCountOutputTypeCountSubmissionsArgs
+    auctionRounds?: boolean | SnippetCountOutputTypeCountAuctionRoundsArgs
   }
 
   // Custom InputTypes
@@ -1459,6 +1680,44 @@ export namespace Prisma {
     where?: SubmissionWhereInput
   }
 
+  /**
+   * SnippetCountOutputType without action
+   */
+  export type SnippetCountOutputTypeCountAuctionRoundsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuctionRoundWhereInput
+  }
+
+
+  /**
+   * Count Type AuctionRoundCountOutputType
+   */
+
+  export type AuctionRoundCountOutputType = {
+    bids: number
+  }
+
+  export type AuctionRoundCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    bids?: boolean | AuctionRoundCountOutputTypeCountBidsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * AuctionRoundCountOutputType without action
+   */
+  export type AuctionRoundCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRoundCountOutputType
+     */
+    select?: AuctionRoundCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * AuctionRoundCountOutputType without action
+   */
+  export type AuctionRoundCountOutputTypeCountBidsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BidWhereInput
+  }
+
 
   /**
    * Models
@@ -1479,11 +1738,17 @@ export namespace Prisma {
   export type TeamAvgAggregateOutputType = {
     credits: number | null
     strikes: number | null
+    vaultTime: number | null
+    lifelinesUsed: number | null
+    lockPenalties: number | null
   }
 
   export type TeamSumAggregateOutputType = {
     credits: number | null
     strikes: number | null
+    vaultTime: number | null
+    lifelinesUsed: number | null
+    lockPenalties: number | null
   }
 
   export type TeamMinAggregateOutputType = {
@@ -1496,6 +1761,9 @@ export namespace Prisma {
     isEliminated: boolean | null
     strikes: number | null
     lastStrikeAt: Date | null
+    vaultTime: number | null
+    lifelinesUsed: number | null
+    lockPenalties: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1510,6 +1778,9 @@ export namespace Prisma {
     isEliminated: boolean | null
     strikes: number | null
     lastStrikeAt: Date | null
+    vaultTime: number | null
+    lifelinesUsed: number | null
+    lockPenalties: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1524,6 +1795,9 @@ export namespace Prisma {
     isEliminated: number
     strikes: number
     lastStrikeAt: number
+    vaultTime: number
+    lifelinesUsed: number
+    lockPenalties: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1533,11 +1807,17 @@ export namespace Prisma {
   export type TeamAvgAggregateInputType = {
     credits?: true
     strikes?: true
+    vaultTime?: true
+    lifelinesUsed?: true
+    lockPenalties?: true
   }
 
   export type TeamSumAggregateInputType = {
     credits?: true
     strikes?: true
+    vaultTime?: true
+    lifelinesUsed?: true
+    lockPenalties?: true
   }
 
   export type TeamMinAggregateInputType = {
@@ -1550,6 +1830,9 @@ export namespace Prisma {
     isEliminated?: true
     strikes?: true
     lastStrikeAt?: true
+    vaultTime?: true
+    lifelinesUsed?: true
+    lockPenalties?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1564,6 +1847,9 @@ export namespace Prisma {
     isEliminated?: true
     strikes?: true
     lastStrikeAt?: true
+    vaultTime?: true
+    lifelinesUsed?: true
+    lockPenalties?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1578,6 +1864,9 @@ export namespace Prisma {
     isEliminated?: true
     strikes?: true
     lastStrikeAt?: true
+    vaultTime?: true
+    lifelinesUsed?: true
+    lockPenalties?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1679,6 +1968,9 @@ export namespace Prisma {
     isEliminated: boolean
     strikes: number
     lastStrikeAt: Date | null
+    vaultTime: number | null
+    lifelinesUsed: number
+    lockPenalties: number
     createdAt: Date
     updatedAt: Date
     _count: TeamCountAggregateOutputType | null
@@ -1712,12 +2004,16 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: boolean
     lastStrikeAt?: boolean
+    vaultTime?: boolean
+    lifelinesUsed?: boolean
+    lockPenalties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     members?: boolean | Team$membersArgs<ExtArgs>
     creditLogs?: boolean | Team$creditLogsArgs<ExtArgs>
     bids?: boolean | Team$bidsArgs<ExtArgs>
     submissions?: boolean | Team$submissionsArgs<ExtArgs>
+    auctionWins?: boolean | Team$auctionWinsArgs<ExtArgs>
     _count?: boolean | TeamCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["team"]>
 
@@ -1731,6 +2027,9 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: boolean
     lastStrikeAt?: boolean
+    vaultTime?: boolean
+    lifelinesUsed?: boolean
+    lockPenalties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["team"]>
@@ -1745,6 +2044,9 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: boolean
     lastStrikeAt?: boolean
+    vaultTime?: boolean
+    lifelinesUsed?: boolean
+    lockPenalties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["team"]>
@@ -1759,16 +2061,20 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: boolean
     lastStrikeAt?: boolean
+    vaultTime?: boolean
+    lifelinesUsed?: boolean
+    lockPenalties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type TeamOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "accessKey" | "password" | "credits" | "role" | "isEliminated" | "strikes" | "lastStrikeAt" | "createdAt" | "updatedAt", ExtArgs["result"]["team"]>
+  export type TeamOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "accessKey" | "password" | "credits" | "role" | "isEliminated" | "strikes" | "lastStrikeAt" | "vaultTime" | "lifelinesUsed" | "lockPenalties" | "createdAt" | "updatedAt", ExtArgs["result"]["team"]>
   export type TeamInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     members?: boolean | Team$membersArgs<ExtArgs>
     creditLogs?: boolean | Team$creditLogsArgs<ExtArgs>
     bids?: boolean | Team$bidsArgs<ExtArgs>
     submissions?: boolean | Team$submissionsArgs<ExtArgs>
+    auctionWins?: boolean | Team$auctionWinsArgs<ExtArgs>
     _count?: boolean | TeamCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TeamIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1781,6 +2087,7 @@ export namespace Prisma {
       creditLogs: Prisma.$CreditLogPayload<ExtArgs>[]
       bids: Prisma.$BidPayload<ExtArgs>[]
       submissions: Prisma.$SubmissionPayload<ExtArgs>[]
+      auctionWins: Prisma.$AuctionRoundPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -1792,6 +2099,9 @@ export namespace Prisma {
       isEliminated: boolean
       strikes: number
       lastStrikeAt: Date | null
+      vaultTime: number | null
+      lifelinesUsed: number
+      lockPenalties: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["team"]>
@@ -2192,6 +2502,7 @@ export namespace Prisma {
     creditLogs<T extends Team$creditLogsArgs<ExtArgs> = {}>(args?: Subset<T, Team$creditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CreditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bids<T extends Team$bidsArgs<ExtArgs> = {}>(args?: Subset<T, Team$bidsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BidPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     submissions<T extends Team$submissionsArgs<ExtArgs> = {}>(args?: Subset<T, Team$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    auctionWins<T extends Team$auctionWinsArgs<ExtArgs> = {}>(args?: Subset<T, Team$auctionWinsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2230,6 +2541,9 @@ export namespace Prisma {
     readonly isEliminated: FieldRef<"Team", 'Boolean'>
     readonly strikes: FieldRef<"Team", 'Int'>
     readonly lastStrikeAt: FieldRef<"Team", 'DateTime'>
+    readonly vaultTime: FieldRef<"Team", 'Int'>
+    readonly lifelinesUsed: FieldRef<"Team", 'Int'>
+    readonly lockPenalties: FieldRef<"Team", 'Int'>
     readonly createdAt: FieldRef<"Team", 'DateTime'>
     readonly updatedAt: FieldRef<"Team", 'DateTime'>
   }
@@ -2721,6 +3035,30 @@ export namespace Prisma {
   }
 
   /**
+   * Team.auctionWins
+   */
+  export type Team$auctionWinsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    where?: AuctionRoundWhereInput
+    orderBy?: AuctionRoundOrderByWithRelationInput | AuctionRoundOrderByWithRelationInput[]
+    cursor?: AuctionRoundWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AuctionRoundScalarFieldEnum | AuctionRoundScalarFieldEnum[]
+  }
+
+  /**
    * Team without action
    */
   export type TeamDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2736,6 +3074,993 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: TeamInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SystemState
+   */
+
+  export type AggregateSystemState = {
+    _count: SystemStateCountAggregateOutputType | null
+    _min: SystemStateMinAggregateOutputType | null
+    _max: SystemStateMaxAggregateOutputType | null
+  }
+
+  export type SystemStateMinAggregateOutputType = {
+    id: string | null
+    currentPhase: $Enums.GlobalPhase | null
+    codingStartTime: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SystemStateMaxAggregateOutputType = {
+    id: string | null
+    currentPhase: $Enums.GlobalPhase | null
+    codingStartTime: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SystemStateCountAggregateOutputType = {
+    id: number
+    currentPhase: number
+    codingStartTime: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SystemStateMinAggregateInputType = {
+    id?: true
+    currentPhase?: true
+    codingStartTime?: true
+    updatedAt?: true
+  }
+
+  export type SystemStateMaxAggregateInputType = {
+    id?: true
+    currentPhase?: true
+    codingStartTime?: true
+    updatedAt?: true
+  }
+
+  export type SystemStateCountAggregateInputType = {
+    id?: true
+    currentPhase?: true
+    codingStartTime?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SystemStateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SystemState to aggregate.
+     */
+    where?: SystemStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SystemStates to fetch.
+     */
+    orderBy?: SystemStateOrderByWithRelationInput | SystemStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SystemStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SystemStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SystemStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SystemStates
+    **/
+    _count?: true | SystemStateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SystemStateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SystemStateMaxAggregateInputType
+  }
+
+  export type GetSystemStateAggregateType<T extends SystemStateAggregateArgs> = {
+        [P in keyof T & keyof AggregateSystemState]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSystemState[P]>
+      : GetScalarType<T[P], AggregateSystemState[P]>
+  }
+
+
+
+
+  export type SystemStateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SystemStateWhereInput
+    orderBy?: SystemStateOrderByWithAggregationInput | SystemStateOrderByWithAggregationInput[]
+    by: SystemStateScalarFieldEnum[] | SystemStateScalarFieldEnum
+    having?: SystemStateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SystemStateCountAggregateInputType | true
+    _min?: SystemStateMinAggregateInputType
+    _max?: SystemStateMaxAggregateInputType
+  }
+
+  export type SystemStateGroupByOutputType = {
+    id: string
+    currentPhase: $Enums.GlobalPhase
+    codingStartTime: Date | null
+    updatedAt: Date
+    _count: SystemStateCountAggregateOutputType | null
+    _min: SystemStateMinAggregateOutputType | null
+    _max: SystemStateMaxAggregateOutputType | null
+  }
+
+  type GetSystemStateGroupByPayload<T extends SystemStateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SystemStateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SystemStateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SystemStateGroupByOutputType[P]>
+            : GetScalarType<T[P], SystemStateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SystemStateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    currentPhase?: boolean
+    codingStartTime?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["systemState"]>
+
+  export type SystemStateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    currentPhase?: boolean
+    codingStartTime?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["systemState"]>
+
+  export type SystemStateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    currentPhase?: boolean
+    codingStartTime?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["systemState"]>
+
+  export type SystemStateSelectScalar = {
+    id?: boolean
+    currentPhase?: boolean
+    codingStartTime?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SystemStateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "currentPhase" | "codingStartTime" | "updatedAt", ExtArgs["result"]["systemState"]>
+
+  export type $SystemStatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SystemState"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      currentPhase: $Enums.GlobalPhase
+      codingStartTime: Date | null
+      updatedAt: Date
+    }, ExtArgs["result"]["systemState"]>
+    composites: {}
+  }
+
+  type SystemStateGetPayload<S extends boolean | null | undefined | SystemStateDefaultArgs> = $Result.GetResult<Prisma.$SystemStatePayload, S>
+
+  type SystemStateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SystemStateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SystemStateCountAggregateInputType | true
+    }
+
+  export interface SystemStateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SystemState'], meta: { name: 'SystemState' } }
+    /**
+     * Find zero or one SystemState that matches the filter.
+     * @param {SystemStateFindUniqueArgs} args - Arguments to find a SystemState
+     * @example
+     * // Get one SystemState
+     * const systemState = await prisma.systemState.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SystemStateFindUniqueArgs>(args: SelectSubset<T, SystemStateFindUniqueArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SystemState that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SystemStateFindUniqueOrThrowArgs} args - Arguments to find a SystemState
+     * @example
+     * // Get one SystemState
+     * const systemState = await prisma.systemState.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SystemStateFindUniqueOrThrowArgs>(args: SelectSubset<T, SystemStateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SystemState that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SystemStateFindFirstArgs} args - Arguments to find a SystemState
+     * @example
+     * // Get one SystemState
+     * const systemState = await prisma.systemState.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SystemStateFindFirstArgs>(args?: SelectSubset<T, SystemStateFindFirstArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SystemState that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SystemStateFindFirstOrThrowArgs} args - Arguments to find a SystemState
+     * @example
+     * // Get one SystemState
+     * const systemState = await prisma.systemState.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SystemStateFindFirstOrThrowArgs>(args?: SelectSubset<T, SystemStateFindFirstOrThrowArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SystemStates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SystemStateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SystemStates
+     * const systemStates = await prisma.systemState.findMany()
+     * 
+     * // Get first 10 SystemStates
+     * const systemStates = await prisma.systemState.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const systemStateWithIdOnly = await prisma.systemState.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SystemStateFindManyArgs>(args?: SelectSubset<T, SystemStateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SystemState.
+     * @param {SystemStateCreateArgs} args - Arguments to create a SystemState.
+     * @example
+     * // Create one SystemState
+     * const SystemState = await prisma.systemState.create({
+     *   data: {
+     *     // ... data to create a SystemState
+     *   }
+     * })
+     * 
+     */
+    create<T extends SystemStateCreateArgs>(args: SelectSubset<T, SystemStateCreateArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SystemStates.
+     * @param {SystemStateCreateManyArgs} args - Arguments to create many SystemStates.
+     * @example
+     * // Create many SystemStates
+     * const systemState = await prisma.systemState.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SystemStateCreateManyArgs>(args?: SelectSubset<T, SystemStateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SystemStates and returns the data saved in the database.
+     * @param {SystemStateCreateManyAndReturnArgs} args - Arguments to create many SystemStates.
+     * @example
+     * // Create many SystemStates
+     * const systemState = await prisma.systemState.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SystemStates and only return the `id`
+     * const systemStateWithIdOnly = await prisma.systemState.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SystemStateCreateManyAndReturnArgs>(args?: SelectSubset<T, SystemStateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SystemState.
+     * @param {SystemStateDeleteArgs} args - Arguments to delete one SystemState.
+     * @example
+     * // Delete one SystemState
+     * const SystemState = await prisma.systemState.delete({
+     *   where: {
+     *     // ... filter to delete one SystemState
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SystemStateDeleteArgs>(args: SelectSubset<T, SystemStateDeleteArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SystemState.
+     * @param {SystemStateUpdateArgs} args - Arguments to update one SystemState.
+     * @example
+     * // Update one SystemState
+     * const systemState = await prisma.systemState.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SystemStateUpdateArgs>(args: SelectSubset<T, SystemStateUpdateArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SystemStates.
+     * @param {SystemStateDeleteManyArgs} args - Arguments to filter SystemStates to delete.
+     * @example
+     * // Delete a few SystemStates
+     * const { count } = await prisma.systemState.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SystemStateDeleteManyArgs>(args?: SelectSubset<T, SystemStateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SystemStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SystemStateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SystemStates
+     * const systemState = await prisma.systemState.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SystemStateUpdateManyArgs>(args: SelectSubset<T, SystemStateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SystemStates and returns the data updated in the database.
+     * @param {SystemStateUpdateManyAndReturnArgs} args - Arguments to update many SystemStates.
+     * @example
+     * // Update many SystemStates
+     * const systemState = await prisma.systemState.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SystemStates and only return the `id`
+     * const systemStateWithIdOnly = await prisma.systemState.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SystemStateUpdateManyAndReturnArgs>(args: SelectSubset<T, SystemStateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SystemState.
+     * @param {SystemStateUpsertArgs} args - Arguments to update or create a SystemState.
+     * @example
+     * // Update or create a SystemState
+     * const systemState = await prisma.systemState.upsert({
+     *   create: {
+     *     // ... data to create a SystemState
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SystemState we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SystemStateUpsertArgs>(args: SelectSubset<T, SystemStateUpsertArgs<ExtArgs>>): Prisma__SystemStateClient<$Result.GetResult<Prisma.$SystemStatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SystemStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SystemStateCountArgs} args - Arguments to filter SystemStates to count.
+     * @example
+     * // Count the number of SystemStates
+     * const count = await prisma.systemState.count({
+     *   where: {
+     *     // ... the filter for the SystemStates we want to count
+     *   }
+     * })
+    **/
+    count<T extends SystemStateCountArgs>(
+      args?: Subset<T, SystemStateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SystemStateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SystemState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SystemStateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SystemStateAggregateArgs>(args: Subset<T, SystemStateAggregateArgs>): Prisma.PrismaPromise<GetSystemStateAggregateType<T>>
+
+    /**
+     * Group by SystemState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SystemStateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SystemStateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SystemStateGroupByArgs['orderBy'] }
+        : { orderBy?: SystemStateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SystemStateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSystemStateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SystemState model
+   */
+  readonly fields: SystemStateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SystemState.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SystemStateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SystemState model
+   */
+  interface SystemStateFieldRefs {
+    readonly id: FieldRef<"SystemState", 'String'>
+    readonly currentPhase: FieldRef<"SystemState", 'GlobalPhase'>
+    readonly codingStartTime: FieldRef<"SystemState", 'DateTime'>
+    readonly updatedAt: FieldRef<"SystemState", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SystemState findUnique
+   */
+  export type SystemStateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * Filter, which SystemState to fetch.
+     */
+    where: SystemStateWhereUniqueInput
+  }
+
+  /**
+   * SystemState findUniqueOrThrow
+   */
+  export type SystemStateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * Filter, which SystemState to fetch.
+     */
+    where: SystemStateWhereUniqueInput
+  }
+
+  /**
+   * SystemState findFirst
+   */
+  export type SystemStateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * Filter, which SystemState to fetch.
+     */
+    where?: SystemStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SystemStates to fetch.
+     */
+    orderBy?: SystemStateOrderByWithRelationInput | SystemStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SystemStates.
+     */
+    cursor?: SystemStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SystemStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SystemStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SystemStates.
+     */
+    distinct?: SystemStateScalarFieldEnum | SystemStateScalarFieldEnum[]
+  }
+
+  /**
+   * SystemState findFirstOrThrow
+   */
+  export type SystemStateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * Filter, which SystemState to fetch.
+     */
+    where?: SystemStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SystemStates to fetch.
+     */
+    orderBy?: SystemStateOrderByWithRelationInput | SystemStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SystemStates.
+     */
+    cursor?: SystemStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SystemStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SystemStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SystemStates.
+     */
+    distinct?: SystemStateScalarFieldEnum | SystemStateScalarFieldEnum[]
+  }
+
+  /**
+   * SystemState findMany
+   */
+  export type SystemStateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * Filter, which SystemStates to fetch.
+     */
+    where?: SystemStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SystemStates to fetch.
+     */
+    orderBy?: SystemStateOrderByWithRelationInput | SystemStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SystemStates.
+     */
+    cursor?: SystemStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SystemStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SystemStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SystemStates.
+     */
+    distinct?: SystemStateScalarFieldEnum | SystemStateScalarFieldEnum[]
+  }
+
+  /**
+   * SystemState create
+   */
+  export type SystemStateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * The data needed to create a SystemState.
+     */
+    data: XOR<SystemStateCreateInput, SystemStateUncheckedCreateInput>
+  }
+
+  /**
+   * SystemState createMany
+   */
+  export type SystemStateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SystemStates.
+     */
+    data: SystemStateCreateManyInput | SystemStateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SystemState createManyAndReturn
+   */
+  export type SystemStateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * The data used to create many SystemStates.
+     */
+    data: SystemStateCreateManyInput | SystemStateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SystemState update
+   */
+  export type SystemStateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * The data needed to update a SystemState.
+     */
+    data: XOR<SystemStateUpdateInput, SystemStateUncheckedUpdateInput>
+    /**
+     * Choose, which SystemState to update.
+     */
+    where: SystemStateWhereUniqueInput
+  }
+
+  /**
+   * SystemState updateMany
+   */
+  export type SystemStateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SystemStates.
+     */
+    data: XOR<SystemStateUpdateManyMutationInput, SystemStateUncheckedUpdateManyInput>
+    /**
+     * Filter which SystemStates to update
+     */
+    where?: SystemStateWhereInput
+    /**
+     * Limit how many SystemStates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SystemState updateManyAndReturn
+   */
+  export type SystemStateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * The data used to update SystemStates.
+     */
+    data: XOR<SystemStateUpdateManyMutationInput, SystemStateUncheckedUpdateManyInput>
+    /**
+     * Filter which SystemStates to update
+     */
+    where?: SystemStateWhereInput
+    /**
+     * Limit how many SystemStates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SystemState upsert
+   */
+  export type SystemStateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * The filter to search for the SystemState to update in case it exists.
+     */
+    where: SystemStateWhereUniqueInput
+    /**
+     * In case the SystemState found by the `where` argument doesn't exist, create a new SystemState with this data.
+     */
+    create: XOR<SystemStateCreateInput, SystemStateUncheckedCreateInput>
+    /**
+     * In case the SystemState was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SystemStateUpdateInput, SystemStateUncheckedUpdateInput>
+  }
+
+  /**
+   * SystemState delete
+   */
+  export type SystemStateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
+    /**
+     * Filter which SystemState to delete.
+     */
+    where: SystemStateWhereUniqueInput
+  }
+
+  /**
+   * SystemState deleteMany
+   */
+  export type SystemStateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SystemStates to delete
+     */
+    where?: SystemStateWhereInput
+    /**
+     * Limit how many SystemStates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SystemState without action
+   */
+  export type SystemStateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SystemState
+     */
+    select?: SystemStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SystemState
+     */
+    omit?: SystemStateOmit<ExtArgs> | null
   }
 
 
@@ -5105,6 +6430,7 @@ export namespace Prisma {
     order?: boolean
     bids?: boolean | Snippet$bidsArgs<ExtArgs>
     submissions?: boolean | Snippet$submissionsArgs<ExtArgs>
+    auctionRounds?: boolean | Snippet$auctionRoundsArgs<ExtArgs>
     _count?: boolean | SnippetCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["snippet"]>
 
@@ -5148,6 +6474,7 @@ export namespace Prisma {
   export type SnippetInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bids?: boolean | Snippet$bidsArgs<ExtArgs>
     submissions?: boolean | Snippet$submissionsArgs<ExtArgs>
+    auctionRounds?: boolean | Snippet$auctionRoundsArgs<ExtArgs>
     _count?: boolean | SnippetCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SnippetIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5158,6 +6485,7 @@ export namespace Prisma {
     objects: {
       bids: Prisma.$BidPayload<ExtArgs>[]
       submissions: Prisma.$SubmissionPayload<ExtArgs>[]
+      auctionRounds: Prisma.$AuctionRoundPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5565,6 +6893,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     bids<T extends Snippet$bidsArgs<ExtArgs> = {}>(args?: Subset<T, Snippet$bidsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BidPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     submissions<T extends Snippet$submissionsArgs<ExtArgs> = {}>(args?: Subset<T, Snippet$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    auctionRounds<T extends Snippet$auctionRoundsArgs<ExtArgs> = {}>(args?: Subset<T, Snippet$auctionRoundsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6044,6 +7373,30 @@ export namespace Prisma {
   }
 
   /**
+   * Snippet.auctionRounds
+   */
+  export type Snippet$auctionRoundsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    where?: AuctionRoundWhereInput
+    orderBy?: AuctionRoundOrderByWithRelationInput | AuctionRoundOrderByWithRelationInput[]
+    cursor?: AuctionRoundWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AuctionRoundScalarFieldEnum | AuctionRoundScalarFieldEnum[]
+  }
+
+  /**
    * Snippet without action
    */
   export type SnippetDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6086,6 +7439,7 @@ export namespace Prisma {
     id: string | null
     teamId: string | null
     snippetId: string | null
+    auctionRoundId: string | null
     amount: number | null
     won: boolean | null
     createdAt: Date | null
@@ -6095,6 +7449,7 @@ export namespace Prisma {
     id: string | null
     teamId: string | null
     snippetId: string | null
+    auctionRoundId: string | null
     amount: number | null
     won: boolean | null
     createdAt: Date | null
@@ -6104,6 +7459,7 @@ export namespace Prisma {
     id: number
     teamId: number
     snippetId: number
+    auctionRoundId: number
     amount: number
     won: number
     createdAt: number
@@ -6123,6 +7479,7 @@ export namespace Prisma {
     id?: true
     teamId?: true
     snippetId?: true
+    auctionRoundId?: true
     amount?: true
     won?: true
     createdAt?: true
@@ -6132,6 +7489,7 @@ export namespace Prisma {
     id?: true
     teamId?: true
     snippetId?: true
+    auctionRoundId?: true
     amount?: true
     won?: true
     createdAt?: true
@@ -6141,6 +7499,7 @@ export namespace Prisma {
     id?: true
     teamId?: true
     snippetId?: true
+    auctionRoundId?: true
     amount?: true
     won?: true
     createdAt?: true
@@ -6237,6 +7596,7 @@ export namespace Prisma {
     id: string
     teamId: string
     snippetId: string
+    auctionRoundId: string | null
     amount: number
     won: boolean
     createdAt: Date
@@ -6265,56 +7625,66 @@ export namespace Prisma {
     id?: boolean
     teamId?: boolean
     snippetId?: boolean
+    auctionRoundId?: boolean
     amount?: boolean
     won?: boolean
     createdAt?: boolean
     team?: boolean | TeamDefaultArgs<ExtArgs>
     snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    auctionRound?: boolean | Bid$auctionRoundArgs<ExtArgs>
   }, ExtArgs["result"]["bid"]>
 
   export type BidSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     teamId?: boolean
     snippetId?: boolean
+    auctionRoundId?: boolean
     amount?: boolean
     won?: boolean
     createdAt?: boolean
     team?: boolean | TeamDefaultArgs<ExtArgs>
     snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    auctionRound?: boolean | Bid$auctionRoundArgs<ExtArgs>
   }, ExtArgs["result"]["bid"]>
 
   export type BidSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     teamId?: boolean
     snippetId?: boolean
+    auctionRoundId?: boolean
     amount?: boolean
     won?: boolean
     createdAt?: boolean
     team?: boolean | TeamDefaultArgs<ExtArgs>
     snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    auctionRound?: boolean | Bid$auctionRoundArgs<ExtArgs>
   }, ExtArgs["result"]["bid"]>
 
   export type BidSelectScalar = {
     id?: boolean
     teamId?: boolean
     snippetId?: boolean
+    auctionRoundId?: boolean
     amount?: boolean
     won?: boolean
     createdAt?: boolean
   }
 
-  export type BidOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "teamId" | "snippetId" | "amount" | "won" | "createdAt", ExtArgs["result"]["bid"]>
+  export type BidOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "teamId" | "snippetId" | "auctionRoundId" | "amount" | "won" | "createdAt", ExtArgs["result"]["bid"]>
   export type BidInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     team?: boolean | TeamDefaultArgs<ExtArgs>
     snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    auctionRound?: boolean | Bid$auctionRoundArgs<ExtArgs>
   }
   export type BidIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     team?: boolean | TeamDefaultArgs<ExtArgs>
     snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    auctionRound?: boolean | Bid$auctionRoundArgs<ExtArgs>
   }
   export type BidIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     team?: boolean | TeamDefaultArgs<ExtArgs>
     snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    auctionRound?: boolean | Bid$auctionRoundArgs<ExtArgs>
   }
 
   export type $BidPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6322,11 +7692,13 @@ export namespace Prisma {
     objects: {
       team: Prisma.$TeamPayload<ExtArgs>
       snippet: Prisma.$SnippetPayload<ExtArgs>
+      auctionRound: Prisma.$AuctionRoundPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       teamId: string
       snippetId: string
+      auctionRoundId: string | null
       amount: number
       won: boolean
       createdAt: Date
@@ -6726,6 +8098,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     team<T extends TeamDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TeamDefaultArgs<ExtArgs>>): Prisma__TeamClient<$Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     snippet<T extends SnippetDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SnippetDefaultArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    auctionRound<T extends Bid$auctionRoundArgs<ExtArgs> = {}>(args?: Subset<T, Bid$auctionRoundArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6758,6 +8131,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Bid", 'String'>
     readonly teamId: FieldRef<"Bid", 'String'>
     readonly snippetId: FieldRef<"Bid", 'String'>
+    readonly auctionRoundId: FieldRef<"Bid", 'String'>
     readonly amount: FieldRef<"Bid", 'Int'>
     readonly won: FieldRef<"Bid", 'Boolean'>
     readonly createdAt: FieldRef<"Bid", 'DateTime'>
@@ -7159,6 +8533,25 @@ export namespace Prisma {
      * Limit how many Bids to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Bid.auctionRound
+   */
+  export type Bid$auctionRoundArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    where?: AuctionRoundWhereInput
   }
 
   /**
@@ -8317,6 +9710,1216 @@ export namespace Prisma {
 
 
   /**
+   * Model AuctionRound
+   */
+
+  export type AggregateAuctionRound = {
+    _count: AuctionRoundCountAggregateOutputType | null
+    _avg: AuctionRoundAvgAggregateOutputType | null
+    _sum: AuctionRoundSumAggregateOutputType | null
+    _min: AuctionRoundMinAggregateOutputType | null
+    _max: AuctionRoundMaxAggregateOutputType | null
+  }
+
+  export type AuctionRoundAvgAggregateOutputType = {
+    duration: number | null
+    winningBid: number | null
+  }
+
+  export type AuctionRoundSumAggregateOutputType = {
+    duration: number | null
+    winningBid: number | null
+  }
+
+  export type AuctionRoundMinAggregateOutputType = {
+    id: string | null
+    snippetId: string | null
+    status: $Enums.AuctionStatus | null
+    startTime: Date | null
+    endTime: Date | null
+    duration: number | null
+    winnerId: string | null
+    winningBid: number | null
+    createdAt: Date | null
+  }
+
+  export type AuctionRoundMaxAggregateOutputType = {
+    id: string | null
+    snippetId: string | null
+    status: $Enums.AuctionStatus | null
+    startTime: Date | null
+    endTime: Date | null
+    duration: number | null
+    winnerId: string | null
+    winningBid: number | null
+    createdAt: Date | null
+  }
+
+  export type AuctionRoundCountAggregateOutputType = {
+    id: number
+    snippetId: number
+    status: number
+    startTime: number
+    endTime: number
+    duration: number
+    winnerId: number
+    winningBid: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AuctionRoundAvgAggregateInputType = {
+    duration?: true
+    winningBid?: true
+  }
+
+  export type AuctionRoundSumAggregateInputType = {
+    duration?: true
+    winningBid?: true
+  }
+
+  export type AuctionRoundMinAggregateInputType = {
+    id?: true
+    snippetId?: true
+    status?: true
+    startTime?: true
+    endTime?: true
+    duration?: true
+    winnerId?: true
+    winningBid?: true
+    createdAt?: true
+  }
+
+  export type AuctionRoundMaxAggregateInputType = {
+    id?: true
+    snippetId?: true
+    status?: true
+    startTime?: true
+    endTime?: true
+    duration?: true
+    winnerId?: true
+    winningBid?: true
+    createdAt?: true
+  }
+
+  export type AuctionRoundCountAggregateInputType = {
+    id?: true
+    snippetId?: true
+    status?: true
+    startTime?: true
+    endTime?: true
+    duration?: true
+    winnerId?: true
+    winningBid?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AuctionRoundAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuctionRound to aggregate.
+     */
+    where?: AuctionRoundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuctionRounds to fetch.
+     */
+    orderBy?: AuctionRoundOrderByWithRelationInput | AuctionRoundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AuctionRoundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuctionRounds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuctionRounds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AuctionRounds
+    **/
+    _count?: true | AuctionRoundCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AuctionRoundAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AuctionRoundSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AuctionRoundMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AuctionRoundMaxAggregateInputType
+  }
+
+  export type GetAuctionRoundAggregateType<T extends AuctionRoundAggregateArgs> = {
+        [P in keyof T & keyof AggregateAuctionRound]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAuctionRound[P]>
+      : GetScalarType<T[P], AggregateAuctionRound[P]>
+  }
+
+
+
+
+  export type AuctionRoundGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuctionRoundWhereInput
+    orderBy?: AuctionRoundOrderByWithAggregationInput | AuctionRoundOrderByWithAggregationInput[]
+    by: AuctionRoundScalarFieldEnum[] | AuctionRoundScalarFieldEnum
+    having?: AuctionRoundScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AuctionRoundCountAggregateInputType | true
+    _avg?: AuctionRoundAvgAggregateInputType
+    _sum?: AuctionRoundSumAggregateInputType
+    _min?: AuctionRoundMinAggregateInputType
+    _max?: AuctionRoundMaxAggregateInputType
+  }
+
+  export type AuctionRoundGroupByOutputType = {
+    id: string
+    snippetId: string
+    status: $Enums.AuctionStatus
+    startTime: Date | null
+    endTime: Date | null
+    duration: number
+    winnerId: string | null
+    winningBid: number | null
+    createdAt: Date
+    _count: AuctionRoundCountAggregateOutputType | null
+    _avg: AuctionRoundAvgAggregateOutputType | null
+    _sum: AuctionRoundSumAggregateOutputType | null
+    _min: AuctionRoundMinAggregateOutputType | null
+    _max: AuctionRoundMaxAggregateOutputType | null
+  }
+
+  type GetAuctionRoundGroupByPayload<T extends AuctionRoundGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AuctionRoundGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AuctionRoundGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AuctionRoundGroupByOutputType[P]>
+            : GetScalarType<T[P], AuctionRoundGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AuctionRoundSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    snippetId?: boolean
+    status?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    duration?: boolean
+    winnerId?: boolean
+    winningBid?: boolean
+    createdAt?: boolean
+    snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    winner?: boolean | AuctionRound$winnerArgs<ExtArgs>
+    bids?: boolean | AuctionRound$bidsArgs<ExtArgs>
+    _count?: boolean | AuctionRoundCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["auctionRound"]>
+
+  export type AuctionRoundSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    snippetId?: boolean
+    status?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    duration?: boolean
+    winnerId?: boolean
+    winningBid?: boolean
+    createdAt?: boolean
+    snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    winner?: boolean | AuctionRound$winnerArgs<ExtArgs>
+  }, ExtArgs["result"]["auctionRound"]>
+
+  export type AuctionRoundSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    snippetId?: boolean
+    status?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    duration?: boolean
+    winnerId?: boolean
+    winningBid?: boolean
+    createdAt?: boolean
+    snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    winner?: boolean | AuctionRound$winnerArgs<ExtArgs>
+  }, ExtArgs["result"]["auctionRound"]>
+
+  export type AuctionRoundSelectScalar = {
+    id?: boolean
+    snippetId?: boolean
+    status?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    duration?: boolean
+    winnerId?: boolean
+    winningBid?: boolean
+    createdAt?: boolean
+  }
+
+  export type AuctionRoundOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "snippetId" | "status" | "startTime" | "endTime" | "duration" | "winnerId" | "winningBid" | "createdAt", ExtArgs["result"]["auctionRound"]>
+  export type AuctionRoundInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    winner?: boolean | AuctionRound$winnerArgs<ExtArgs>
+    bids?: boolean | AuctionRound$bidsArgs<ExtArgs>
+    _count?: boolean | AuctionRoundCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type AuctionRoundIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    winner?: boolean | AuctionRound$winnerArgs<ExtArgs>
+  }
+  export type AuctionRoundIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    snippet?: boolean | SnippetDefaultArgs<ExtArgs>
+    winner?: boolean | AuctionRound$winnerArgs<ExtArgs>
+  }
+
+  export type $AuctionRoundPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AuctionRound"
+    objects: {
+      snippet: Prisma.$SnippetPayload<ExtArgs>
+      winner: Prisma.$TeamPayload<ExtArgs> | null
+      bids: Prisma.$BidPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      snippetId: string
+      status: $Enums.AuctionStatus
+      startTime: Date | null
+      endTime: Date | null
+      duration: number
+      winnerId: string | null
+      winningBid: number | null
+      createdAt: Date
+    }, ExtArgs["result"]["auctionRound"]>
+    composites: {}
+  }
+
+  type AuctionRoundGetPayload<S extends boolean | null | undefined | AuctionRoundDefaultArgs> = $Result.GetResult<Prisma.$AuctionRoundPayload, S>
+
+  type AuctionRoundCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AuctionRoundFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AuctionRoundCountAggregateInputType | true
+    }
+
+  export interface AuctionRoundDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AuctionRound'], meta: { name: 'AuctionRound' } }
+    /**
+     * Find zero or one AuctionRound that matches the filter.
+     * @param {AuctionRoundFindUniqueArgs} args - Arguments to find a AuctionRound
+     * @example
+     * // Get one AuctionRound
+     * const auctionRound = await prisma.auctionRound.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AuctionRoundFindUniqueArgs>(args: SelectSubset<T, AuctionRoundFindUniqueArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AuctionRound that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AuctionRoundFindUniqueOrThrowArgs} args - Arguments to find a AuctionRound
+     * @example
+     * // Get one AuctionRound
+     * const auctionRound = await prisma.auctionRound.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AuctionRoundFindUniqueOrThrowArgs>(args: SelectSubset<T, AuctionRoundFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuctionRound that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuctionRoundFindFirstArgs} args - Arguments to find a AuctionRound
+     * @example
+     * // Get one AuctionRound
+     * const auctionRound = await prisma.auctionRound.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AuctionRoundFindFirstArgs>(args?: SelectSubset<T, AuctionRoundFindFirstArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuctionRound that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuctionRoundFindFirstOrThrowArgs} args - Arguments to find a AuctionRound
+     * @example
+     * // Get one AuctionRound
+     * const auctionRound = await prisma.auctionRound.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AuctionRoundFindFirstOrThrowArgs>(args?: SelectSubset<T, AuctionRoundFindFirstOrThrowArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AuctionRounds that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuctionRoundFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AuctionRounds
+     * const auctionRounds = await prisma.auctionRound.findMany()
+     * 
+     * // Get first 10 AuctionRounds
+     * const auctionRounds = await prisma.auctionRound.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const auctionRoundWithIdOnly = await prisma.auctionRound.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AuctionRoundFindManyArgs>(args?: SelectSubset<T, AuctionRoundFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AuctionRound.
+     * @param {AuctionRoundCreateArgs} args - Arguments to create a AuctionRound.
+     * @example
+     * // Create one AuctionRound
+     * const AuctionRound = await prisma.auctionRound.create({
+     *   data: {
+     *     // ... data to create a AuctionRound
+     *   }
+     * })
+     * 
+     */
+    create<T extends AuctionRoundCreateArgs>(args: SelectSubset<T, AuctionRoundCreateArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AuctionRounds.
+     * @param {AuctionRoundCreateManyArgs} args - Arguments to create many AuctionRounds.
+     * @example
+     * // Create many AuctionRounds
+     * const auctionRound = await prisma.auctionRound.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AuctionRoundCreateManyArgs>(args?: SelectSubset<T, AuctionRoundCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AuctionRounds and returns the data saved in the database.
+     * @param {AuctionRoundCreateManyAndReturnArgs} args - Arguments to create many AuctionRounds.
+     * @example
+     * // Create many AuctionRounds
+     * const auctionRound = await prisma.auctionRound.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AuctionRounds and only return the `id`
+     * const auctionRoundWithIdOnly = await prisma.auctionRound.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AuctionRoundCreateManyAndReturnArgs>(args?: SelectSubset<T, AuctionRoundCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AuctionRound.
+     * @param {AuctionRoundDeleteArgs} args - Arguments to delete one AuctionRound.
+     * @example
+     * // Delete one AuctionRound
+     * const AuctionRound = await prisma.auctionRound.delete({
+     *   where: {
+     *     // ... filter to delete one AuctionRound
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AuctionRoundDeleteArgs>(args: SelectSubset<T, AuctionRoundDeleteArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AuctionRound.
+     * @param {AuctionRoundUpdateArgs} args - Arguments to update one AuctionRound.
+     * @example
+     * // Update one AuctionRound
+     * const auctionRound = await prisma.auctionRound.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AuctionRoundUpdateArgs>(args: SelectSubset<T, AuctionRoundUpdateArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AuctionRounds.
+     * @param {AuctionRoundDeleteManyArgs} args - Arguments to filter AuctionRounds to delete.
+     * @example
+     * // Delete a few AuctionRounds
+     * const { count } = await prisma.auctionRound.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AuctionRoundDeleteManyArgs>(args?: SelectSubset<T, AuctionRoundDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuctionRounds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuctionRoundUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AuctionRounds
+     * const auctionRound = await prisma.auctionRound.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AuctionRoundUpdateManyArgs>(args: SelectSubset<T, AuctionRoundUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuctionRounds and returns the data updated in the database.
+     * @param {AuctionRoundUpdateManyAndReturnArgs} args - Arguments to update many AuctionRounds.
+     * @example
+     * // Update many AuctionRounds
+     * const auctionRound = await prisma.auctionRound.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AuctionRounds and only return the `id`
+     * const auctionRoundWithIdOnly = await prisma.auctionRound.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AuctionRoundUpdateManyAndReturnArgs>(args: SelectSubset<T, AuctionRoundUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AuctionRound.
+     * @param {AuctionRoundUpsertArgs} args - Arguments to update or create a AuctionRound.
+     * @example
+     * // Update or create a AuctionRound
+     * const auctionRound = await prisma.auctionRound.upsert({
+     *   create: {
+     *     // ... data to create a AuctionRound
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AuctionRound we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AuctionRoundUpsertArgs>(args: SelectSubset<T, AuctionRoundUpsertArgs<ExtArgs>>): Prisma__AuctionRoundClient<$Result.GetResult<Prisma.$AuctionRoundPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AuctionRounds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuctionRoundCountArgs} args - Arguments to filter AuctionRounds to count.
+     * @example
+     * // Count the number of AuctionRounds
+     * const count = await prisma.auctionRound.count({
+     *   where: {
+     *     // ... the filter for the AuctionRounds we want to count
+     *   }
+     * })
+    **/
+    count<T extends AuctionRoundCountArgs>(
+      args?: Subset<T, AuctionRoundCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AuctionRoundCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AuctionRound.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuctionRoundAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AuctionRoundAggregateArgs>(args: Subset<T, AuctionRoundAggregateArgs>): Prisma.PrismaPromise<GetAuctionRoundAggregateType<T>>
+
+    /**
+     * Group by AuctionRound.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuctionRoundGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AuctionRoundGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AuctionRoundGroupByArgs['orderBy'] }
+        : { orderBy?: AuctionRoundGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AuctionRoundGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAuctionRoundGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AuctionRound model
+   */
+  readonly fields: AuctionRoundFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AuctionRound.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AuctionRoundClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    snippet<T extends SnippetDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SnippetDefaultArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    winner<T extends AuctionRound$winnerArgs<ExtArgs> = {}>(args?: Subset<T, AuctionRound$winnerArgs<ExtArgs>>): Prisma__TeamClient<$Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    bids<T extends AuctionRound$bidsArgs<ExtArgs> = {}>(args?: Subset<T, AuctionRound$bidsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BidPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AuctionRound model
+   */
+  interface AuctionRoundFieldRefs {
+    readonly id: FieldRef<"AuctionRound", 'String'>
+    readonly snippetId: FieldRef<"AuctionRound", 'String'>
+    readonly status: FieldRef<"AuctionRound", 'AuctionStatus'>
+    readonly startTime: FieldRef<"AuctionRound", 'DateTime'>
+    readonly endTime: FieldRef<"AuctionRound", 'DateTime'>
+    readonly duration: FieldRef<"AuctionRound", 'Int'>
+    readonly winnerId: FieldRef<"AuctionRound", 'String'>
+    readonly winningBid: FieldRef<"AuctionRound", 'Int'>
+    readonly createdAt: FieldRef<"AuctionRound", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AuctionRound findUnique
+   */
+  export type AuctionRoundFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * Filter, which AuctionRound to fetch.
+     */
+    where: AuctionRoundWhereUniqueInput
+  }
+
+  /**
+   * AuctionRound findUniqueOrThrow
+   */
+  export type AuctionRoundFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * Filter, which AuctionRound to fetch.
+     */
+    where: AuctionRoundWhereUniqueInput
+  }
+
+  /**
+   * AuctionRound findFirst
+   */
+  export type AuctionRoundFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * Filter, which AuctionRound to fetch.
+     */
+    where?: AuctionRoundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuctionRounds to fetch.
+     */
+    orderBy?: AuctionRoundOrderByWithRelationInput | AuctionRoundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuctionRounds.
+     */
+    cursor?: AuctionRoundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuctionRounds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuctionRounds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuctionRounds.
+     */
+    distinct?: AuctionRoundScalarFieldEnum | AuctionRoundScalarFieldEnum[]
+  }
+
+  /**
+   * AuctionRound findFirstOrThrow
+   */
+  export type AuctionRoundFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * Filter, which AuctionRound to fetch.
+     */
+    where?: AuctionRoundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuctionRounds to fetch.
+     */
+    orderBy?: AuctionRoundOrderByWithRelationInput | AuctionRoundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuctionRounds.
+     */
+    cursor?: AuctionRoundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuctionRounds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuctionRounds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuctionRounds.
+     */
+    distinct?: AuctionRoundScalarFieldEnum | AuctionRoundScalarFieldEnum[]
+  }
+
+  /**
+   * AuctionRound findMany
+   */
+  export type AuctionRoundFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * Filter, which AuctionRounds to fetch.
+     */
+    where?: AuctionRoundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuctionRounds to fetch.
+     */
+    orderBy?: AuctionRoundOrderByWithRelationInput | AuctionRoundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AuctionRounds.
+     */
+    cursor?: AuctionRoundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuctionRounds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuctionRounds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuctionRounds.
+     */
+    distinct?: AuctionRoundScalarFieldEnum | AuctionRoundScalarFieldEnum[]
+  }
+
+  /**
+   * AuctionRound create
+   */
+  export type AuctionRoundCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AuctionRound.
+     */
+    data: XOR<AuctionRoundCreateInput, AuctionRoundUncheckedCreateInput>
+  }
+
+  /**
+   * AuctionRound createMany
+   */
+  export type AuctionRoundCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AuctionRounds.
+     */
+    data: AuctionRoundCreateManyInput | AuctionRoundCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AuctionRound createManyAndReturn
+   */
+  export type AuctionRoundCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * The data used to create many AuctionRounds.
+     */
+    data: AuctionRoundCreateManyInput | AuctionRoundCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AuctionRound update
+   */
+  export type AuctionRoundUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AuctionRound.
+     */
+    data: XOR<AuctionRoundUpdateInput, AuctionRoundUncheckedUpdateInput>
+    /**
+     * Choose, which AuctionRound to update.
+     */
+    where: AuctionRoundWhereUniqueInput
+  }
+
+  /**
+   * AuctionRound updateMany
+   */
+  export type AuctionRoundUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AuctionRounds.
+     */
+    data: XOR<AuctionRoundUpdateManyMutationInput, AuctionRoundUncheckedUpdateManyInput>
+    /**
+     * Filter which AuctionRounds to update
+     */
+    where?: AuctionRoundWhereInput
+    /**
+     * Limit how many AuctionRounds to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuctionRound updateManyAndReturn
+   */
+  export type AuctionRoundUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * The data used to update AuctionRounds.
+     */
+    data: XOR<AuctionRoundUpdateManyMutationInput, AuctionRoundUncheckedUpdateManyInput>
+    /**
+     * Filter which AuctionRounds to update
+     */
+    where?: AuctionRoundWhereInput
+    /**
+     * Limit how many AuctionRounds to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AuctionRound upsert
+   */
+  export type AuctionRoundUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AuctionRound to update in case it exists.
+     */
+    where: AuctionRoundWhereUniqueInput
+    /**
+     * In case the AuctionRound found by the `where` argument doesn't exist, create a new AuctionRound with this data.
+     */
+    create: XOR<AuctionRoundCreateInput, AuctionRoundUncheckedCreateInput>
+    /**
+     * In case the AuctionRound was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AuctionRoundUpdateInput, AuctionRoundUncheckedUpdateInput>
+  }
+
+  /**
+   * AuctionRound delete
+   */
+  export type AuctionRoundDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+    /**
+     * Filter which AuctionRound to delete.
+     */
+    where: AuctionRoundWhereUniqueInput
+  }
+
+  /**
+   * AuctionRound deleteMany
+   */
+  export type AuctionRoundDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuctionRounds to delete
+     */
+    where?: AuctionRoundWhereInput
+    /**
+     * Limit how many AuctionRounds to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuctionRound.winner
+   */
+  export type AuctionRound$winnerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Team
+     */
+    select?: TeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Team
+     */
+    omit?: TeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamInclude<ExtArgs> | null
+    where?: TeamWhereInput
+  }
+
+  /**
+   * AuctionRound.bids
+   */
+  export type AuctionRound$bidsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Bid
+     */
+    select?: BidSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Bid
+     */
+    omit?: BidOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BidInclude<ExtArgs> | null
+    where?: BidWhereInput
+    orderBy?: BidOrderByWithRelationInput | BidOrderByWithRelationInput[]
+    cursor?: BidWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BidScalarFieldEnum | BidScalarFieldEnum[]
+  }
+
+  /**
+   * AuctionRound without action
+   */
+  export type AuctionRoundDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuctionRound
+     */
+    select?: AuctionRoundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuctionRound
+     */
+    omit?: AuctionRoundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuctionRoundInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -8340,11 +10943,24 @@ export namespace Prisma {
     isEliminated: 'isEliminated',
     strikes: 'strikes',
     lastStrikeAt: 'lastStrikeAt',
+    vaultTime: 'vaultTime',
+    lifelinesUsed: 'lifelinesUsed',
+    lockPenalties: 'lockPenalties',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type TeamScalarFieldEnum = (typeof TeamScalarFieldEnum)[keyof typeof TeamScalarFieldEnum]
+
+
+  export const SystemStateScalarFieldEnum: {
+    id: 'id',
+    currentPhase: 'currentPhase',
+    codingStartTime: 'codingStartTime',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SystemStateScalarFieldEnum = (typeof SystemStateScalarFieldEnum)[keyof typeof SystemStateScalarFieldEnum]
 
 
   export const MemberScalarFieldEnum: {
@@ -8386,6 +11002,7 @@ export namespace Prisma {
     id: 'id',
     teamId: 'teamId',
     snippetId: 'snippetId',
+    auctionRoundId: 'auctionRoundId',
     amount: 'amount',
     won: 'won',
     createdAt: 'createdAt'
@@ -8408,6 +11025,21 @@ export namespace Prisma {
   };
 
   export type SubmissionScalarFieldEnum = (typeof SubmissionScalarFieldEnum)[keyof typeof SubmissionScalarFieldEnum]
+
+
+  export const AuctionRoundScalarFieldEnum: {
+    id: 'id',
+    snippetId: 'snippetId',
+    status: 'status',
+    startTime: 'startTime',
+    endTime: 'endTime',
+    duration: 'duration',
+    winnerId: 'winnerId',
+    winningBid: 'winningBid',
+    createdAt: 'createdAt'
+  };
+
+  export type AuctionRoundScalarFieldEnum = (typeof AuctionRoundScalarFieldEnum)[keyof typeof AuctionRoundScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -8503,6 +11135,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'GlobalPhase'
+   */
+  export type EnumGlobalPhaseFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GlobalPhase'>
+    
+
+
+  /**
+   * Reference to a field of type 'GlobalPhase[]'
+   */
+  export type ListEnumGlobalPhaseFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GlobalPhase[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Category'
    */
   export type EnumCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Category'>
@@ -8527,6 +11173,20 @@ export namespace Prisma {
    * Reference to a field of type 'SubmissionStatus[]'
    */
   export type ListEnumSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubmissionStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AuctionStatus'
+   */
+  export type EnumAuctionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuctionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AuctionStatus[]'
+   */
+  export type ListEnumAuctionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuctionStatus[]'>
     
 
 
@@ -8560,12 +11220,16 @@ export namespace Prisma {
     isEliminated?: BoolFilter<"Team"> | boolean
     strikes?: IntFilter<"Team"> | number
     lastStrikeAt?: DateTimeNullableFilter<"Team"> | Date | string | null
+    vaultTime?: IntNullableFilter<"Team"> | number | null
+    lifelinesUsed?: IntFilter<"Team"> | number
+    lockPenalties?: IntFilter<"Team"> | number
     createdAt?: DateTimeFilter<"Team"> | Date | string
     updatedAt?: DateTimeFilter<"Team"> | Date | string
     members?: MemberListRelationFilter
     creditLogs?: CreditLogListRelationFilter
     bids?: BidListRelationFilter
     submissions?: SubmissionListRelationFilter
+    auctionWins?: AuctionRoundListRelationFilter
   }
 
   export type TeamOrderByWithRelationInput = {
@@ -8578,12 +11242,16 @@ export namespace Prisma {
     isEliminated?: SortOrder
     strikes?: SortOrder
     lastStrikeAt?: SortOrderInput | SortOrder
+    vaultTime?: SortOrderInput | SortOrder
+    lifelinesUsed?: SortOrder
+    lockPenalties?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     members?: MemberOrderByRelationAggregateInput
     creditLogs?: CreditLogOrderByRelationAggregateInput
     bids?: BidOrderByRelationAggregateInput
     submissions?: SubmissionOrderByRelationAggregateInput
+    auctionWins?: AuctionRoundOrderByRelationAggregateInput
   }
 
   export type TeamWhereUniqueInput = Prisma.AtLeast<{
@@ -8599,12 +11267,16 @@ export namespace Prisma {
     isEliminated?: BoolFilter<"Team"> | boolean
     strikes?: IntFilter<"Team"> | number
     lastStrikeAt?: DateTimeNullableFilter<"Team"> | Date | string | null
+    vaultTime?: IntNullableFilter<"Team"> | number | null
+    lifelinesUsed?: IntFilter<"Team"> | number
+    lockPenalties?: IntFilter<"Team"> | number
     createdAt?: DateTimeFilter<"Team"> | Date | string
     updatedAt?: DateTimeFilter<"Team"> | Date | string
     members?: MemberListRelationFilter
     creditLogs?: CreditLogListRelationFilter
     bids?: BidListRelationFilter
     submissions?: SubmissionListRelationFilter
+    auctionWins?: AuctionRoundListRelationFilter
   }, "id" | "name" | "accessKey">
 
   export type TeamOrderByWithAggregationInput = {
@@ -8617,6 +11289,9 @@ export namespace Prisma {
     isEliminated?: SortOrder
     strikes?: SortOrder
     lastStrikeAt?: SortOrderInput | SortOrder
+    vaultTime?: SortOrderInput | SortOrder
+    lifelinesUsed?: SortOrder
+    lockPenalties?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: TeamCountOrderByAggregateInput
@@ -8639,8 +11314,58 @@ export namespace Prisma {
     isEliminated?: BoolWithAggregatesFilter<"Team"> | boolean
     strikes?: IntWithAggregatesFilter<"Team"> | number
     lastStrikeAt?: DateTimeNullableWithAggregatesFilter<"Team"> | Date | string | null
+    vaultTime?: IntNullableWithAggregatesFilter<"Team"> | number | null
+    lifelinesUsed?: IntWithAggregatesFilter<"Team"> | number
+    lockPenalties?: IntWithAggregatesFilter<"Team"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Team"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Team"> | Date | string
+  }
+
+  export type SystemStateWhereInput = {
+    AND?: SystemStateWhereInput | SystemStateWhereInput[]
+    OR?: SystemStateWhereInput[]
+    NOT?: SystemStateWhereInput | SystemStateWhereInput[]
+    id?: StringFilter<"SystemState"> | string
+    currentPhase?: EnumGlobalPhaseFilter<"SystemState"> | $Enums.GlobalPhase
+    codingStartTime?: DateTimeNullableFilter<"SystemState"> | Date | string | null
+    updatedAt?: DateTimeFilter<"SystemState"> | Date | string
+  }
+
+  export type SystemStateOrderByWithRelationInput = {
+    id?: SortOrder
+    currentPhase?: SortOrder
+    codingStartTime?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SystemStateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SystemStateWhereInput | SystemStateWhereInput[]
+    OR?: SystemStateWhereInput[]
+    NOT?: SystemStateWhereInput | SystemStateWhereInput[]
+    currentPhase?: EnumGlobalPhaseFilter<"SystemState"> | $Enums.GlobalPhase
+    codingStartTime?: DateTimeNullableFilter<"SystemState"> | Date | string | null
+    updatedAt?: DateTimeFilter<"SystemState"> | Date | string
+  }, "id">
+
+  export type SystemStateOrderByWithAggregationInput = {
+    id?: SortOrder
+    currentPhase?: SortOrder
+    codingStartTime?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: SystemStateCountOrderByAggregateInput
+    _max?: SystemStateMaxOrderByAggregateInput
+    _min?: SystemStateMinOrderByAggregateInput
+  }
+
+  export type SystemStateScalarWhereWithAggregatesInput = {
+    AND?: SystemStateScalarWhereWithAggregatesInput | SystemStateScalarWhereWithAggregatesInput[]
+    OR?: SystemStateScalarWhereWithAggregatesInput[]
+    NOT?: SystemStateScalarWhereWithAggregatesInput | SystemStateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SystemState"> | string
+    currentPhase?: EnumGlobalPhaseWithAggregatesFilter<"SystemState"> | $Enums.GlobalPhase
+    codingStartTime?: DateTimeNullableWithAggregatesFilter<"SystemState"> | Date | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"SystemState"> | Date | string
   }
 
   export type MemberWhereInput = {
@@ -8760,6 +11485,7 @@ export namespace Prisma {
     order?: IntFilter<"Snippet"> | number
     bids?: BidListRelationFilter
     submissions?: SubmissionListRelationFilter
+    auctionRounds?: AuctionRoundListRelationFilter
   }
 
   export type SnippetOrderByWithRelationInput = {
@@ -8774,14 +11500,15 @@ export namespace Prisma {
     order?: SortOrder
     bids?: BidOrderByRelationAggregateInput
     submissions?: SubmissionOrderByRelationAggregateInput
+    auctionRounds?: AuctionRoundOrderByRelationAggregateInput
   }
 
   export type SnippetWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    title?: string
     AND?: SnippetWhereInput | SnippetWhereInput[]
     OR?: SnippetWhereInput[]
     NOT?: SnippetWhereInput | SnippetWhereInput[]
-    title?: StringFilter<"Snippet"> | string
     category?: EnumCategoryFilter<"Snippet"> | $Enums.Category
     buggyCode?: StringFilter<"Snippet"> | string
     solution?: StringFilter<"Snippet"> | string
@@ -8791,7 +11518,8 @@ export namespace Prisma {
     order?: IntFilter<"Snippet"> | number
     bids?: BidListRelationFilter
     submissions?: SubmissionListRelationFilter
-  }, "id">
+    auctionRounds?: AuctionRoundListRelationFilter
+  }, "id" | "title">
 
   export type SnippetOrderByWithAggregationInput = {
     id?: SortOrder
@@ -8832,22 +11560,26 @@ export namespace Prisma {
     id?: StringFilter<"Bid"> | string
     teamId?: StringFilter<"Bid"> | string
     snippetId?: StringFilter<"Bid"> | string
+    auctionRoundId?: StringNullableFilter<"Bid"> | string | null
     amount?: IntFilter<"Bid"> | number
     won?: BoolFilter<"Bid"> | boolean
     createdAt?: DateTimeFilter<"Bid"> | Date | string
     team?: XOR<TeamScalarRelationFilter, TeamWhereInput>
     snippet?: XOR<SnippetScalarRelationFilter, SnippetWhereInput>
+    auctionRound?: XOR<AuctionRoundNullableScalarRelationFilter, AuctionRoundWhereInput> | null
   }
 
   export type BidOrderByWithRelationInput = {
     id?: SortOrder
     teamId?: SortOrder
     snippetId?: SortOrder
+    auctionRoundId?: SortOrderInput | SortOrder
     amount?: SortOrder
     won?: SortOrder
     createdAt?: SortOrder
     team?: TeamOrderByWithRelationInput
     snippet?: SnippetOrderByWithRelationInput
+    auctionRound?: AuctionRoundOrderByWithRelationInput
   }
 
   export type BidWhereUniqueInput = Prisma.AtLeast<{
@@ -8857,17 +11589,20 @@ export namespace Prisma {
     NOT?: BidWhereInput | BidWhereInput[]
     teamId?: StringFilter<"Bid"> | string
     snippetId?: StringFilter<"Bid"> | string
+    auctionRoundId?: StringNullableFilter<"Bid"> | string | null
     amount?: IntFilter<"Bid"> | number
     won?: BoolFilter<"Bid"> | boolean
     createdAt?: DateTimeFilter<"Bid"> | Date | string
     team?: XOR<TeamScalarRelationFilter, TeamWhereInput>
     snippet?: XOR<SnippetScalarRelationFilter, SnippetWhereInput>
+    auctionRound?: XOR<AuctionRoundNullableScalarRelationFilter, AuctionRoundWhereInput> | null
   }, "id">
 
   export type BidOrderByWithAggregationInput = {
     id?: SortOrder
     teamId?: SortOrder
     snippetId?: SortOrder
+    auctionRoundId?: SortOrderInput | SortOrder
     amount?: SortOrder
     won?: SortOrder
     createdAt?: SortOrder
@@ -8885,6 +11620,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Bid"> | string
     teamId?: StringWithAggregatesFilter<"Bid"> | string
     snippetId?: StringWithAggregatesFilter<"Bid"> | string
+    auctionRoundId?: StringNullableWithAggregatesFilter<"Bid"> | string | null
     amount?: IntWithAggregatesFilter<"Bid"> | number
     won?: BoolWithAggregatesFilter<"Bid"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Bid"> | Date | string
@@ -8973,6 +11709,89 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
   }
 
+  export type AuctionRoundWhereInput = {
+    AND?: AuctionRoundWhereInput | AuctionRoundWhereInput[]
+    OR?: AuctionRoundWhereInput[]
+    NOT?: AuctionRoundWhereInput | AuctionRoundWhereInput[]
+    id?: StringFilter<"AuctionRound"> | string
+    snippetId?: StringFilter<"AuctionRound"> | string
+    status?: EnumAuctionStatusFilter<"AuctionRound"> | $Enums.AuctionStatus
+    startTime?: DateTimeNullableFilter<"AuctionRound"> | Date | string | null
+    endTime?: DateTimeNullableFilter<"AuctionRound"> | Date | string | null
+    duration?: IntFilter<"AuctionRound"> | number
+    winnerId?: StringNullableFilter<"AuctionRound"> | string | null
+    winningBid?: IntNullableFilter<"AuctionRound"> | number | null
+    createdAt?: DateTimeFilter<"AuctionRound"> | Date | string
+    snippet?: XOR<SnippetScalarRelationFilter, SnippetWhereInput>
+    winner?: XOR<TeamNullableScalarRelationFilter, TeamWhereInput> | null
+    bids?: BidListRelationFilter
+  }
+
+  export type AuctionRoundOrderByWithRelationInput = {
+    id?: SortOrder
+    snippetId?: SortOrder
+    status?: SortOrder
+    startTime?: SortOrderInput | SortOrder
+    endTime?: SortOrderInput | SortOrder
+    duration?: SortOrder
+    winnerId?: SortOrderInput | SortOrder
+    winningBid?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    snippet?: SnippetOrderByWithRelationInput
+    winner?: TeamOrderByWithRelationInput
+    bids?: BidOrderByRelationAggregateInput
+  }
+
+  export type AuctionRoundWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AuctionRoundWhereInput | AuctionRoundWhereInput[]
+    OR?: AuctionRoundWhereInput[]
+    NOT?: AuctionRoundWhereInput | AuctionRoundWhereInput[]
+    snippetId?: StringFilter<"AuctionRound"> | string
+    status?: EnumAuctionStatusFilter<"AuctionRound"> | $Enums.AuctionStatus
+    startTime?: DateTimeNullableFilter<"AuctionRound"> | Date | string | null
+    endTime?: DateTimeNullableFilter<"AuctionRound"> | Date | string | null
+    duration?: IntFilter<"AuctionRound"> | number
+    winnerId?: StringNullableFilter<"AuctionRound"> | string | null
+    winningBid?: IntNullableFilter<"AuctionRound"> | number | null
+    createdAt?: DateTimeFilter<"AuctionRound"> | Date | string
+    snippet?: XOR<SnippetScalarRelationFilter, SnippetWhereInput>
+    winner?: XOR<TeamNullableScalarRelationFilter, TeamWhereInput> | null
+    bids?: BidListRelationFilter
+  }, "id">
+
+  export type AuctionRoundOrderByWithAggregationInput = {
+    id?: SortOrder
+    snippetId?: SortOrder
+    status?: SortOrder
+    startTime?: SortOrderInput | SortOrder
+    endTime?: SortOrderInput | SortOrder
+    duration?: SortOrder
+    winnerId?: SortOrderInput | SortOrder
+    winningBid?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: AuctionRoundCountOrderByAggregateInput
+    _avg?: AuctionRoundAvgOrderByAggregateInput
+    _max?: AuctionRoundMaxOrderByAggregateInput
+    _min?: AuctionRoundMinOrderByAggregateInput
+    _sum?: AuctionRoundSumOrderByAggregateInput
+  }
+
+  export type AuctionRoundScalarWhereWithAggregatesInput = {
+    AND?: AuctionRoundScalarWhereWithAggregatesInput | AuctionRoundScalarWhereWithAggregatesInput[]
+    OR?: AuctionRoundScalarWhereWithAggregatesInput[]
+    NOT?: AuctionRoundScalarWhereWithAggregatesInput | AuctionRoundScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AuctionRound"> | string
+    snippetId?: StringWithAggregatesFilter<"AuctionRound"> | string
+    status?: EnumAuctionStatusWithAggregatesFilter<"AuctionRound"> | $Enums.AuctionStatus
+    startTime?: DateTimeNullableWithAggregatesFilter<"AuctionRound"> | Date | string | null
+    endTime?: DateTimeNullableWithAggregatesFilter<"AuctionRound"> | Date | string | null
+    duration?: IntWithAggregatesFilter<"AuctionRound"> | number
+    winnerId?: StringNullableWithAggregatesFilter<"AuctionRound"> | string | null
+    winningBid?: IntNullableWithAggregatesFilter<"AuctionRound"> | number | null
+    createdAt?: DateTimeWithAggregatesFilter<"AuctionRound"> | Date | string
+  }
+
   export type TeamCreateInput = {
     id?: string
     name: string
@@ -8983,12 +11802,16 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberCreateNestedManyWithoutTeamInput
     creditLogs?: CreditLogCreateNestedManyWithoutTeamInput
     bids?: BidCreateNestedManyWithoutTeamInput
     submissions?: SubmissionCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamUncheckedCreateInput = {
@@ -9001,12 +11824,16 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberUncheckedCreateNestedManyWithoutTeamInput
     creditLogs?: CreditLogUncheckedCreateNestedManyWithoutTeamInput
     bids?: BidUncheckedCreateNestedManyWithoutTeamInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundUncheckedCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamUpdateInput = {
@@ -9019,12 +11846,16 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUpdateManyWithoutTeamNestedInput
     creditLogs?: CreditLogUpdateManyWithoutTeamNestedInput
     bids?: BidUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUpdateManyWithoutWinnerNestedInput
   }
 
   export type TeamUncheckedUpdateInput = {
@@ -9037,12 +11868,16 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUncheckedUpdateManyWithoutTeamNestedInput
     creditLogs?: CreditLogUncheckedUpdateManyWithoutTeamNestedInput
     bids?: BidUncheckedUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUncheckedUpdateManyWithoutWinnerNestedInput
   }
 
   export type TeamCreateManyInput = {
@@ -9055,6 +11890,9 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9069,6 +11907,9 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9083,7 +11924,59 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SystemStateCreateInput = {
+    id?: string
+    currentPhase?: $Enums.GlobalPhase
+    codingStartTime?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type SystemStateUncheckedCreateInput = {
+    id?: string
+    currentPhase?: $Enums.GlobalPhase
+    codingStartTime?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type SystemStateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentPhase?: EnumGlobalPhaseFieldUpdateOperationsInput | $Enums.GlobalPhase
+    codingStartTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SystemStateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentPhase?: EnumGlobalPhaseFieldUpdateOperationsInput | $Enums.GlobalPhase
+    codingStartTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SystemStateCreateManyInput = {
+    id?: string
+    currentPhase?: $Enums.GlobalPhase
+    codingStartTime?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type SystemStateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentPhase?: EnumGlobalPhaseFieldUpdateOperationsInput | $Enums.GlobalPhase
+    codingStartTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SystemStateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currentPhase?: EnumGlobalPhaseFieldUpdateOperationsInput | $Enums.GlobalPhase
+    codingStartTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9195,6 +12088,7 @@ export namespace Prisma {
     order?: number
     bids?: BidCreateNestedManyWithoutSnippetInput
     submissions?: SubmissionCreateNestedManyWithoutSnippetInput
+    auctionRounds?: AuctionRoundCreateNestedManyWithoutSnippetInput
   }
 
   export type SnippetUncheckedCreateInput = {
@@ -9209,6 +12103,7 @@ export namespace Prisma {
     order?: number
     bids?: BidUncheckedCreateNestedManyWithoutSnippetInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutSnippetInput
+    auctionRounds?: AuctionRoundUncheckedCreateNestedManyWithoutSnippetInput
   }
 
   export type SnippetUpdateInput = {
@@ -9223,6 +12118,7 @@ export namespace Prisma {
     order?: IntFieldUpdateOperationsInput | number
     bids?: BidUpdateManyWithoutSnippetNestedInput
     submissions?: SubmissionUpdateManyWithoutSnippetNestedInput
+    auctionRounds?: AuctionRoundUpdateManyWithoutSnippetNestedInput
   }
 
   export type SnippetUncheckedUpdateInput = {
@@ -9237,6 +12133,7 @@ export namespace Prisma {
     order?: IntFieldUpdateOperationsInput | number
     bids?: BidUncheckedUpdateManyWithoutSnippetNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutSnippetNestedInput
+    auctionRounds?: AuctionRoundUncheckedUpdateManyWithoutSnippetNestedInput
   }
 
   export type SnippetCreateManyInput = {
@@ -9282,12 +12179,14 @@ export namespace Prisma {
     createdAt?: Date | string
     team: TeamCreateNestedOneWithoutBidsInput
     snippet: SnippetCreateNestedOneWithoutBidsInput
+    auctionRound?: AuctionRoundCreateNestedOneWithoutBidsInput
   }
 
   export type BidUncheckedCreateInput = {
     id?: string
     teamId: string
     snippetId: string
+    auctionRoundId?: string | null
     amount: number
     won?: boolean
     createdAt?: Date | string
@@ -9300,12 +12199,14 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     team?: TeamUpdateOneRequiredWithoutBidsNestedInput
     snippet?: SnippetUpdateOneRequiredWithoutBidsNestedInput
+    auctionRound?: AuctionRoundUpdateOneWithoutBidsNestedInput
   }
 
   export type BidUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     teamId?: StringFieldUpdateOperationsInput | string
     snippetId?: StringFieldUpdateOperationsInput | string
+    auctionRoundId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: IntFieldUpdateOperationsInput | number
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9315,6 +12216,7 @@ export namespace Prisma {
     id?: string
     teamId: string
     snippetId: string
+    auctionRoundId?: string | null
     amount: number
     won?: boolean
     createdAt?: Date | string
@@ -9331,6 +12233,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     teamId?: StringFieldUpdateOperationsInput | string
     snippetId?: StringFieldUpdateOperationsInput | string
+    auctionRoundId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: IntFieldUpdateOperationsInput | number
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9425,6 +12328,92 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AuctionRoundCreateInput = {
+    id?: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winningBid?: number | null
+    createdAt?: Date | string
+    snippet: SnippetCreateNestedOneWithoutAuctionRoundsInput
+    winner?: TeamCreateNestedOneWithoutAuctionWinsInput
+    bids?: BidCreateNestedManyWithoutAuctionRoundInput
+  }
+
+  export type AuctionRoundUncheckedCreateInput = {
+    id?: string
+    snippetId: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winnerId?: string | null
+    winningBid?: number | null
+    createdAt?: Date | string
+    bids?: BidUncheckedCreateNestedManyWithoutAuctionRoundInput
+  }
+
+  export type AuctionRoundUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    snippet?: SnippetUpdateOneRequiredWithoutAuctionRoundsNestedInput
+    winner?: TeamUpdateOneWithoutAuctionWinsNestedInput
+    bids?: BidUpdateManyWithoutAuctionRoundNestedInput
+  }
+
+  export type AuctionRoundUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snippetId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bids?: BidUncheckedUpdateManyWithoutAuctionRoundNestedInput
+  }
+
+  export type AuctionRoundCreateManyInput = {
+    id?: string
+    snippetId: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winnerId?: string | null
+    winningBid?: number | null
+    createdAt?: Date | string
+  }
+
+  export type AuctionRoundUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuctionRoundUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snippetId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -9474,6 +12463,17 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -9509,6 +12509,12 @@ export namespace Prisma {
     none?: SubmissionWhereInput
   }
 
+  export type AuctionRoundListRelationFilter = {
+    every?: AuctionRoundWhereInput
+    some?: AuctionRoundWhereInput
+    none?: AuctionRoundWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -9530,6 +12536,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type AuctionRoundOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type TeamCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -9540,6 +12550,9 @@ export namespace Prisma {
     isEliminated?: SortOrder
     strikes?: SortOrder
     lastStrikeAt?: SortOrder
+    vaultTime?: SortOrder
+    lifelinesUsed?: SortOrder
+    lockPenalties?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9547,6 +12560,9 @@ export namespace Prisma {
   export type TeamAvgOrderByAggregateInput = {
     credits?: SortOrder
     strikes?: SortOrder
+    vaultTime?: SortOrder
+    lifelinesUsed?: SortOrder
+    lockPenalties?: SortOrder
   }
 
   export type TeamMaxOrderByAggregateInput = {
@@ -9559,6 +12575,9 @@ export namespace Prisma {
     isEliminated?: SortOrder
     strikes?: SortOrder
     lastStrikeAt?: SortOrder
+    vaultTime?: SortOrder
+    lifelinesUsed?: SortOrder
+    lockPenalties?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9573,6 +12592,9 @@ export namespace Prisma {
     isEliminated?: SortOrder
     strikes?: SortOrder
     lastStrikeAt?: SortOrder
+    vaultTime?: SortOrder
+    lifelinesUsed?: SortOrder
+    lockPenalties?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9580,6 +12602,9 @@ export namespace Prisma {
   export type TeamSumOrderByAggregateInput = {
     credits?: SortOrder
     strikes?: SortOrder
+    vaultTime?: SortOrder
+    lifelinesUsed?: SortOrder
+    lockPenalties?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -9648,6 +12673,22 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -9660,6 +12701,44 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type EnumGlobalPhaseFilter<$PrismaModel = never> = {
+    equals?: $Enums.GlobalPhase | EnumGlobalPhaseFieldRefInput<$PrismaModel>
+    in?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    not?: NestedEnumGlobalPhaseFilter<$PrismaModel> | $Enums.GlobalPhase
+  }
+
+  export type SystemStateCountOrderByAggregateInput = {
+    id?: SortOrder
+    currentPhase?: SortOrder
+    codingStartTime?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SystemStateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    currentPhase?: SortOrder
+    codingStartTime?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SystemStateMinOrderByAggregateInput = {
+    id?: SortOrder
+    currentPhase?: SortOrder
+    codingStartTime?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumGlobalPhaseWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.GlobalPhase | EnumGlobalPhaseFieldRefInput<$PrismaModel>
+    in?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    not?: NestedEnumGlobalPhaseWithAggregatesFilter<$PrismaModel> | $Enums.GlobalPhase
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumGlobalPhaseFilter<$PrismaModel>
+    _max?: NestedEnumGlobalPhaseFilter<$PrismaModel>
   }
 
   export type TeamScalarRelationFilter = {
@@ -9816,10 +12895,16 @@ export namespace Prisma {
     isNot?: SnippetWhereInput
   }
 
+  export type AuctionRoundNullableScalarRelationFilter = {
+    is?: AuctionRoundWhereInput | null
+    isNot?: AuctionRoundWhereInput | null
+  }
+
   export type BidCountOrderByAggregateInput = {
     id?: SortOrder
     teamId?: SortOrder
     snippetId?: SortOrder
+    auctionRoundId?: SortOrder
     amount?: SortOrder
     won?: SortOrder
     createdAt?: SortOrder
@@ -9833,6 +12918,7 @@ export namespace Prisma {
     id?: SortOrder
     teamId?: SortOrder
     snippetId?: SortOrder
+    auctionRoundId?: SortOrder
     amount?: SortOrder
     won?: SortOrder
     createdAt?: SortOrder
@@ -9842,6 +12928,7 @@ export namespace Prisma {
     id?: SortOrder
     teamId?: SortOrder
     snippetId?: SortOrder
+    auctionRoundId?: SortOrder
     amount?: SortOrder
     won?: SortOrder
     createdAt?: SortOrder
@@ -9907,6 +12994,74 @@ export namespace Prisma {
     _max?: NestedEnumSubmissionStatusFilter<$PrismaModel>
   }
 
+  export type EnumAuctionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AuctionStatus | EnumAuctionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAuctionStatusFilter<$PrismaModel> | $Enums.AuctionStatus
+  }
+
+  export type TeamNullableScalarRelationFilter = {
+    is?: TeamWhereInput | null
+    isNot?: TeamWhereInput | null
+  }
+
+  export type AuctionRoundCountOrderByAggregateInput = {
+    id?: SortOrder
+    snippetId?: SortOrder
+    status?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    duration?: SortOrder
+    winnerId?: SortOrder
+    winningBid?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuctionRoundAvgOrderByAggregateInput = {
+    duration?: SortOrder
+    winningBid?: SortOrder
+  }
+
+  export type AuctionRoundMaxOrderByAggregateInput = {
+    id?: SortOrder
+    snippetId?: SortOrder
+    status?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    duration?: SortOrder
+    winnerId?: SortOrder
+    winningBid?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuctionRoundMinOrderByAggregateInput = {
+    id?: SortOrder
+    snippetId?: SortOrder
+    status?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    duration?: SortOrder
+    winnerId?: SortOrder
+    winningBid?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuctionRoundSumOrderByAggregateInput = {
+    duration?: SortOrder
+    winningBid?: SortOrder
+  }
+
+  export type EnumAuctionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AuctionStatus | EnumAuctionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAuctionStatusWithAggregatesFilter<$PrismaModel> | $Enums.AuctionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAuctionStatusFilter<$PrismaModel>
+    _max?: NestedEnumAuctionStatusFilter<$PrismaModel>
+  }
+
   export type MemberCreateNestedManyWithoutTeamInput = {
     create?: XOR<MemberCreateWithoutTeamInput, MemberUncheckedCreateWithoutTeamInput> | MemberCreateWithoutTeamInput[] | MemberUncheckedCreateWithoutTeamInput[]
     connectOrCreate?: MemberCreateOrConnectWithoutTeamInput | MemberCreateOrConnectWithoutTeamInput[]
@@ -9933,6 +13088,13 @@ export namespace Prisma {
     connectOrCreate?: SubmissionCreateOrConnectWithoutTeamInput | SubmissionCreateOrConnectWithoutTeamInput[]
     createMany?: SubmissionCreateManyTeamInputEnvelope
     connect?: SubmissionWhereUniqueInput | SubmissionWhereUniqueInput[]
+  }
+
+  export type AuctionRoundCreateNestedManyWithoutWinnerInput = {
+    create?: XOR<AuctionRoundCreateWithoutWinnerInput, AuctionRoundUncheckedCreateWithoutWinnerInput> | AuctionRoundCreateWithoutWinnerInput[] | AuctionRoundUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutWinnerInput | AuctionRoundCreateOrConnectWithoutWinnerInput[]
+    createMany?: AuctionRoundCreateManyWinnerInputEnvelope
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
   }
 
   export type MemberUncheckedCreateNestedManyWithoutTeamInput = {
@@ -9963,6 +13125,13 @@ export namespace Prisma {
     connect?: SubmissionWhereUniqueInput | SubmissionWhereUniqueInput[]
   }
 
+  export type AuctionRoundUncheckedCreateNestedManyWithoutWinnerInput = {
+    create?: XOR<AuctionRoundCreateWithoutWinnerInput, AuctionRoundUncheckedCreateWithoutWinnerInput> | AuctionRoundCreateWithoutWinnerInput[] | AuctionRoundUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutWinnerInput | AuctionRoundCreateOrConnectWithoutWinnerInput[]
+    createMany?: AuctionRoundCreateManyWinnerInputEnvelope
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -9985,6 +13154,14 @@ export namespace Prisma {
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -10047,6 +13224,20 @@ export namespace Prisma {
     deleteMany?: SubmissionScalarWhereInput | SubmissionScalarWhereInput[]
   }
 
+  export type AuctionRoundUpdateManyWithoutWinnerNestedInput = {
+    create?: XOR<AuctionRoundCreateWithoutWinnerInput, AuctionRoundUncheckedCreateWithoutWinnerInput> | AuctionRoundCreateWithoutWinnerInput[] | AuctionRoundUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutWinnerInput | AuctionRoundCreateOrConnectWithoutWinnerInput[]
+    upsert?: AuctionRoundUpsertWithWhereUniqueWithoutWinnerInput | AuctionRoundUpsertWithWhereUniqueWithoutWinnerInput[]
+    createMany?: AuctionRoundCreateManyWinnerInputEnvelope
+    set?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    disconnect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    delete?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    update?: AuctionRoundUpdateWithWhereUniqueWithoutWinnerInput | AuctionRoundUpdateWithWhereUniqueWithoutWinnerInput[]
+    updateMany?: AuctionRoundUpdateManyWithWhereWithoutWinnerInput | AuctionRoundUpdateManyWithWhereWithoutWinnerInput[]
+    deleteMany?: AuctionRoundScalarWhereInput | AuctionRoundScalarWhereInput[]
+  }
+
   export type MemberUncheckedUpdateManyWithoutTeamNestedInput = {
     create?: XOR<MemberCreateWithoutTeamInput, MemberUncheckedCreateWithoutTeamInput> | MemberCreateWithoutTeamInput[] | MemberUncheckedCreateWithoutTeamInput[]
     connectOrCreate?: MemberCreateOrConnectWithoutTeamInput | MemberCreateOrConnectWithoutTeamInput[]
@@ -10103,6 +13294,24 @@ export namespace Prisma {
     deleteMany?: SubmissionScalarWhereInput | SubmissionScalarWhereInput[]
   }
 
+  export type AuctionRoundUncheckedUpdateManyWithoutWinnerNestedInput = {
+    create?: XOR<AuctionRoundCreateWithoutWinnerInput, AuctionRoundUncheckedCreateWithoutWinnerInput> | AuctionRoundCreateWithoutWinnerInput[] | AuctionRoundUncheckedCreateWithoutWinnerInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutWinnerInput | AuctionRoundCreateOrConnectWithoutWinnerInput[]
+    upsert?: AuctionRoundUpsertWithWhereUniqueWithoutWinnerInput | AuctionRoundUpsertWithWhereUniqueWithoutWinnerInput[]
+    createMany?: AuctionRoundCreateManyWinnerInputEnvelope
+    set?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    disconnect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    delete?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    update?: AuctionRoundUpdateWithWhereUniqueWithoutWinnerInput | AuctionRoundUpdateWithWhereUniqueWithoutWinnerInput[]
+    updateMany?: AuctionRoundUpdateManyWithWhereWithoutWinnerInput | AuctionRoundUpdateManyWithWhereWithoutWinnerInput[]
+    deleteMany?: AuctionRoundScalarWhereInput | AuctionRoundScalarWhereInput[]
+  }
+
+  export type EnumGlobalPhaseFieldUpdateOperationsInput = {
+    set?: $Enums.GlobalPhase
+  }
+
   export type TeamCreateNestedOneWithoutMembersInput = {
     create?: XOR<TeamCreateWithoutMembersInput, TeamUncheckedCreateWithoutMembersInput>
     connectOrCreate?: TeamCreateOrConnectWithoutMembersInput
@@ -10145,6 +13354,13 @@ export namespace Prisma {
     connect?: SubmissionWhereUniqueInput | SubmissionWhereUniqueInput[]
   }
 
+  export type AuctionRoundCreateNestedManyWithoutSnippetInput = {
+    create?: XOR<AuctionRoundCreateWithoutSnippetInput, AuctionRoundUncheckedCreateWithoutSnippetInput> | AuctionRoundCreateWithoutSnippetInput[] | AuctionRoundUncheckedCreateWithoutSnippetInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutSnippetInput | AuctionRoundCreateOrConnectWithoutSnippetInput[]
+    createMany?: AuctionRoundCreateManySnippetInputEnvelope
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+  }
+
   export type BidUncheckedCreateNestedManyWithoutSnippetInput = {
     create?: XOR<BidCreateWithoutSnippetInput, BidUncheckedCreateWithoutSnippetInput> | BidCreateWithoutSnippetInput[] | BidUncheckedCreateWithoutSnippetInput[]
     connectOrCreate?: BidCreateOrConnectWithoutSnippetInput | BidCreateOrConnectWithoutSnippetInput[]
@@ -10157,6 +13373,13 @@ export namespace Prisma {
     connectOrCreate?: SubmissionCreateOrConnectWithoutSnippetInput | SubmissionCreateOrConnectWithoutSnippetInput[]
     createMany?: SubmissionCreateManySnippetInputEnvelope
     connect?: SubmissionWhereUniqueInput | SubmissionWhereUniqueInput[]
+  }
+
+  export type AuctionRoundUncheckedCreateNestedManyWithoutSnippetInput = {
+    create?: XOR<AuctionRoundCreateWithoutSnippetInput, AuctionRoundUncheckedCreateWithoutSnippetInput> | AuctionRoundCreateWithoutSnippetInput[] | AuctionRoundUncheckedCreateWithoutSnippetInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutSnippetInput | AuctionRoundCreateOrConnectWithoutSnippetInput[]
+    createMany?: AuctionRoundCreateManySnippetInputEnvelope
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
   }
 
   export type EnumCategoryFieldUpdateOperationsInput = {
@@ -10195,6 +13418,20 @@ export namespace Prisma {
     deleteMany?: SubmissionScalarWhereInput | SubmissionScalarWhereInput[]
   }
 
+  export type AuctionRoundUpdateManyWithoutSnippetNestedInput = {
+    create?: XOR<AuctionRoundCreateWithoutSnippetInput, AuctionRoundUncheckedCreateWithoutSnippetInput> | AuctionRoundCreateWithoutSnippetInput[] | AuctionRoundUncheckedCreateWithoutSnippetInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutSnippetInput | AuctionRoundCreateOrConnectWithoutSnippetInput[]
+    upsert?: AuctionRoundUpsertWithWhereUniqueWithoutSnippetInput | AuctionRoundUpsertWithWhereUniqueWithoutSnippetInput[]
+    createMany?: AuctionRoundCreateManySnippetInputEnvelope
+    set?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    disconnect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    delete?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    update?: AuctionRoundUpdateWithWhereUniqueWithoutSnippetInput | AuctionRoundUpdateWithWhereUniqueWithoutSnippetInput[]
+    updateMany?: AuctionRoundUpdateManyWithWhereWithoutSnippetInput | AuctionRoundUpdateManyWithWhereWithoutSnippetInput[]
+    deleteMany?: AuctionRoundScalarWhereInput | AuctionRoundScalarWhereInput[]
+  }
+
   export type BidUncheckedUpdateManyWithoutSnippetNestedInput = {
     create?: XOR<BidCreateWithoutSnippetInput, BidUncheckedCreateWithoutSnippetInput> | BidCreateWithoutSnippetInput[] | BidUncheckedCreateWithoutSnippetInput[]
     connectOrCreate?: BidCreateOrConnectWithoutSnippetInput | BidCreateOrConnectWithoutSnippetInput[]
@@ -10223,6 +13460,20 @@ export namespace Prisma {
     deleteMany?: SubmissionScalarWhereInput | SubmissionScalarWhereInput[]
   }
 
+  export type AuctionRoundUncheckedUpdateManyWithoutSnippetNestedInput = {
+    create?: XOR<AuctionRoundCreateWithoutSnippetInput, AuctionRoundUncheckedCreateWithoutSnippetInput> | AuctionRoundCreateWithoutSnippetInput[] | AuctionRoundUncheckedCreateWithoutSnippetInput[]
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutSnippetInput | AuctionRoundCreateOrConnectWithoutSnippetInput[]
+    upsert?: AuctionRoundUpsertWithWhereUniqueWithoutSnippetInput | AuctionRoundUpsertWithWhereUniqueWithoutSnippetInput[]
+    createMany?: AuctionRoundCreateManySnippetInputEnvelope
+    set?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    disconnect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    delete?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    connect?: AuctionRoundWhereUniqueInput | AuctionRoundWhereUniqueInput[]
+    update?: AuctionRoundUpdateWithWhereUniqueWithoutSnippetInput | AuctionRoundUpdateWithWhereUniqueWithoutSnippetInput[]
+    updateMany?: AuctionRoundUpdateManyWithWhereWithoutSnippetInput | AuctionRoundUpdateManyWithWhereWithoutSnippetInput[]
+    deleteMany?: AuctionRoundScalarWhereInput | AuctionRoundScalarWhereInput[]
+  }
+
   export type TeamCreateNestedOneWithoutBidsInput = {
     create?: XOR<TeamCreateWithoutBidsInput, TeamUncheckedCreateWithoutBidsInput>
     connectOrCreate?: TeamCreateOrConnectWithoutBidsInput
@@ -10233,6 +13484,12 @@ export namespace Prisma {
     create?: XOR<SnippetCreateWithoutBidsInput, SnippetUncheckedCreateWithoutBidsInput>
     connectOrCreate?: SnippetCreateOrConnectWithoutBidsInput
     connect?: SnippetWhereUniqueInput
+  }
+
+  export type AuctionRoundCreateNestedOneWithoutBidsInput = {
+    create?: XOR<AuctionRoundCreateWithoutBidsInput, AuctionRoundUncheckedCreateWithoutBidsInput>
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutBidsInput
+    connect?: AuctionRoundWhereUniqueInput
   }
 
   export type TeamUpdateOneRequiredWithoutBidsNestedInput = {
@@ -10249,6 +13506,16 @@ export namespace Prisma {
     upsert?: SnippetUpsertWithoutBidsInput
     connect?: SnippetWhereUniqueInput
     update?: XOR<XOR<SnippetUpdateToOneWithWhereWithoutBidsInput, SnippetUpdateWithoutBidsInput>, SnippetUncheckedUpdateWithoutBidsInput>
+  }
+
+  export type AuctionRoundUpdateOneWithoutBidsNestedInput = {
+    create?: XOR<AuctionRoundCreateWithoutBidsInput, AuctionRoundUncheckedCreateWithoutBidsInput>
+    connectOrCreate?: AuctionRoundCreateOrConnectWithoutBidsInput
+    upsert?: AuctionRoundUpsertWithoutBidsInput
+    disconnect?: AuctionRoundWhereInput | boolean
+    delete?: AuctionRoundWhereInput | boolean
+    connect?: AuctionRoundWhereUniqueInput
+    update?: XOR<XOR<AuctionRoundUpdateToOneWithWhereWithoutBidsInput, AuctionRoundUpdateWithoutBidsInput>, AuctionRoundUncheckedUpdateWithoutBidsInput>
   }
 
   export type TeamCreateNestedOneWithoutSubmissionsInput = {
@@ -10281,6 +13548,82 @@ export namespace Prisma {
     upsert?: SnippetUpsertWithoutSubmissionsInput
     connect?: SnippetWhereUniqueInput
     update?: XOR<XOR<SnippetUpdateToOneWithWhereWithoutSubmissionsInput, SnippetUpdateWithoutSubmissionsInput>, SnippetUncheckedUpdateWithoutSubmissionsInput>
+  }
+
+  export type SnippetCreateNestedOneWithoutAuctionRoundsInput = {
+    create?: XOR<SnippetCreateWithoutAuctionRoundsInput, SnippetUncheckedCreateWithoutAuctionRoundsInput>
+    connectOrCreate?: SnippetCreateOrConnectWithoutAuctionRoundsInput
+    connect?: SnippetWhereUniqueInput
+  }
+
+  export type TeamCreateNestedOneWithoutAuctionWinsInput = {
+    create?: XOR<TeamCreateWithoutAuctionWinsInput, TeamUncheckedCreateWithoutAuctionWinsInput>
+    connectOrCreate?: TeamCreateOrConnectWithoutAuctionWinsInput
+    connect?: TeamWhereUniqueInput
+  }
+
+  export type BidCreateNestedManyWithoutAuctionRoundInput = {
+    create?: XOR<BidCreateWithoutAuctionRoundInput, BidUncheckedCreateWithoutAuctionRoundInput> | BidCreateWithoutAuctionRoundInput[] | BidUncheckedCreateWithoutAuctionRoundInput[]
+    connectOrCreate?: BidCreateOrConnectWithoutAuctionRoundInput | BidCreateOrConnectWithoutAuctionRoundInput[]
+    createMany?: BidCreateManyAuctionRoundInputEnvelope
+    connect?: BidWhereUniqueInput | BidWhereUniqueInput[]
+  }
+
+  export type BidUncheckedCreateNestedManyWithoutAuctionRoundInput = {
+    create?: XOR<BidCreateWithoutAuctionRoundInput, BidUncheckedCreateWithoutAuctionRoundInput> | BidCreateWithoutAuctionRoundInput[] | BidUncheckedCreateWithoutAuctionRoundInput[]
+    connectOrCreate?: BidCreateOrConnectWithoutAuctionRoundInput | BidCreateOrConnectWithoutAuctionRoundInput[]
+    createMany?: BidCreateManyAuctionRoundInputEnvelope
+    connect?: BidWhereUniqueInput | BidWhereUniqueInput[]
+  }
+
+  export type EnumAuctionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AuctionStatus
+  }
+
+  export type SnippetUpdateOneRequiredWithoutAuctionRoundsNestedInput = {
+    create?: XOR<SnippetCreateWithoutAuctionRoundsInput, SnippetUncheckedCreateWithoutAuctionRoundsInput>
+    connectOrCreate?: SnippetCreateOrConnectWithoutAuctionRoundsInput
+    upsert?: SnippetUpsertWithoutAuctionRoundsInput
+    connect?: SnippetWhereUniqueInput
+    update?: XOR<XOR<SnippetUpdateToOneWithWhereWithoutAuctionRoundsInput, SnippetUpdateWithoutAuctionRoundsInput>, SnippetUncheckedUpdateWithoutAuctionRoundsInput>
+  }
+
+  export type TeamUpdateOneWithoutAuctionWinsNestedInput = {
+    create?: XOR<TeamCreateWithoutAuctionWinsInput, TeamUncheckedCreateWithoutAuctionWinsInput>
+    connectOrCreate?: TeamCreateOrConnectWithoutAuctionWinsInput
+    upsert?: TeamUpsertWithoutAuctionWinsInput
+    disconnect?: TeamWhereInput | boolean
+    delete?: TeamWhereInput | boolean
+    connect?: TeamWhereUniqueInput
+    update?: XOR<XOR<TeamUpdateToOneWithWhereWithoutAuctionWinsInput, TeamUpdateWithoutAuctionWinsInput>, TeamUncheckedUpdateWithoutAuctionWinsInput>
+  }
+
+  export type BidUpdateManyWithoutAuctionRoundNestedInput = {
+    create?: XOR<BidCreateWithoutAuctionRoundInput, BidUncheckedCreateWithoutAuctionRoundInput> | BidCreateWithoutAuctionRoundInput[] | BidUncheckedCreateWithoutAuctionRoundInput[]
+    connectOrCreate?: BidCreateOrConnectWithoutAuctionRoundInput | BidCreateOrConnectWithoutAuctionRoundInput[]
+    upsert?: BidUpsertWithWhereUniqueWithoutAuctionRoundInput | BidUpsertWithWhereUniqueWithoutAuctionRoundInput[]
+    createMany?: BidCreateManyAuctionRoundInputEnvelope
+    set?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    disconnect?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    delete?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    connect?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    update?: BidUpdateWithWhereUniqueWithoutAuctionRoundInput | BidUpdateWithWhereUniqueWithoutAuctionRoundInput[]
+    updateMany?: BidUpdateManyWithWhereWithoutAuctionRoundInput | BidUpdateManyWithWhereWithoutAuctionRoundInput[]
+    deleteMany?: BidScalarWhereInput | BidScalarWhereInput[]
+  }
+
+  export type BidUncheckedUpdateManyWithoutAuctionRoundNestedInput = {
+    create?: XOR<BidCreateWithoutAuctionRoundInput, BidUncheckedCreateWithoutAuctionRoundInput> | BidCreateWithoutAuctionRoundInput[] | BidUncheckedCreateWithoutAuctionRoundInput[]
+    connectOrCreate?: BidCreateOrConnectWithoutAuctionRoundInput | BidCreateOrConnectWithoutAuctionRoundInput[]
+    upsert?: BidUpsertWithWhereUniqueWithoutAuctionRoundInput | BidUpsertWithWhereUniqueWithoutAuctionRoundInput[]
+    createMany?: BidCreateManyAuctionRoundInputEnvelope
+    set?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    disconnect?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    delete?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    connect?: BidWhereUniqueInput | BidWhereUniqueInput[]
+    update?: BidUpdateWithWhereUniqueWithoutAuctionRoundInput | BidUpdateWithWhereUniqueWithoutAuctionRoundInput[]
+    updateMany?: BidUpdateManyWithWhereWithoutAuctionRoundInput | BidUpdateManyWithWhereWithoutAuctionRoundInput[]
+    deleteMany?: BidScalarWhereInput | BidScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -10329,6 +13672,17 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -10418,7 +13772,7 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -10426,7 +13780,23 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10441,6 +13811,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumGlobalPhaseFilter<$PrismaModel = never> = {
+    equals?: $Enums.GlobalPhase | EnumGlobalPhaseFieldRefInput<$PrismaModel>
+    in?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    not?: NestedEnumGlobalPhaseFilter<$PrismaModel> | $Enums.GlobalPhase
+  }
+
+  export type NestedEnumGlobalPhaseWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.GlobalPhase | EnumGlobalPhaseFieldRefInput<$PrismaModel>
+    in?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GlobalPhase[] | ListEnumGlobalPhaseFieldRefInput<$PrismaModel>
+    not?: NestedEnumGlobalPhaseWithAggregatesFilter<$PrismaModel> | $Enums.GlobalPhase
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumGlobalPhaseFilter<$PrismaModel>
+    _max?: NestedEnumGlobalPhaseFilter<$PrismaModel>
   }
 
   export type NestedEnumCategoryFilter<$PrismaModel = never> = {
@@ -10508,6 +13895,23 @@ export namespace Prisma {
     _max?: NestedEnumSubmissionStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumAuctionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AuctionStatus | EnumAuctionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAuctionStatusFilter<$PrismaModel> | $Enums.AuctionStatus
+  }
+
+  export type NestedEnumAuctionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AuctionStatus | EnumAuctionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AuctionStatus[] | ListEnumAuctionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAuctionStatusWithAggregatesFilter<$PrismaModel> | $Enums.AuctionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAuctionStatusFilter<$PrismaModel>
+    _max?: NestedEnumAuctionStatusFilter<$PrismaModel>
+  }
+
   export type MemberCreateWithoutTeamInput = {
     id?: string
     name: string
@@ -10558,11 +13962,13 @@ export namespace Prisma {
     won?: boolean
     createdAt?: Date | string
     snippet: SnippetCreateNestedOneWithoutBidsInput
+    auctionRound?: AuctionRoundCreateNestedOneWithoutBidsInput
   }
 
   export type BidUncheckedCreateWithoutTeamInput = {
     id?: string
     snippetId: string
+    auctionRoundId?: string | null
     amount: number
     won?: boolean
     createdAt?: Date | string
@@ -10609,6 +14015,40 @@ export namespace Prisma {
 
   export type SubmissionCreateManyTeamInputEnvelope = {
     data: SubmissionCreateManyTeamInput | SubmissionCreateManyTeamInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AuctionRoundCreateWithoutWinnerInput = {
+    id?: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winningBid?: number | null
+    createdAt?: Date | string
+    snippet: SnippetCreateNestedOneWithoutAuctionRoundsInput
+    bids?: BidCreateNestedManyWithoutAuctionRoundInput
+  }
+
+  export type AuctionRoundUncheckedCreateWithoutWinnerInput = {
+    id?: string
+    snippetId: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winningBid?: number | null
+    createdAt?: Date | string
+    bids?: BidUncheckedCreateNestedManyWithoutAuctionRoundInput
+  }
+
+  export type AuctionRoundCreateOrConnectWithoutWinnerInput = {
+    where: AuctionRoundWhereUniqueInput
+    create: XOR<AuctionRoundCreateWithoutWinnerInput, AuctionRoundUncheckedCreateWithoutWinnerInput>
+  }
+
+  export type AuctionRoundCreateManyWinnerInputEnvelope = {
+    data: AuctionRoundCreateManyWinnerInput | AuctionRoundCreateManyWinnerInput[]
     skipDuplicates?: boolean
   }
 
@@ -10687,6 +14127,7 @@ export namespace Prisma {
     id?: StringFilter<"Bid"> | string
     teamId?: StringFilter<"Bid"> | string
     snippetId?: StringFilter<"Bid"> | string
+    auctionRoundId?: StringNullableFilter<"Bid"> | string | null
     amount?: IntFilter<"Bid"> | number
     won?: BoolFilter<"Bid"> | boolean
     createdAt?: DateTimeFilter<"Bid"> | Date | string
@@ -10724,6 +14165,37 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Submission"> | Date | string
   }
 
+  export type AuctionRoundUpsertWithWhereUniqueWithoutWinnerInput = {
+    where: AuctionRoundWhereUniqueInput
+    update: XOR<AuctionRoundUpdateWithoutWinnerInput, AuctionRoundUncheckedUpdateWithoutWinnerInput>
+    create: XOR<AuctionRoundCreateWithoutWinnerInput, AuctionRoundUncheckedCreateWithoutWinnerInput>
+  }
+
+  export type AuctionRoundUpdateWithWhereUniqueWithoutWinnerInput = {
+    where: AuctionRoundWhereUniqueInput
+    data: XOR<AuctionRoundUpdateWithoutWinnerInput, AuctionRoundUncheckedUpdateWithoutWinnerInput>
+  }
+
+  export type AuctionRoundUpdateManyWithWhereWithoutWinnerInput = {
+    where: AuctionRoundScalarWhereInput
+    data: XOR<AuctionRoundUpdateManyMutationInput, AuctionRoundUncheckedUpdateManyWithoutWinnerInput>
+  }
+
+  export type AuctionRoundScalarWhereInput = {
+    AND?: AuctionRoundScalarWhereInput | AuctionRoundScalarWhereInput[]
+    OR?: AuctionRoundScalarWhereInput[]
+    NOT?: AuctionRoundScalarWhereInput | AuctionRoundScalarWhereInput[]
+    id?: StringFilter<"AuctionRound"> | string
+    snippetId?: StringFilter<"AuctionRound"> | string
+    status?: EnumAuctionStatusFilter<"AuctionRound"> | $Enums.AuctionStatus
+    startTime?: DateTimeNullableFilter<"AuctionRound"> | Date | string | null
+    endTime?: DateTimeNullableFilter<"AuctionRound"> | Date | string | null
+    duration?: IntFilter<"AuctionRound"> | number
+    winnerId?: StringNullableFilter<"AuctionRound"> | string | null
+    winningBid?: IntNullableFilter<"AuctionRound"> | number | null
+    createdAt?: DateTimeFilter<"AuctionRound"> | Date | string
+  }
+
   export type TeamCreateWithoutMembersInput = {
     id?: string
     name: string
@@ -10734,11 +14206,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     creditLogs?: CreditLogCreateNestedManyWithoutTeamInput
     bids?: BidCreateNestedManyWithoutTeamInput
     submissions?: SubmissionCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamUncheckedCreateWithoutMembersInput = {
@@ -10751,11 +14227,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     creditLogs?: CreditLogUncheckedCreateNestedManyWithoutTeamInput
     bids?: BidUncheckedCreateNestedManyWithoutTeamInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundUncheckedCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamCreateOrConnectWithoutMembersInput = {
@@ -10784,11 +14264,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creditLogs?: CreditLogUpdateManyWithoutTeamNestedInput
     bids?: BidUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUpdateManyWithoutWinnerNestedInput
   }
 
   export type TeamUncheckedUpdateWithoutMembersInput = {
@@ -10801,11 +14285,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creditLogs?: CreditLogUncheckedUpdateManyWithoutTeamNestedInput
     bids?: BidUncheckedUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUncheckedUpdateManyWithoutWinnerNestedInput
   }
 
   export type TeamCreateWithoutCreditLogsInput = {
@@ -10818,11 +14306,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberCreateNestedManyWithoutTeamInput
     bids?: BidCreateNestedManyWithoutTeamInput
     submissions?: SubmissionCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamUncheckedCreateWithoutCreditLogsInput = {
@@ -10835,11 +14327,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberUncheckedCreateNestedManyWithoutTeamInput
     bids?: BidUncheckedCreateNestedManyWithoutTeamInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundUncheckedCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamCreateOrConnectWithoutCreditLogsInput = {
@@ -10868,11 +14364,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUpdateManyWithoutTeamNestedInput
     bids?: BidUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUpdateManyWithoutWinnerNestedInput
   }
 
   export type TeamUncheckedUpdateWithoutCreditLogsInput = {
@@ -10885,11 +14385,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUncheckedUpdateManyWithoutTeamNestedInput
     bids?: BidUncheckedUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUncheckedUpdateManyWithoutWinnerNestedInput
   }
 
   export type BidCreateWithoutSnippetInput = {
@@ -10898,11 +14402,13 @@ export namespace Prisma {
     won?: boolean
     createdAt?: Date | string
     team: TeamCreateNestedOneWithoutBidsInput
+    auctionRound?: AuctionRoundCreateNestedOneWithoutBidsInput
   }
 
   export type BidUncheckedCreateWithoutSnippetInput = {
     id?: string
     teamId: string
+    auctionRoundId?: string | null
     amount: number
     won?: boolean
     createdAt?: Date | string
@@ -10952,6 +14458,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type AuctionRoundCreateWithoutSnippetInput = {
+    id?: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winningBid?: number | null
+    createdAt?: Date | string
+    winner?: TeamCreateNestedOneWithoutAuctionWinsInput
+    bids?: BidCreateNestedManyWithoutAuctionRoundInput
+  }
+
+  export type AuctionRoundUncheckedCreateWithoutSnippetInput = {
+    id?: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winnerId?: string | null
+    winningBid?: number | null
+    createdAt?: Date | string
+    bids?: BidUncheckedCreateNestedManyWithoutAuctionRoundInput
+  }
+
+  export type AuctionRoundCreateOrConnectWithoutSnippetInput = {
+    where: AuctionRoundWhereUniqueInput
+    create: XOR<AuctionRoundCreateWithoutSnippetInput, AuctionRoundUncheckedCreateWithoutSnippetInput>
+  }
+
+  export type AuctionRoundCreateManySnippetInputEnvelope = {
+    data: AuctionRoundCreateManySnippetInput | AuctionRoundCreateManySnippetInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BidUpsertWithWhereUniqueWithoutSnippetInput = {
     where: BidWhereUniqueInput
     update: XOR<BidUpdateWithoutSnippetInput, BidUncheckedUpdateWithoutSnippetInput>
@@ -10984,6 +14524,22 @@ export namespace Prisma {
     data: XOR<SubmissionUpdateManyMutationInput, SubmissionUncheckedUpdateManyWithoutSnippetInput>
   }
 
+  export type AuctionRoundUpsertWithWhereUniqueWithoutSnippetInput = {
+    where: AuctionRoundWhereUniqueInput
+    update: XOR<AuctionRoundUpdateWithoutSnippetInput, AuctionRoundUncheckedUpdateWithoutSnippetInput>
+    create: XOR<AuctionRoundCreateWithoutSnippetInput, AuctionRoundUncheckedCreateWithoutSnippetInput>
+  }
+
+  export type AuctionRoundUpdateWithWhereUniqueWithoutSnippetInput = {
+    where: AuctionRoundWhereUniqueInput
+    data: XOR<AuctionRoundUpdateWithoutSnippetInput, AuctionRoundUncheckedUpdateWithoutSnippetInput>
+  }
+
+  export type AuctionRoundUpdateManyWithWhereWithoutSnippetInput = {
+    where: AuctionRoundScalarWhereInput
+    data: XOR<AuctionRoundUpdateManyMutationInput, AuctionRoundUncheckedUpdateManyWithoutSnippetInput>
+  }
+
   export type TeamCreateWithoutBidsInput = {
     id?: string
     name: string
@@ -10994,11 +14550,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberCreateNestedManyWithoutTeamInput
     creditLogs?: CreditLogCreateNestedManyWithoutTeamInput
     submissions?: SubmissionCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamUncheckedCreateWithoutBidsInput = {
@@ -11011,11 +14571,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberUncheckedCreateNestedManyWithoutTeamInput
     creditLogs?: CreditLogUncheckedCreateNestedManyWithoutTeamInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundUncheckedCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamCreateOrConnectWithoutBidsInput = {
@@ -11034,6 +14598,7 @@ export namespace Prisma {
     isActive?: boolean
     order?: number
     submissions?: SubmissionCreateNestedManyWithoutSnippetInput
+    auctionRounds?: AuctionRoundCreateNestedManyWithoutSnippetInput
   }
 
   export type SnippetUncheckedCreateWithoutBidsInput = {
@@ -11047,11 +14612,41 @@ export namespace Prisma {
     isActive?: boolean
     order?: number
     submissions?: SubmissionUncheckedCreateNestedManyWithoutSnippetInput
+    auctionRounds?: AuctionRoundUncheckedCreateNestedManyWithoutSnippetInput
   }
 
   export type SnippetCreateOrConnectWithoutBidsInput = {
     where: SnippetWhereUniqueInput
     create: XOR<SnippetCreateWithoutBidsInput, SnippetUncheckedCreateWithoutBidsInput>
+  }
+
+  export type AuctionRoundCreateWithoutBidsInput = {
+    id?: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winningBid?: number | null
+    createdAt?: Date | string
+    snippet: SnippetCreateNestedOneWithoutAuctionRoundsInput
+    winner?: TeamCreateNestedOneWithoutAuctionWinsInput
+  }
+
+  export type AuctionRoundUncheckedCreateWithoutBidsInput = {
+    id?: string
+    snippetId: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winnerId?: string | null
+    winningBid?: number | null
+    createdAt?: Date | string
+  }
+
+  export type AuctionRoundCreateOrConnectWithoutBidsInput = {
+    where: AuctionRoundWhereUniqueInput
+    create: XOR<AuctionRoundCreateWithoutBidsInput, AuctionRoundUncheckedCreateWithoutBidsInput>
   }
 
   export type TeamUpsertWithoutBidsInput = {
@@ -11075,11 +14670,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUpdateManyWithoutTeamNestedInput
     creditLogs?: CreditLogUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUpdateManyWithoutWinnerNestedInput
   }
 
   export type TeamUncheckedUpdateWithoutBidsInput = {
@@ -11092,11 +14691,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUncheckedUpdateManyWithoutTeamNestedInput
     creditLogs?: CreditLogUncheckedUpdateManyWithoutTeamNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUncheckedUpdateManyWithoutWinnerNestedInput
   }
 
   export type SnippetUpsertWithoutBidsInput = {
@@ -11121,6 +14724,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     submissions?: SubmissionUpdateManyWithoutSnippetNestedInput
+    auctionRounds?: AuctionRoundUpdateManyWithoutSnippetNestedInput
   }
 
   export type SnippetUncheckedUpdateWithoutBidsInput = {
@@ -11134,6 +14738,42 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     submissions?: SubmissionUncheckedUpdateManyWithoutSnippetNestedInput
+    auctionRounds?: AuctionRoundUncheckedUpdateManyWithoutSnippetNestedInput
+  }
+
+  export type AuctionRoundUpsertWithoutBidsInput = {
+    update: XOR<AuctionRoundUpdateWithoutBidsInput, AuctionRoundUncheckedUpdateWithoutBidsInput>
+    create: XOR<AuctionRoundCreateWithoutBidsInput, AuctionRoundUncheckedCreateWithoutBidsInput>
+    where?: AuctionRoundWhereInput
+  }
+
+  export type AuctionRoundUpdateToOneWithWhereWithoutBidsInput = {
+    where?: AuctionRoundWhereInput
+    data: XOR<AuctionRoundUpdateWithoutBidsInput, AuctionRoundUncheckedUpdateWithoutBidsInput>
+  }
+
+  export type AuctionRoundUpdateWithoutBidsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    snippet?: SnippetUpdateOneRequiredWithoutAuctionRoundsNestedInput
+    winner?: TeamUpdateOneWithoutAuctionWinsNestedInput
+  }
+
+  export type AuctionRoundUncheckedUpdateWithoutBidsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snippetId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TeamCreateWithoutSubmissionsInput = {
@@ -11146,11 +14786,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberCreateNestedManyWithoutTeamInput
     creditLogs?: CreditLogCreateNestedManyWithoutTeamInput
     bids?: BidCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamUncheckedCreateWithoutSubmissionsInput = {
@@ -11163,11 +14807,15 @@ export namespace Prisma {
     isEliminated?: boolean
     strikes?: number
     lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: MemberUncheckedCreateNestedManyWithoutTeamInput
     creditLogs?: CreditLogUncheckedCreateNestedManyWithoutTeamInput
     bids?: BidUncheckedCreateNestedManyWithoutTeamInput
+    auctionWins?: AuctionRoundUncheckedCreateNestedManyWithoutWinnerInput
   }
 
   export type TeamCreateOrConnectWithoutSubmissionsInput = {
@@ -11186,6 +14834,7 @@ export namespace Prisma {
     isActive?: boolean
     order?: number
     bids?: BidCreateNestedManyWithoutSnippetInput
+    auctionRounds?: AuctionRoundCreateNestedManyWithoutSnippetInput
   }
 
   export type SnippetUncheckedCreateWithoutSubmissionsInput = {
@@ -11199,6 +14848,7 @@ export namespace Prisma {
     isActive?: boolean
     order?: number
     bids?: BidUncheckedCreateNestedManyWithoutSnippetInput
+    auctionRounds?: AuctionRoundUncheckedCreateNestedManyWithoutSnippetInput
   }
 
   export type SnippetCreateOrConnectWithoutSubmissionsInput = {
@@ -11227,11 +14877,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUpdateManyWithoutTeamNestedInput
     creditLogs?: CreditLogUpdateManyWithoutTeamNestedInput
     bids?: BidUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUpdateManyWithoutWinnerNestedInput
   }
 
   export type TeamUncheckedUpdateWithoutSubmissionsInput = {
@@ -11244,11 +14898,15 @@ export namespace Prisma {
     isEliminated?: BoolFieldUpdateOperationsInput | boolean
     strikes?: IntFieldUpdateOperationsInput | number
     lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: MemberUncheckedUpdateManyWithoutTeamNestedInput
     creditLogs?: CreditLogUncheckedUpdateManyWithoutTeamNestedInput
     bids?: BidUncheckedUpdateManyWithoutTeamNestedInput
+    auctionWins?: AuctionRoundUncheckedUpdateManyWithoutWinnerNestedInput
   }
 
   export type SnippetUpsertWithoutSubmissionsInput = {
@@ -11273,6 +14931,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     bids?: BidUpdateManyWithoutSnippetNestedInput
+    auctionRounds?: AuctionRoundUpdateManyWithoutSnippetNestedInput
   }
 
   export type SnippetUncheckedUpdateWithoutSubmissionsInput = {
@@ -11286,6 +14945,223 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     bids?: BidUncheckedUpdateManyWithoutSnippetNestedInput
+    auctionRounds?: AuctionRoundUncheckedUpdateManyWithoutSnippetNestedInput
+  }
+
+  export type SnippetCreateWithoutAuctionRoundsInput = {
+    id?: string
+    title: string
+    category: $Enums.Category
+    buggyCode: string
+    solution: string
+    hiddenInput?: string | null
+    expected?: string | null
+    isActive?: boolean
+    order?: number
+    bids?: BidCreateNestedManyWithoutSnippetInput
+    submissions?: SubmissionCreateNestedManyWithoutSnippetInput
+  }
+
+  export type SnippetUncheckedCreateWithoutAuctionRoundsInput = {
+    id?: string
+    title: string
+    category: $Enums.Category
+    buggyCode: string
+    solution: string
+    hiddenInput?: string | null
+    expected?: string | null
+    isActive?: boolean
+    order?: number
+    bids?: BidUncheckedCreateNestedManyWithoutSnippetInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutSnippetInput
+  }
+
+  export type SnippetCreateOrConnectWithoutAuctionRoundsInput = {
+    where: SnippetWhereUniqueInput
+    create: XOR<SnippetCreateWithoutAuctionRoundsInput, SnippetUncheckedCreateWithoutAuctionRoundsInput>
+  }
+
+  export type TeamCreateWithoutAuctionWinsInput = {
+    id?: string
+    name: string
+    accessKey: string
+    password: string
+    credits?: number
+    role?: $Enums.Role
+    isEliminated?: boolean
+    strikes?: number
+    lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: MemberCreateNestedManyWithoutTeamInput
+    creditLogs?: CreditLogCreateNestedManyWithoutTeamInput
+    bids?: BidCreateNestedManyWithoutTeamInput
+    submissions?: SubmissionCreateNestedManyWithoutTeamInput
+  }
+
+  export type TeamUncheckedCreateWithoutAuctionWinsInput = {
+    id?: string
+    name: string
+    accessKey: string
+    password: string
+    credits?: number
+    role?: $Enums.Role
+    isEliminated?: boolean
+    strikes?: number
+    lastStrikeAt?: Date | string | null
+    vaultTime?: number | null
+    lifelinesUsed?: number
+    lockPenalties?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: MemberUncheckedCreateNestedManyWithoutTeamInput
+    creditLogs?: CreditLogUncheckedCreateNestedManyWithoutTeamInput
+    bids?: BidUncheckedCreateNestedManyWithoutTeamInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutTeamInput
+  }
+
+  export type TeamCreateOrConnectWithoutAuctionWinsInput = {
+    where: TeamWhereUniqueInput
+    create: XOR<TeamCreateWithoutAuctionWinsInput, TeamUncheckedCreateWithoutAuctionWinsInput>
+  }
+
+  export type BidCreateWithoutAuctionRoundInput = {
+    id?: string
+    amount: number
+    won?: boolean
+    createdAt?: Date | string
+    team: TeamCreateNestedOneWithoutBidsInput
+    snippet: SnippetCreateNestedOneWithoutBidsInput
+  }
+
+  export type BidUncheckedCreateWithoutAuctionRoundInput = {
+    id?: string
+    teamId: string
+    snippetId: string
+    amount: number
+    won?: boolean
+    createdAt?: Date | string
+  }
+
+  export type BidCreateOrConnectWithoutAuctionRoundInput = {
+    where: BidWhereUniqueInput
+    create: XOR<BidCreateWithoutAuctionRoundInput, BidUncheckedCreateWithoutAuctionRoundInput>
+  }
+
+  export type BidCreateManyAuctionRoundInputEnvelope = {
+    data: BidCreateManyAuctionRoundInput | BidCreateManyAuctionRoundInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SnippetUpsertWithoutAuctionRoundsInput = {
+    update: XOR<SnippetUpdateWithoutAuctionRoundsInput, SnippetUncheckedUpdateWithoutAuctionRoundsInput>
+    create: XOR<SnippetCreateWithoutAuctionRoundsInput, SnippetUncheckedCreateWithoutAuctionRoundsInput>
+    where?: SnippetWhereInput
+  }
+
+  export type SnippetUpdateToOneWithWhereWithoutAuctionRoundsInput = {
+    where?: SnippetWhereInput
+    data: XOR<SnippetUpdateWithoutAuctionRoundsInput, SnippetUncheckedUpdateWithoutAuctionRoundsInput>
+  }
+
+  export type SnippetUpdateWithoutAuctionRoundsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    category?: EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+    buggyCode?: StringFieldUpdateOperationsInput | string
+    solution?: StringFieldUpdateOperationsInput | string
+    hiddenInput?: NullableStringFieldUpdateOperationsInput | string | null
+    expected?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    order?: IntFieldUpdateOperationsInput | number
+    bids?: BidUpdateManyWithoutSnippetNestedInput
+    submissions?: SubmissionUpdateManyWithoutSnippetNestedInput
+  }
+
+  export type SnippetUncheckedUpdateWithoutAuctionRoundsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    category?: EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+    buggyCode?: StringFieldUpdateOperationsInput | string
+    solution?: StringFieldUpdateOperationsInput | string
+    hiddenInput?: NullableStringFieldUpdateOperationsInput | string | null
+    expected?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    order?: IntFieldUpdateOperationsInput | number
+    bids?: BidUncheckedUpdateManyWithoutSnippetNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutSnippetNestedInput
+  }
+
+  export type TeamUpsertWithoutAuctionWinsInput = {
+    update: XOR<TeamUpdateWithoutAuctionWinsInput, TeamUncheckedUpdateWithoutAuctionWinsInput>
+    create: XOR<TeamCreateWithoutAuctionWinsInput, TeamUncheckedCreateWithoutAuctionWinsInput>
+    where?: TeamWhereInput
+  }
+
+  export type TeamUpdateToOneWithWhereWithoutAuctionWinsInput = {
+    where?: TeamWhereInput
+    data: XOR<TeamUpdateWithoutAuctionWinsInput, TeamUncheckedUpdateWithoutAuctionWinsInput>
+  }
+
+  export type TeamUpdateWithoutAuctionWinsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    accessKey?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    credits?: IntFieldUpdateOperationsInput | number
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    isEliminated?: BoolFieldUpdateOperationsInput | boolean
+    strikes?: IntFieldUpdateOperationsInput | number
+    lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: MemberUpdateManyWithoutTeamNestedInput
+    creditLogs?: CreditLogUpdateManyWithoutTeamNestedInput
+    bids?: BidUpdateManyWithoutTeamNestedInput
+    submissions?: SubmissionUpdateManyWithoutTeamNestedInput
+  }
+
+  export type TeamUncheckedUpdateWithoutAuctionWinsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    accessKey?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    credits?: IntFieldUpdateOperationsInput | number
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    isEliminated?: BoolFieldUpdateOperationsInput | boolean
+    strikes?: IntFieldUpdateOperationsInput | number
+    lastStrikeAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    vaultTime?: NullableIntFieldUpdateOperationsInput | number | null
+    lifelinesUsed?: IntFieldUpdateOperationsInput | number
+    lockPenalties?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: MemberUncheckedUpdateManyWithoutTeamNestedInput
+    creditLogs?: CreditLogUncheckedUpdateManyWithoutTeamNestedInput
+    bids?: BidUncheckedUpdateManyWithoutTeamNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutTeamNestedInput
+  }
+
+  export type BidUpsertWithWhereUniqueWithoutAuctionRoundInput = {
+    where: BidWhereUniqueInput
+    update: XOR<BidUpdateWithoutAuctionRoundInput, BidUncheckedUpdateWithoutAuctionRoundInput>
+    create: XOR<BidCreateWithoutAuctionRoundInput, BidUncheckedCreateWithoutAuctionRoundInput>
+  }
+
+  export type BidUpdateWithWhereUniqueWithoutAuctionRoundInput = {
+    where: BidWhereUniqueInput
+    data: XOR<BidUpdateWithoutAuctionRoundInput, BidUncheckedUpdateWithoutAuctionRoundInput>
+  }
+
+  export type BidUpdateManyWithWhereWithoutAuctionRoundInput = {
+    where: BidScalarWhereInput
+    data: XOR<BidUpdateManyMutationInput, BidUncheckedUpdateManyWithoutAuctionRoundInput>
   }
 
   export type MemberCreateManyTeamInput = {
@@ -11303,6 +15179,7 @@ export namespace Prisma {
   export type BidCreateManyTeamInput = {
     id?: string
     snippetId: string
+    auctionRoundId?: string | null
     amount: number
     won?: boolean
     createdAt?: Date | string
@@ -11317,6 +15194,17 @@ export namespace Prisma {
     stderr?: string | null
     solverName?: string | null
     solverRole?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AuctionRoundCreateManyWinnerInput = {
+    id?: string
+    snippetId: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winningBid?: number | null
     createdAt?: Date | string
   }
 
@@ -11362,11 +15250,13 @@ export namespace Prisma {
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     snippet?: SnippetUpdateOneRequiredWithoutBidsNestedInput
+    auctionRound?: AuctionRoundUpdateOneWithoutBidsNestedInput
   }
 
   export type BidUncheckedUpdateWithoutTeamInput = {
     id?: StringFieldUpdateOperationsInput | string
     snippetId?: StringFieldUpdateOperationsInput | string
+    auctionRoundId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: IntFieldUpdateOperationsInput | number
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11375,6 +15265,7 @@ export namespace Prisma {
   export type BidUncheckedUpdateManyWithoutTeamInput = {
     id?: StringFieldUpdateOperationsInput | string
     snippetId?: StringFieldUpdateOperationsInput | string
+    auctionRoundId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: IntFieldUpdateOperationsInput | number
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11416,9 +15307,45 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AuctionRoundUpdateWithoutWinnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    snippet?: SnippetUpdateOneRequiredWithoutAuctionRoundsNestedInput
+    bids?: BidUpdateManyWithoutAuctionRoundNestedInput
+  }
+
+  export type AuctionRoundUncheckedUpdateWithoutWinnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snippetId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bids?: BidUncheckedUpdateManyWithoutAuctionRoundNestedInput
+  }
+
+  export type AuctionRoundUncheckedUpdateManyWithoutWinnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    snippetId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type BidCreateManySnippetInput = {
     id?: string
     teamId: string
+    auctionRoundId?: string | null
     amount: number
     won?: boolean
     createdAt?: Date | string
@@ -11436,17 +15363,30 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type AuctionRoundCreateManySnippetInput = {
+    id?: string
+    status?: $Enums.AuctionStatus
+    startTime?: Date | string | null
+    endTime?: Date | string | null
+    duration?: number
+    winnerId?: string | null
+    winningBid?: number | null
+    createdAt?: Date | string
+  }
+
   export type BidUpdateWithoutSnippetInput = {
     id?: StringFieldUpdateOperationsInput | string
     amount?: IntFieldUpdateOperationsInput | number
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     team?: TeamUpdateOneRequiredWithoutBidsNestedInput
+    auctionRound?: AuctionRoundUpdateOneWithoutBidsNestedInput
   }
 
   export type BidUncheckedUpdateWithoutSnippetInput = {
     id?: StringFieldUpdateOperationsInput | string
     teamId?: StringFieldUpdateOperationsInput | string
+    auctionRoundId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: IntFieldUpdateOperationsInput | number
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11455,6 +15395,7 @@ export namespace Prisma {
   export type BidUncheckedUpdateManyWithoutSnippetInput = {
     id?: StringFieldUpdateOperationsInput | string
     teamId?: StringFieldUpdateOperationsInput | string
+    auctionRoundId?: NullableStringFieldUpdateOperationsInput | string | null
     amount?: IntFieldUpdateOperationsInput | number
     won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11493,6 +15434,77 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     solverName?: NullableStringFieldUpdateOperationsInput | string | null
     solverRole?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuctionRoundUpdateWithoutSnippetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    winner?: TeamUpdateOneWithoutAuctionWinsNestedInput
+    bids?: BidUpdateManyWithoutAuctionRoundNestedInput
+  }
+
+  export type AuctionRoundUncheckedUpdateWithoutSnippetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bids?: BidUncheckedUpdateManyWithoutAuctionRoundNestedInput
+  }
+
+  export type AuctionRoundUncheckedUpdateManyWithoutSnippetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumAuctionStatusFieldUpdateOperationsInput | $Enums.AuctionStatus
+    startTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    duration?: IntFieldUpdateOperationsInput | number
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    winningBid?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BidCreateManyAuctionRoundInput = {
+    id?: string
+    teamId: string
+    snippetId: string
+    amount: number
+    won?: boolean
+    createdAt?: Date | string
+  }
+
+  export type BidUpdateWithoutAuctionRoundInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: IntFieldUpdateOperationsInput | number
+    won?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    team?: TeamUpdateOneRequiredWithoutBidsNestedInput
+    snippet?: SnippetUpdateOneRequiredWithoutBidsNestedInput
+  }
+
+  export type BidUncheckedUpdateWithoutAuctionRoundInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    teamId?: StringFieldUpdateOperationsInput | string
+    snippetId?: StringFieldUpdateOperationsInput | string
+    amount?: IntFieldUpdateOperationsInput | number
+    won?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BidUncheckedUpdateManyWithoutAuctionRoundInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    teamId?: StringFieldUpdateOperationsInput | string
+    snippetId?: StringFieldUpdateOperationsInput | string
+    amount?: IntFieldUpdateOperationsInput | number
+    won?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

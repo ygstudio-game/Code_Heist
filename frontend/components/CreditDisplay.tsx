@@ -35,6 +35,7 @@ export default function CreditDisplay({ amount }: CreditDisplayProps) {
 
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current!);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount]);
 
   const isLow = displayValue < 200;

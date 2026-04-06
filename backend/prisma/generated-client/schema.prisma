@@ -28,22 +28,50 @@ enum SubmissionStatus {
   FAILED
 }
 
+enum AuctionStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
 model Team {
-  id           String       @id @default(uuid())
-  name         String       @unique
-  accessKey    String       @unique
+  id           String         @id @default(uuid())
+  name         String         @unique
+  accessKey    String         @unique
   password     String
-  credits      Int          @default(1000)
-  role         Role         @default(TEAM)
-  isEliminated Boolean      @default(false)
-  strikes      Int          @default(0)
+  credits      Int            @default(1000)
+  role         Role           @default(TEAM)
+  isEliminated Boolean        @default(false)
+  strikes      Int            @default(0)
   lastStrikeAt DateTime?
   members      Member[]
   creditLogs   CreditLog[]
   bids         Bid[]
   submissions  Submission[]
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  auctionWins  AuctionRound[] @relation("AuctionWinner")
+
+  // Vault Phase Results
+  vaultTime     Int? @default(0) // in seconds
+  lifelinesUsed Int  @default(0)
+  lockPenalties Int  @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum GlobalPhase {
+  AUCTION
+  CODING
+  VAULT
+  FINISHED
+}
+
+model SystemState {
+  id              String      @id @default("CURRENT_STATE")
+  currentPhase    GlobalPhase @default(AUCTION)
+  codingStartTime DateTime?
+  updatedAt       DateTime    @updatedAt
 }
 
 model Member {
@@ -63,28 +91,31 @@ model CreditLog {
 }
 
 model Snippet {
-  id          String       @id @default(uuid())
-  title       String
-  category    Category
-  buggyCode   String       @db.Text
-  solution    String       @db.Text
-  hiddenInput String?      @db.Text
-  expected    String?      @db.Text
-  isActive    Boolean      @default(true)
-  order       Int          @default(0)
-  bids        Bid[]
-  submissions Submission[]
+  id            String         @id @default(uuid())
+  title         String         @unique
+  category      Category
+  buggyCode     String         @db.Text
+  solution      String         @db.Text
+  hiddenInput   String?        @db.Text
+  expected      String?        @db.Text
+  isActive      Boolean        @default(true)
+  order         Int            @default(0)
+  bids          Bid[]
+  submissions   Submission[]
+  auctionRounds AuctionRound[]
 }
 
 model Bid {
-  id        String   @id @default(uuid())
-  teamId    String
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  snippetId String
-  snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
-  amount    Int
-  won       Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id             String        @id @default(uuid())
+  teamId         String
+  team           Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  snippetId      String
+  snippet        Snippet       @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  auctionRoundId String?
+  auctionRound   AuctionRound? @relation(fields: [auctionRoundId], references: [id], onDelete: Cascade)
+  amount         Int
+  won            Boolean       @default(false)
+  createdAt      DateTime      @default(now())
 }
 
 model Submission {
@@ -100,4 +131,19 @@ model Submission {
   solverName String?
   solverRole String?
   createdAt  DateTime         @default(now())
+}
+
+model AuctionRound {
+  id         String        @id @default(uuid())
+  snippetId  String
+  snippet    Snippet       @relation(fields: [snippetId], references: [id])
+  status     AuctionStatus @default(PENDING)
+  startTime  DateTime?
+  endTime    DateTime?
+  duration   Int           @default(120)
+  winnerId   String?
+  winner     Team?         @relation("AuctionWinner", fields: [winnerId], references: [id])
+  winningBid Int?
+  bids       Bid[]
+  createdAt  DateTime      @default(now())
 }

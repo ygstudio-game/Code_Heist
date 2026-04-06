@@ -130,7 +130,17 @@ exports.Prisma.TeamScalarFieldEnum = {
   isEliminated: 'isEliminated',
   strikes: 'strikes',
   lastStrikeAt: 'lastStrikeAt',
+  vaultTime: 'vaultTime',
+  lifelinesUsed: 'lifelinesUsed',
+  lockPenalties: 'lockPenalties',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SystemStateScalarFieldEnum = {
+  id: 'id',
+  currentPhase: 'currentPhase',
+  codingStartTime: 'codingStartTime',
   updatedAt: 'updatedAt'
 };
 
@@ -164,6 +174,7 @@ exports.Prisma.BidScalarFieldEnum = {
   id: 'id',
   teamId: 'teamId',
   snippetId: 'snippetId',
+  auctionRoundId: 'auctionRoundId',
   amount: 'amount',
   won: 'won',
   createdAt: 'createdAt'
@@ -179,6 +190,18 @@ exports.Prisma.SubmissionScalarFieldEnum = {
   stderr: 'stderr',
   solverName: 'solverName',
   solverRole: 'solverRole',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AuctionRoundScalarFieldEnum = {
+  id: 'id',
+  snippetId: 'snippetId',
+  status: 'status',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  duration: 'duration',
+  winnerId: 'winnerId',
+  winningBid: 'winningBid',
   createdAt: 'createdAt'
 };
 
@@ -202,6 +225,13 @@ exports.Role = exports.$Enums.Role = {
   SPECTATOR: 'SPECTATOR'
 };
 
+exports.GlobalPhase = exports.$Enums.GlobalPhase = {
+  AUCTION: 'AUCTION',
+  CODING: 'CODING',
+  VAULT: 'VAULT',
+  FINISHED: 'FINISHED'
+};
+
 exports.Category = exports.$Enums.Category = {
   CP: 'CP',
   WEB: 'WEB',
@@ -216,13 +246,22 @@ exports.SubmissionStatus = exports.$Enums.SubmissionStatus = {
   FAILED: 'FAILED'
 };
 
+exports.AuctionStatus = exports.$Enums.AuctionStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.Prisma.ModelName = {
   Team: 'Team',
+  SystemState: 'SystemState',
   Member: 'Member',
   CreditLog: 'CreditLog',
   Snippet: 'Snippet',
   Bid: 'Bid',
-  Submission: 'Submission'
+  Submission: 'Submission',
+  AuctionRound: 'AuctionRound'
 };
 
 /**

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { UserPlus, ShieldPlus, ChevronRight, X } from 'lucide-react';
+import { UserPlus, X } from 'lucide-react';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -42,7 +42,7 @@ export default function RegisterPage() {
       } else {
         toast.error(data.error || 'REGISTRATION REJECTED');
       }
-    } catch (error) {
+    } catch {
       toast.error('UPLINK FAILED');
     } finally {
       setIsLoading(false);
