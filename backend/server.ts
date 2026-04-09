@@ -11,6 +11,7 @@ import codeRoutes from './routes/codeRoutes';
 import auctionRoutes from './routes/auctionRoutes';
 import adminRoutes from './routes/adminRoutes';
 import systemRoutes from './routes/systemRoutes';
+import vaultRoutes from './routes/vaultRoutes';
 import prisma from './lib/prisma';
 
 const app: Application = express();
@@ -38,6 +39,7 @@ app.use('/api/code', codeRoutes);
 app.use('/api/auction', auctionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/system', systemRoutes);
+app.use('/api/vault', vaultRoutes);
 
 // 4. Start Sequence
 const PORT = process.env.PORT || 5000;

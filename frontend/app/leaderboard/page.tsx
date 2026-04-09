@@ -69,9 +69,18 @@ export default function LeaderboardPage() {
     const totalAttempts = team.submissions.filter((s: any) => s.status === 'VERIFIED' || s.status === 'FAILED').length;
     const accuracy = totalAttempts > 0 ? verifiedSubmissions.length / totalAttempts : 0;
 
-    // Final Points (Score = (Solved * 1000) - (Strikes * 50) + (Accuracy * 100))
-    // We'll use these for internal tie-breaking sorting
-    return { solvedCount, avgTime, accuracy, credits: team.credits, strikes: team.strikes };
+    // Vault Phase Integration
+    const vaultTime = team.vaultTime || 0;
+    const lifelinesUsed = team.lifelinesUsed || 0;
+    const lockPenalties = team.lockPenalties || 0;
+    const lifelinePenalty = lifelinesUsed * 180; // 3 min per lifeline
+    const lockPenalty = lockPenalties * 60; // 1 min per incorrect lock
+    const totalVaultTime = vaultTime + lifelinePenalty + lockPenalty;
+
+    // Grand Total = Code Submission Time + Physical Vault Time + Penalties
+    const grandTotalTime = totalSolveTime + totalVaultTime;
+
+    return { solvedCount, avgTime, accuracy, credits: team.credits, strikes: team.strikes, vaultTime, totalVaultTime, grandTotalTime };
   };
 
   const loadTeams = async () => {
@@ -162,17 +171,17 @@ export default function LeaderboardPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-text/30">
-                    <th className="px-8 py-4 font-bold">Rank</th>
-                    <th className="px-8 py-4 font-bold">Squad Identity</th>
+                    <th className="px-4 md:px-8 py-4 font-bold">Rank</th>
+                    <th className="px-4 md:px-8 py-4 font-bold">Squad Identity</th>
                     {displayMode === 'FINAL' && (
                       <>
-                        <th className="px-8 py-4 font-bold text-center">Solved</th>
-                        <th className="px-8 py-4 font-bold text-center">Avg Time</th>
-                        <th className="px-8 py-4 font-bold text-center">Accuracy</th>
+                        <th className="px-4 md:px-8 py-4 font-bold text-center">Solved</th>
+                        <th className="px-4 md:px-8 py-4 font-bold text-center">Avg Time</th>
+                        <th className="px-4 md:px-8 py-4 font-bold text-center">Accuracy</th>
                       </>
                     )}
-                    <th className="px-8 py-4 font-bold text-right">Status</th>
-                    <th className="px-8 py-4 font-bold text-right">{displayMode === 'AUCTION' ? 'Liquid Credits' : 'Final Points'}</th>
+                    <th className="px-4 md:px-8 py-4 font-bold text-right">Status</th>
+                    <th className="px-4 md:px-8 py-4 font-bold text-right">{displayMode === 'AUCTION' ? 'Liquid Credits' : 'Final Points'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.02]">

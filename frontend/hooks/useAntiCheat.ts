@@ -48,25 +48,11 @@ export const useAntiCheat = (teamId: string, phase: string) => {
       setBreaches((prev) => {
         const next = prev + 1;
         
-        if (next >= 5) {
-          toast.error('CRITICAL: SECURITY BREACH DETECTED. SYSTEM LOCKDOWN INITIATED.', {
-            duration: 10000,
-            style: { background: '#FF2A55', color: '#fff' }
-          });
-          reportBreach(next);
-        } else {
-          toast.warning(`WARNING: TAB SWITCH DETECTED. STRIKE ${next}/5.`, {
-            style: { background: '#131620', border: '1px solid #FF2A55', color: '#FF2A55' }
-          });
-          reportBreach(next);
-        }
+        // Report breach to admin silently
+        reportBreach(next);
         
         return next;
       });
-
-      // HackerEarth style focus-pull / violent alert
-      document.body.classList.add('glitch-active');
-      setTimeout(() => document.body.classList.remove('glitch-active'), 500);
     };
 
     const handleVisibilityChange = () => {
