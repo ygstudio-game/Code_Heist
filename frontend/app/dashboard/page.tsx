@@ -162,32 +162,7 @@ export default function DashboardPage() {
     }
   };
 
-  // Fullscreen Enforcement during CODING phase
-  useEffect(() => {
-    if (phase === 'CODING') {
-      const enterFullscreen = () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {
-            toast.error('SECURITY ALERT: Fullscreen mode is MANDATORY for this phase.');
-          });
-        }
-      };
-
-      // Attempt to enter fullscreen immediately
-      enterFullscreen();
-
-      const handleFullscreenChange = () => {
-        if (!document.fullscreenElement) {
-          toast.warning('SECURITY BREACH: Unauthorized Exit from Fullscreen.', {
-            description: 'Please return to fullscreen to continue the objective.'
-          });
-        }
-      };
-
-      document.addEventListener('fullscreenchange', handleFullscreenChange);
-      return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    }
-  }, [phase]);
+  // Fullscreen Enforcement disabled as per latest request
 
   // 60-minute coding countdown
   useEffect(() => {
@@ -319,81 +294,84 @@ export default function DashboardPage() {
   // Briefing View for Initial Stage
   if (phase === 'AUCTION' && snippets.length === 0) {
     return (
-      <div className="min-h-screen bg-background font-space selection:bg-primary/30 pt-20 px-6">
-        <div className="max-w-4xl mx-auto space-y-12 pb-20">
-          <div className="text-center space-y-4">
-             <div className="inline-flex items-center gap-3 px-4 py-1 bg-primary/5 border border-primary/20 text-primary text-[10px] font-mono tracking-[6px] uppercase glow-text">
-                [ Competition Briefing ]
-             </div>
-             <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter">
-                Initial <span className="text-primary not-italic">Briefing</span>
-             </h1>
-          </div>
+      <div className="min-h-screen bg-background font-space selection:bg-primary/30">
+        <Navbar />
+        <div className="pt-20 px-6">
+          <div className="max-w-4xl mx-auto space-y-12 pb-20">
+            <div className="text-center space-y-4 pt-12">
+               <div className="inline-flex items-center gap-3 px-4 py-1 bg-primary/5 border border-primary/20 text-primary text-[10px] font-mono tracking-[6px] uppercase glow-text">
+                  [ Competition Briefing ]
+               </div>
+               <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter">
+                  Initial <span className="text-primary not-italic">Briefing</span>
+               </h1>
+            </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-             <div className="terminal-card border-white/5 space-y-6">
-                <h3 className="text-primary font-bold uppercase tracking-widest text-sm flex items-center gap-2">
-                   <Shield size={18} /> THE CODE HEIST RULES
-                </h3>
-                <div className="space-y-4 text-xs text-text/60 leading-relaxed uppercase tracking-tight">
-                   <div className="flex gap-4 p-3 bg-white/[0.02] border border-white/5">
-                      <span className="text-primary font-bold">01</span>
-                      <p><span className="text-white font-bold">ONE PROBLEM PER MEMBER:</span> Each member must solve exactly one problem. You cannot claim more than one.</p>
-                   </div>
-                   <div className="flex gap-4 p-3 bg-white/[0.02] border border-white/5">
-                      <span className="text-primary font-bold">02</span>
-                      <p><span className="text-white font-bold">MINIMUM 4 PROBLEMS:</span> Your team must acquire at least 4 problems during the auction to proceed to the coding round.</p>
-                   </div>
-                   <div className="flex gap-4 p-3 bg-white/[0.02] border border-white/5">
-                      <span className="text-primary font-bold">03</span>
-                      <p><span className="text-white font-bold">TAB LOCKDOWN:</span> Any attempt to switch tabs or exit fullscreen will trigger a security alert. 3 violations result in score penalties.</p>
-                   </div>
-                </div>
-             </div>
+            <div className="grid md:grid-cols-2 gap-8">
+               <div className="terminal-card border-white/5 space-y-6">
+                  <h3 className="text-primary font-bold uppercase tracking-widest text-sm flex items-center gap-2">
+                     <Shield size={18} /> THE CODE HEIST RULES
+                  </h3>
+                  <div className="space-y-4 text-xs text-text/60 leading-relaxed uppercase tracking-tight">
+                     <div className="flex gap-4 p-3 bg-white/[0.02] border border-white/5">
+                        <span className="text-primary font-bold">01</span>
+                        <p><span className="text-white font-bold">ONE PROBLEM PER MEMBER:</span> Each member must solve exactly one problem. You cannot claim more than one.</p>
+                     </div>
+                     <div className="flex gap-4 p-3 bg-white/[0.02] border border-white/5">
+                        <span className="text-primary font-bold">02</span>
+                        <p><span className="text-white font-bold">MINIMUM 4 PROBLEMS:</span> Your team must acquire at least 4 problems during the auction to proceed to the coding round.</p>
+                     </div>
+                     <div className="flex gap-4 p-3 bg-white/[0.02] border border-white/5">
+                        <span className="text-primary font-bold">03</span>
+                        <p><span className="text-white font-bold">TAB LOCKDOWN:</span> Any attempt to switch tabs or exit fullscreen will trigger a security alert. 3 violations result in score penalties.</p>
+                     </div>
+                  </div>
+               </div>
 
-             <div className="space-y-6 flex flex-col justify-center">
-                <div className="terminal-card bg-primary/5 border-primary/20 text-center py-12 space-y-6">
-                   <div className="w-16 h-16 bg-primary/10 border border-primary/30 flex items-center justify-center text-primary mx-auto animate-pulse">
-                      <Activity size={32} />
-                   </div>
-                   <div className="space-y-2">
-                      <h4 className="text-xl font-bold text-white uppercase italic">Awaiting Rounds</h4>
-                      <p className="text-[10px] text-text/40 font-mono uppercase tracking-widest">The Auction is currently dormant.</p>
-                   </div>
-                   {activeAuction && (
-                      <button 
-                        onClick={() => router.push('/auction')}
-                        className="terminal-button px-8 py-3 text-sm animate-bounce"
-                      >
-                         ENTER AUCTION ROOM
-                      </button>
-                   )}
-                </div>
-                {!activeAuction && (
-                   <p className="text-[9px] text-center text-text/30 font-mono italic uppercase">
-                      &gt; Stand by for system broadcast... Admin will initiate bidding shortly.
-                   </p>
-                )}
-             </div>
-          </div>
+               <div className="space-y-6 flex flex-col justify-center">
+                  <div className="terminal-card bg-primary/5 border-primary/20 text-center py-12 space-y-6">
+                     <div className="w-16 h-16 bg-primary/10 border border-primary/30 flex items-center justify-center text-primary mx-auto animate-pulse">
+                        <Activity size={32} />
+                     </div>
+                     <div className="space-y-2">
+                        <h4 className="text-xl font-bold text-white uppercase italic">Awaiting Rounds</h4>
+                        <p className="text-[10px] text-text/40 font-mono uppercase tracking-widest">The Auction is currently dormant.</p>
+                     </div>
+                     {activeAuction && (
+                        <button 
+                          onClick={() => router.push('/auction')}
+                          className="terminal-button px-8 py-3 text-sm animate-bounce"
+                        >
+                           ENTER AUCTION ROOM
+                        </button>
+                     )}
+                  </div>
+                  {!activeAuction && (
+                     <p className="text-[9px] text-center text-text/30 font-mono italic uppercase">
+                        &gt; Stand by for system broadcast... Admin will initiate bidding shortly.
+                     </p>
+                  )}
+               </div>
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
-                <p className="text-[8px] text-text/40 uppercase mb-1">Time Limit</p>
-                <p className="text-sm font-bold text-white">60 MINS</p>
-             </div>
-             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
-                <p className="text-[8px] text-text/40 uppercase mb-1">Total Teams</p>
-                <p className="text-sm font-bold text-white">15 SQUADS</p>
-             </div>
-             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
-                <p className="text-[8px] text-text/40 uppercase mb-1">Security</p>
-                <p className="text-sm font-bold text-white">LEVEL 5</p>
-             </div>
-             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
-                <p className="text-[8px] text-text/40 uppercase mb-1">Submission</p>
-                <p className="text-sm font-bold text-white">AUTO-SYNC</p>
-             </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+               <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
+                  <p className="text-[8px] text-text/40 uppercase mb-1">Time Limit</p>
+                  <p className="text-sm font-bold text-white">60 MINS</p>
+               </div>
+               <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
+                  <p className="text-[8px] text-text/40 uppercase mb-1">Total Teams</p>
+                  <p className="text-sm font-bold text-white">15 SQUADS</p>
+               </div>
+               <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
+                  <p className="text-[8px] text-text/40 uppercase mb-1">Security</p>
+                  <p className="text-sm font-bold text-white">LEVEL 5</p>
+               </div>
+               <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm text-center">
+                  <p className="text-[8px] text-text/40 uppercase mb-1">Submission</p>
+                  <p className="text-sm font-bold text-white">AUTO-SYNC</p>
+               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -401,22 +379,25 @@ export default function DashboardPage() {
   }
   if (phase === 'CODING' && snippets.length < 4) {
     return (
-      <div className="min-h-screen bg-background font-space selection:bg-primary/30 data-stream-bg flex items-center justify-center p-6">
-        <div className="scanline"></div>
-        <div className="particle-bg"></div>
-        <div className="max-w-2xl w-full terminal-card border-danger/30 bg-danger/5 backdrop-blur-md text-center p-12 radiant-border">
-          <ShieldAlert size={64} className="mx-auto text-danger animate-pulse mb-6" />
-          <h1 className="text-4xl font-black text-white glow-text tracking-tighter uppercase mb-4">Access Denied</h1>
-          <div className="h-px bg-danger/20 mb-8 max-w-[200px] mx-auto"></div>
-          <p className="text-text/60 font-geist-mono text-sm leading-relaxed uppercase tracking-[2px]">
-            Requirement Not Met: Team <span className="text-white font-bold">{team.name}</span> failed to acquire sufficient problems.
-          </p>
-          <div className="mt-8 p-4 bg-black/40 border border-danger/10 text-danger/80 text-[10px] font-mono uppercase tracking-[3px]">
-            Requirement: 4/4 Problems // Current: {snippets.length}/4 Acquired
+      <div className="min-h-screen bg-background font-space selection:bg-primary/30 data-stream-bg">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[calc(100vh-64px)] p-6">
+          <div className="scanline"></div>
+          <div className="particle-bg"></div>
+          <div className="max-w-2xl w-full terminal-card border-danger/30 bg-danger/5 backdrop-blur-md text-center p-12 radiant-border">
+            <ShieldAlert size={64} className="mx-auto text-danger animate-pulse mb-6" />
+            <h1 className="text-4xl font-black text-white glow-text tracking-tighter uppercase mb-4">Access Denied</h1>
+            <div className="h-px bg-danger/20 mb-8 max-w-[200px] mx-auto"></div>
+            <p className="text-text/60 font-geist-mono text-sm leading-relaxed uppercase tracking-[2px]">
+              Requirement Not Met: Team <span className="text-white font-bold">{team.name}</span> failed to acquire sufficient problems.
+            </p>
+            <div className="mt-8 p-4 bg-black/40 border border-danger/10 text-danger/80 text-[10px] font-mono uppercase tracking-[3px]">
+              Requirement: 4/4 Problems // Current: {snippets.length}/4 Acquired
+            </div>
+            <p className="mt-12 text-[10px] text-text/30 font-mono uppercase italic">
+              &gt; Please wait for the admin&apos;s next instruction.
+            </p>
           </div>
-          <p className="mt-12 text-[10px] text-text/30 font-mono uppercase italic">
-            &gt; Please wait for the admin&apos;s next instruction.
-          </p>
         </div>
       </div>
     );
@@ -455,7 +436,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[calc(100vh-280px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[calc(100vh-320px)] lg:min-h-[500px]">
           
           {/* Left Sidebar - Active Snippets & Logs (3 cols) */}
           <div className="col-span-1 md:col-span-3 flex flex-col gap-6 h-full">

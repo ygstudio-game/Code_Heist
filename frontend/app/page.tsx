@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { Shield, Lock, Terminal as TerminalIcon } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background relative flex flex-col items-center justify-center p-6 overflow-hidden">
+      <Navbar />
       <div className="scanline"></div>
       <div className="particle-bg"></div>
       

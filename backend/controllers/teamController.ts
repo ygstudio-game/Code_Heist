@@ -57,3 +57,22 @@ export const getTeamById = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const getMe = async (req: any, res: Response) => {
+  const teamId = req.user?.teamId;
+  if (!teamId) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+      include: { members: true }
+    });
+
+    if (!team) return res.status(404).json({ error: 'Team not found' });
+
+    const { password, ...safeTeam } = team;
+    res.json(safeTeam);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

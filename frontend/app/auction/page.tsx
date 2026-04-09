@@ -107,16 +107,16 @@ export default function AuctionPage() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch pt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-4">
               {/* Left Column: Problem Details & Code Viewer */}
-              <div className="col-span-1 md:col-span-12 lg:col-span-7 flex flex-col gap-6">
+              <div className="col-span-1 lg:col-span-7 flex flex-col gap-6">
                 <div className="space-y-6 relative z-10 animate-in fade-in slide-in-from-left-8 duration-500 delay-75">
-                  <div className="flex justify-between items-start">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-sm font-semibold uppercase">
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-sm font-semibold uppercase shrink-0">
                         Problem ID: {auction.snippet.id.slice(0, 8)}
                     </div>
                     {auction.isPreview && (
-                      <div className="px-4 py-1 bg-warning/10 border border-warning/20 text-warning text-sm font-bold uppercase animate-pulse">
+                      <div className="px-4 py-1 bg-warning/10 border border-warning/20 text-warning text-[10px] md:text-sm font-bold uppercase animate-pulse">
                         Preview Round - Bidding Locked
                       </div>
                     )}
@@ -128,20 +128,20 @@ export default function AuctionPage() {
                         <Users size={14} />
                       </div>
                       <div>
-                        <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest">Active High Bidder</p>
-                        <p className="text-sm font-bold text-white uppercase">{highestBidder}</p>
+                        <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">High Bidder</p>
+                        <p className="text-xs md:text-sm font-bold text-white uppercase truncate max-w-[100px] md:max-w-[200px]">{highestBidder}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                       <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest">Global Current Bid</p>
-                       <p className="text-xl font-black text-primary font-mono lowercase">{currentBid} <span className="text-[10px]">cr</span></p>
+                       <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">Current Bid</p>
+                       <p className="text-lg md:text-xl font-black text-primary font-mono lowercase">{currentBid} <span className="text-[10px]">cr</span></p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Right Column: Bidding Console & History */}
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500 delay-150">
+              <div className="col-span-1 lg:col-span-5 space-y-6 animate-in fade-in slide-in-from-right-8 duration-500 delay-150 relative z-20">
                 <div className={`terminal-card space-y-8 p-8 ${auction.isPreview ? 'border-warning/20 bg-warning/5' : 'border-primary/20 bg-primary/5'}`}>
                   <div className="space-y-2">
                     <h3 className="text-xl font-bold text-white uppercase">Bid on Problem</h3>
