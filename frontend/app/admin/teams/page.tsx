@@ -14,8 +14,6 @@ import {
   X,
   AlertTriangle,
   CheckCircle2,
-  Copy,
-  ChevronRight,
   Eye,
   EyeOff
 } from 'lucide-react';
@@ -98,7 +96,7 @@ export default function AdminTeams() {
         const data = await res.json();
         notify('error', data.error || 'Uplink failed.');
       }
-    } catch (err) {
+    } catch (_err) {
       notify('error', 'Network failure.');
     }
   };
@@ -114,7 +112,7 @@ export default function AdminTeams() {
       } else {
         notify('error', 'Decommissioning failed.');
       }
-    } catch (err) {
+    } catch (_err) {
       notify('error', 'Network failure.');
     }
   };
@@ -136,7 +134,7 @@ export default function AdminTeams() {
       } else {
         notify('error', 'Credential update failed.');
       }
-    } catch (err) {
+    } catch (_err) {
       notify('error', 'Network failure.');
     }
   };

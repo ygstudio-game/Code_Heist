@@ -5,7 +5,7 @@ import { fetchWithAuth } from '@/lib/api';
 import { useSocket } from '@/context/SocketContext';
 import Navbar from '@/components/Navbar';
 import { toast } from 'sonner';
-import { Timer, Trophy, Shield, AlertTriangle, Lock, Unlock, Zap, Clock, Skull, HeartPulse } from 'lucide-react';
+import { Timer, Trophy, Shield, AlertTriangle, Lock, Zap, Clock, Skull, HeartPulse } from 'lucide-react';
 
 interface VaultTeam {
   id: string;
@@ -53,8 +53,8 @@ export default function Round2Page() {
         const data = await res.json();
         setVaultState(data);
       }
-    } catch (error) {
-      console.error('Failed to load vault state:', error);
+    } catch (err) {
+      console.error('Failed to load vault state:', err);
     } finally {
       setLoading(false);
     }

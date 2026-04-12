@@ -13,10 +13,9 @@ import {
   HeartPulse,
   Lock,
   RotateCcw,
-  AlertTriangle,
+
   CheckCircle,
   Skull,
-  Clock,
   Shield,
 } from 'lucide-react';
 
@@ -133,7 +132,7 @@ export default function AdminVaultPage() {
       } else {
         toast.error(data.error || `${label} failed`);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(`Network error: ${label}`);
     } finally {
       setActionLoading(null);

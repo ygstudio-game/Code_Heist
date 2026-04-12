@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
-import { Timer, Gavel, Shield, Terminal as TerminalIcon, TrendingUp, Users } from 'lucide-react';
+import { Timer, Gavel, Shield, TrendingUp, Users } from 'lucide-react';
 import { useAuction, AuctionBid } from '@/hooks/useAuction';
 import { toast } from 'sonner';
-import MonacoEditor from '@/components/MonacoEditor';
+
 
 export default function AuctionPage() {
   const { 
@@ -243,14 +243,4 @@ export default function AuctionPage() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
-  return (
-    <div className="p-4 bg-white/[0.02] border border-white/5 space-y-3 hover:border-primary/20 transition-all">
-       <div className="flex items-center gap-2 text-[8px] text-text/40 uppercase font-mono tracking-[2px]">
-          {icon}
-          {label}
-       </div>
-       <div className="text-xl font-bold text-white tracking-tight uppercase italic">{value}</div>
-    </div>
-  );
-}
+

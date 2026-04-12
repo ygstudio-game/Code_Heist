@@ -6,7 +6,6 @@ import { useSocket } from '@/context/SocketContext';
 import Navbar from '@/components/Navbar';
 import { toast } from 'sonner';
 import {
-  Timer,
   Play,
   Square,
   Lock,
@@ -59,8 +58,8 @@ export default function TeamVaultPage() {
         const data = await res.json();
         setVaultState(data);
       }
-    } catch (error) {
-      console.error('Failed to load vault state:', error);
+    } catch (err) {
+      console.error('Failed to load vault state:', err);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import CreditDisplay from '@/components/CreditDisplay';
 import MonacoEditor from '@/components/MonacoEditor';
 import { fetchWithAuth } from '@/lib/api';
@@ -31,7 +31,7 @@ export default function DashboardPage() {
   const { socket, isConnected } = useSocket();
   const { phase, codingStartTime } = useSystemState();
   const { active: activeAuction } = useAuction();
-  const { breaches } = useAntiCheat(team?.id || 'default', phase, activeSolver?.name);
+  const { breaches: _breaches } = useAntiCheat(team?.id || 'default', phase, activeSolver?.name);
   const router = useRouter();
   const [codingTimeLeft, setCodingTimeLeft] = useState<number | null>(null);
 
@@ -45,7 +45,7 @@ export default function DashboardPage() {
   const [mySubmissions, setMySubmissions] = useState<Submission[]>([]);
 
   // Fetch submissions whenever checking the submissions tab
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = useCallback(async () => {
     if (!activeSnippet) return;
     try {
       const res = await fetchWithAuth('/code/my-submissions');
@@ -53,16 +53,16 @@ export default function DashboardPage() {
         const data = await res.json();
         setMySubmissions(data.filter((s: Submission) => s.snippetId === activeSnippet.id && s.status !== 'ACQUIRED'));
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to fetch submissions');
     }
-  };
+  }, [activeSnippet]);
 
   useEffect(() => {
     if (activeConsoleTab === 'submissions') {
       fetchSubmissions();
     }
-  }, [activeConsoleTab, activeSnippet]);
+  }, [activeConsoleTab, activeSnippet, fetchSubmissions]);
 
   useEffect(() => {
     fetchWithAuth('/code/my-snippets')
@@ -219,7 +219,7 @@ export default function DashboardPage() {
       } else {
         toast.error(data.error || 'Claim Failed.');
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Connection Failed.');
     }
   };
@@ -237,7 +237,7 @@ export default function DashboardPage() {
     if (savedSolver) {
       setActiveSolver(JSON.parse(savedSolver));
     }
-  }, []);
+  }, [team]);
 
   const handleUpload = async () => {
     if (!activeSnippet || !activeSolver) {
@@ -272,7 +272,7 @@ export default function DashboardPage() {
       } else {
         toast.error(data.error || 'Wrong! Check your code and try again.');
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('ERROR: Connection lost during submission.');
     } finally {
       setIsSubmitting(false);
@@ -438,7 +438,6 @@ export default function DashboardPage() {
                   No Problems acquired in auction.
                 </div>
               ) : snippets.map((snippet: Snippet) => {
-                const isClaimedByMe = activeSolver && snippet.claimant === activeSolver.name;
                 const isClaimedByOther = snippet.claimant && snippet.claimant !== activeSolver?.name;
                 
                 // Check if ANY snippet in this category is claimed by the team

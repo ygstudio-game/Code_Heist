@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import TeamCard from '@/components/TeamCard';
 import { fetchWithAuth } from '@/lib/api';
 import { Users, RefreshCw, AlertTriangle, Activity, TrendingUp, ShieldAlert, Timer } from 'lucide-react';
@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import BootSequence from '@/components/BootSequence';
 
-import { Team, Submission, Snippet, AuctionBid, GameState } from '@/types';
+import { Submission, Snippet, AuctionBid, GameState } from '@/types';
 import { useSocket } from '@/context/SocketContext';
 import { useSystemState } from '@/hooks/useSystemState';
 
@@ -36,9 +36,9 @@ export default function AdminDashboard() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isAutoPilot, setIsAutoPilot] = useState(false);
   const { socket, isConnected } = useSocket();
-  const { phase, updatePhase } = useSystemState();
+  const { phase } = useSystemState();
 
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       setLoading(true);
       const [stateRes, snippetsRes, submissionsRes] = await Promise.all([
@@ -81,7 +81,142 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  const handleUpdatePhase = useCallback(async (newPhase: string) => {
+    try {
+      const res = await fetchWithAuth('/system/phase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phase: newPhase }),
+      });
+      if (res.ok) {
+        toast.success(`Phase updated to ${newPhase}`);
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Failed to update phase');
+    }
+  }, [loadDashboard]);
+
+  const handleStartAuction = useCallback(async (snippetId: string) => {
+    try {
+      const res = await fetchWithAuth('/admin/auction/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ snippetId, duration: 120, isPreviewOnly: isPreviewMode }),
+      });
+      if (res.ok) {
+        toast.success('Auction Started');
+        loadDashboard();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to start auction');
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  }, [isPreviewMode, loadDashboard]);
+
+  const startNextAuction = useCallback(async () => {
+    // Refresh snippets to get latest status
+    const res = await fetchWithAuth('/admin/snippets');
+    if (!res.ok) return;
+    const allSnippets: Snippet[] = await res.json();
+    
+    // Find first snippet that hasn't been completed in an auction round
+    const nextSnippet = allSnippets.find(s => 
+      !s.auctionRounds?.some(r => r.status === 'COMPLETED')
+    );
+
+    if (nextSnippet) {
+      handleStartAuction(nextSnippet.id);
+    } else {
+      toast.info('All problems auctioned. Starting Coding Phase...');
+      setIsAutoPilot(false);
+      handleUpdatePhase('CODING');
+    }
+  }, [handleStartAuction, handleUpdatePhase]);
+
+  const handleEndAuction = useCallback(async () => {
+    try {
+      const res = await fetchWithAuth('/admin/auction/end', { method: 'POST' });
+      if (res.ok) {
+        toast.success('Auction Ended');
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  }, [loadDashboard]);
+
+  const handlePenalty = useCallback(async (teamId: string, strikes: number, creditPenalty: number) => {
+    try {
+      const res = await fetchWithAuth('/admin/penalty', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teamId, strikes, creditPenalty, reason: 'Admin Intervention' }),
+      });
+      if (res.ok) {
+        toast.success('Penalty Applied');
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  }, [loadDashboard]);
+
+  const handleAdjustCredits = useCallback(async (teamId: string, customAmount: number) => {
+    try {
+      const res = await fetchWithAuth('/admin/credits/adjust', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teamId, amount: customAmount, reason: 'Admin Manual Adjustment' }),
+      });
+      if (res.ok) {
+        toast.success(`Credits Adjusted by ${customAmount}`);
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  }, [loadDashboard]);
+
+  const handleForceApprove = useCallback(async (id: string) => {
+    try {
+      const res = await fetchWithAuth(`/admin/submissions/${id}/force-approve`, { method: 'POST' });
+      if (res.ok) {
+        toast.success('Answer approved');
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Override Failed');
+    }
+  }, [loadDashboard]);
+
+  const handleForceReject = useCallback(async (id: string) => {
+    try {
+      const res = await fetchWithAuth(`/admin/submissions/${id}/force-reject`, { method: 'POST' });
+      if (res.ok) {
+        toast.success('Answer rejected');
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Override Failed');
+    }
+  }, [loadDashboard]);
+
+  const handleForceReset = useCallback(async (id: string) => {
+    try {
+      const res = await fetchWithAuth(`/admin/submissions/${id}/force-reset`, { method: 'POST' });
+      if (res.ok) {
+        toast.success('Answer reset');
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Override Failed');
+    }
+  }, [loadDashboard]);
 
   useEffect(() => {
     loadDashboard();
@@ -102,7 +237,7 @@ export default function AdminDashboard() {
     if (isConnected && socket) {
       socket.emit('join-admin');
       
-      socket.on('team:penalty', (data) => {
+      socket.on('team:penalty', () => {
         loadDashboard();
       });
       socket.on('auction:started', () => {
@@ -145,158 +280,11 @@ export default function AdminDashboard() {
         socket.off('admin:newLog');
       };
     }
-  }, [isConnected, socket]);
+  }, [isConnected, socket, isAutoPilot, startNextAuction, loadDashboard]);
 
-  const handleStartAuction = async (snippetId: string) => {
-    try {
-      const res = await fetchWithAuth('/admin/auction/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ snippetId, duration: 120, isPreviewOnly: isPreviewMode }),
-      });
-      if (res.ok) {
-        toast.success('Auction Started');
-        loadDashboard();
-      } else {
-        const data = await res.json();
-        toast.error(data.error || 'Failed to start auction');
-      }
-    } catch {
-      toast.error('Network error');
-    }
-  };
 
-  const startNextAuction = async () => {
-    // Refresh snippets to get latest status
-    const res = await fetchWithAuth('/admin/snippets');
-    if (!res.ok) return;
-    const allSnippets: Snippet[] = await res.json();
-    
-    // Find first snippet that hasn't been completed in an auction round
-    const nextSnippet = allSnippets.find(s => 
-      !s.auctionRounds?.some(r => r.status === 'COMPLETED')
-    );
 
-    if (nextSnippet) {
-      handleStartAuction(nextSnippet.id);
-    } else {
-      toast.info('All problems auctioned. Starting Coding Phase...');
-      setIsAutoPilot(false);
-      handleUpdatePhase('CODING');
-    }
-  };
 
-  const handleUpdatePhase = async (newPhase: string) => {
-    try {
-      const res = await fetchWithAuth('/system/phase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phase: newPhase }),
-      });
-      if (res.ok) {
-        toast.success(`Phase updated to ${newPhase}`);
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Failed to update phase');
-    }
-  };
-
-  const handleEndAuction = async () => {
-    try {
-      const res = await fetchWithAuth('/admin/auction/end', { method: 'POST' });
-      if (res.ok) {
-        toast.success('Auction Ended');
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Network error');
-    }
-  };
-
-  const handlePenalty = async (teamId: string, strikes: number, creditPenalty: number) => {
-    try {
-      const res = await fetchWithAuth('/admin/penalty', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teamId, strikes, creditPenalty, reason: 'Admin Intervention' }),
-      });
-      if (res.ok) {
-        toast.success('Penalty Applied');
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Network error');
-    }
-  };
-
-  const handleAdjustCredits = async (teamId: string, customAmount: number) => {
-    try {
-      const res = await fetchWithAuth('/admin/credits/adjust', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teamId, amount: customAmount, reason: 'Admin Manual Adjustment' }),
-      });
-      if (res.ok) {
-        toast.success(`Credits Adjusted by ${customAmount}`);
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Network error');
-    }
-  };
-
-  const handleForceApprove = async (id: string) => {
-    try {
-      const res = await fetchWithAuth(`/admin/submissions/${id}/force-approve`, { method: 'POST' });
-      if (res.ok) {
-        toast.success('Answer approved');
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Override Failed');
-    }
-  };
-
-  const handleForceReject = async (id: string) => {
-    try {
-      const res = await fetchWithAuth(`/admin/submissions/${id}/force-reject`, { method: 'POST' });
-      if (res.ok) {
-        toast.success('Answer rejected');
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Override Failed');
-    }
-  };
-
-  const handleForceReset = async (id: string) => {
-    try {
-      const res = await fetchWithAuth(`/admin/submissions/${id}/force-reset`, { method: 'POST' });
-      if (res.ok) {
-        toast.success('Answer reset');
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Override Failed');
-    }
-  };
-
-  const handleReleaseClaim = async (teamId: string, snippetId?: string) => {
-    try {
-      const res = await fetchWithAuth('/admin/submissions/release-claim', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teamId, snippetId }),
-      });
-      if (res.ok) {
-        toast.success('Problem released');
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Network error');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background text-text selection:bg-primary/30 pt-20">
@@ -535,7 +523,7 @@ export default function AdminDashboard() {
                          {['ALL', 'SOLVED', 'WARNING'].map(f => (
                             <button 
                                key={f}
-                               onClick={() => setLogFilter(f as any)}
+                               onClick={() => setLogFilter(f as typeof logFilter)}
                                className={`text-[8px] font-bold px-2 py-0.5 border ${logFilter === f ? 'bg-primary text-black border-primary' : 'text-text/40 border-white/10 hover:border-text/30'}`}
                             >
                                {f}

@@ -30,7 +30,7 @@ export default function BootSequence() {
     }, 150);
 
     return () => clearInterval(interval);
-  }, [manifest]);
+  }, []);
 
   if (!visible) return null;
 

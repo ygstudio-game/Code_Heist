@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchWithAuth } from '@/lib/api';
-import { TrendingUp, Users, Target, Shield, Zap, Crosshair } from 'lucide-react';
+import { TrendingUp, Users, Target, Shield, Zap } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useSystemState } from '@/hooks/useSystemState';
 import { useSocket } from '@/context/SocketContext';
@@ -83,7 +83,7 @@ export default function LeaderboardPage() {
     return { solvedCount, avgTime, accuracy, credits: team.credits, strikes: team.strikes, vaultTime, totalVaultTime, grandTotalTime };
   };
 
-  const loadTeams = async () => {
+  const loadTeams = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetchWithAuth('/teams');
@@ -96,11 +96,11 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadTeams();
-  }, []);
+  }, [loadTeams]);
 
   const sortedTeams = [...teams].sort((a, b) => {
     if (displayMode === 'CODING') {

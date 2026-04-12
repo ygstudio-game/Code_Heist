@@ -20,14 +20,14 @@ export default function MonacoEditor({
   teamId = 'default',
   phase = 'AUCTION'
 }: MonacoEditorProps & { teamId?: string, phase?: string }) {
-  const { breaches } = useAntiCheat(teamId, phase);
-  const editorRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
-  const monacoRef = useRef<Monaco | null>(null);
+   const { breaches: _breaches } = useAntiCheat(teamId, phase);
+  const _editorRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const _monacoRef = useRef<Monaco | null>(null);
 
 
   const handleEditorMount: OnMount = (editor, monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
+    _editorRef.current = editor;
+    _monacoRef.current = monaco;
 
     // Define Aegis Terminal Theme
     monaco.editor.defineTheme('aegis-dark', {
@@ -128,7 +128,7 @@ export default function MonacoEditor({
   };
 
   return (
-    <div className={`w-full h-full relative group ${breaches > 0 ? 'glitch-active' : ''} clip-edge-tl`}>
+    <div className={`w-full h-full relative group ${_breaches > 0 ? 'glitch-active' : ''} clip-edge-tl`}>
       <div className="absolute inset-0 pointer-events-none z-10 scanlines-overlay opacity-30"></div>
       <div className="absolute inset-0 pointer-events-none z-10 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"></div>
       <Editor
