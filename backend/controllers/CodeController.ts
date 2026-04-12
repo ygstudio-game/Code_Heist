@@ -112,9 +112,12 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
 
     // 4. Check if all 4 problems are now VERIFIED → stamp completion time
     if (isCorrect) {
-      const verifiedCount = await prisma.submission.count({
+      const verifiedSnippets = await prisma.submission.findMany({
         where: { teamId, status: 'VERIFIED' },
+        select: { snippetId: true },
+        distinct: ['snippetId'],
       });
+      const verifiedCount = verifiedSnippets.length;
 
       if (verifiedCount >= 4) {
         const systemState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
