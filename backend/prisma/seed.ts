@@ -6,12 +6,12 @@ import 'dotenv/config';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new pg.Pool({ connectionString });
-const adapter = new PrismaPg(pool);
+const adapter = new PrismaPg(pool as any);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const teamPassword = await bcrypt.hash('team123', 10);
-  
+
   // 1. Create Admins
   const admins = [
     { name: 'Aegis Command', key: 'AEGIS_ADMIN', pass: 'admin123' },

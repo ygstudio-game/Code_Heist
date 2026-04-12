@@ -6,7 +6,7 @@ import 'dotenv/config';
 async function verify() {
   const connectionString = process.env.DATABASE_URL;
   const pool = new pg.Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
+  const adapter = new PrismaPg(pool as any);
   const prisma = new PrismaClient({ adapter });
 
   try {
