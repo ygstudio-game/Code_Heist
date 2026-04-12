@@ -28,13 +28,13 @@ export default function AuctionPage() {
 
   const currentBid = auction?.highestBid?.amount || 0;
   const highestBidder = auction?.highestBid?.team.name || "NO BIDS YET";
-  const minIncrease = currentBid === 0 ? 250 : 50; 
-  const recommendedBid = currentBid === 0 ? 250 : currentBid + minIncrease;
+  const minIncrease = 1; 
+  const recommendedBid = currentBid === 0 ? 1 : currentBid + minIncrease;
 
   const handleBidSubmit = async (customAmount?: number) => {
     const amount = customAmount || parseInt(bidAmount);
     if (isNaN(amount) || amount < recommendedBid) {
-      toast.error(`MINIMUM BID REQUIRED: ${recommendedBid} CR`);
+      toast.error(`At least ${recommendedBid} points needed`);
       return;
     }
     
@@ -46,7 +46,12 @@ export default function AuctionPage() {
 
   useEffect(() => {
     if (active && auction && !bidAmount) {
-      setBidAmount(recommendedBid.toString());
+      const recommended = recommendedBid.toString();
+      if (bidAmount !== recommended) {
+        // Use timeout to resolve cascading render warning
+        const timer = setTimeout(() => setBidAmount(recommended), 0);
+        return () => clearTimeout(timer);
+      }
     }
   }, [active, auction, recommendedBid, bidAmount]);
 
@@ -55,15 +60,15 @@ export default function AuctionPage() {
        <div className="scanline"></div>
        <Navbar />
        
-       <main className="max-w-7xl mx-auto px-6 py-12 space-y-12 pt-32">
+       <main className="max-w-7xl mx-auto px-6 py-12 space-y-12 pt-40 md:pt-40">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/5 pb-8">
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-primary font-mono text-sm font-semibold uppercase">
                 <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                Live Problem Auction
+                Buy Problems
               </div>
               <h1 className="text-4xl font-bold uppercase tracking-tight">
-                Problem <span className="text-white/20">Bidding</span>
+                Buy <span className="text-white/20">Problems</span>
               </h1>
             </div>
             
@@ -99,10 +104,10 @@ export default function AuctionPage() {
             <div className="terminal-card min-h-[400px] flex items-center justify-center border-white/5 bg-white/[0.02]">
               <div className="text-center space-y-6 max-w-lg">
                 <Shield className="w-16 h-16 text-white/10 mx-auto" />
-                <h2 className="text-2xl font-bold text-white/40">Waiting for Auction</h2>
+                <h2 className="text-2xl font-bold text-white/40">Waiting</h2>
                 <p className="text-text/60 text-base leading-relaxed">
-                  No active problem auction at the moment.<br/>
-                  Please wait for the admin to start the next round.
+                  No problems to buy right now.<br/>
+                  Please wait for the next one.
                 </p>
               </div>
             </div>
@@ -117,7 +122,7 @@ export default function AuctionPage() {
                     </div>
                     {auction.isPreview && (
                       <div className="px-4 py-1 bg-warning/10 border border-warning/20 text-warning text-[10px] md:text-sm font-bold uppercase animate-pulse">
-                        Preview Round - Bidding Locked
+                        Preview - Cannot Bid
                       </div>
                     )}
                   </div>
@@ -128,13 +133,13 @@ export default function AuctionPage() {
                         <Users size={14} />
                       </div>
                       <div>
-                        <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">High Bidder</p>
+                        <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">Team</p>
                         <p className="text-xs md:text-sm font-bold text-white uppercase truncate max-w-[100px] md:max-w-[200px]">{highestBidder}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                       <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">Current Bid</p>
-                       <p className="text-lg md:text-xl font-black text-primary font-mono lowercase">{currentBid} <span className="text-[10px]">cr</span></p>
+                       <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">Price</p>
+                       <p className="text-lg md:text-xl font-black text-primary font-mono lowercase">{currentBid}</p>
                     </div>
                   </div>
                 </div>
@@ -144,8 +149,8 @@ export default function AuctionPage() {
               <div className="col-span-1 lg:col-span-5 space-y-6 animate-in fade-in slide-in-from-right-8 duration-500 delay-150 relative z-20">
                 <div className={`terminal-card space-y-8 p-8 ${auction.isPreview ? 'border-warning/20 bg-warning/5' : 'border-primary/20 bg-primary/5'}`}>
                   <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-white uppercase">Bid on Problem</h3>
-                    <p className="text-sm text-text/60">Credits required to purchase this problem.</p>
+                    <h3 className="text-xl font-bold text-white uppercase">Buy it</h3>
+                    <p className="text-sm text-text/60">Enter how much you want to pay.</p>
                   </div>
 
                   <div className="space-y-6">
@@ -159,7 +164,7 @@ export default function AuctionPage() {
                          className="w-full bg-black/60 border border-white/10 p-5 pl-12 text-3xl font-black font-mono text-primary outline-none focus:border-primary/50 transition-all placeholder:text-white/10"
                        />
                        <div className="flex justify-between mt-2 font-mono text-[9px] uppercase tracking-widest opacity-40">
-                          <span>Min: {currentBid === 0 ? '250' : '+50'} Units</span>
+                          <span>Min: {currentBid === 0 ? '1' : '+1'} Unit</span>
                           <span>Next: {recommendedBid} CR</span>
                        </div>
                     </div>
@@ -170,7 +175,7 @@ export default function AuctionPage() {
                          disabled={isSubmitting || auction.isPreview}
                          className="px-4 py-2 bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all text-white/60"
                       >
-                         Min Bid ({recommendedBid})
+                         Min ({recommendedBid})
                       </button>
                       <button 
                          onClick={() => handleBidSubmit(recommendedBid + 100)}
@@ -187,14 +192,14 @@ export default function AuctionPage() {
                       className="terminal-button w-full py-5 text-xl flex items-center justify-center gap-3 group disabled:opacity-20 disabled:grayscale transition-all shadow-[0_0_30px_rgba(0,229,255,0.1)] hover:shadow-[0_0_40px_rgba(0,229,255,0.2)]"
                     >
                       <Gavel size={24} className="group-hover:rotate-[-45deg] transition-transform" />
-                      <span className="relative z-10 uppercase font-black italic tracking-wider">Place Bid</span>
+                     <span className="relative z-10 uppercase font-black italic tracking-wider">Bid</span>
                     </button>
                   </div>
 
                   {auction.isPreview && (
-                    <div className="p-4 border border-warning/20 bg-warning/10 text-sm text-center text-warning/80 font-bold uppercase">
-                       Bidding is temporarily locked for preview
-                    </div>
+                     <div className="p-4 border border-warning/20 bg-warning/10 text-sm text-center text-warning/80 font-bold uppercase">
+                        Locked - check the problem first
+                     </div>
                   )}
                 </div>
 
@@ -219,7 +224,7 @@ export default function AuctionPage() {
                        ))
                      ) : (
                        <div className="p-12 text-center text-xs text-text/20 font-mono uppercase tracking-widest italic">
-                         No Bids Synchronized...
+                         No bids yet.
                        </div>
                      )}
                    </div>

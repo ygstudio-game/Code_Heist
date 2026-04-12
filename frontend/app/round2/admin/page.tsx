@@ -115,7 +115,7 @@ export default function AdminVaultPage() {
     };
   }, [isConnected, socket, loadVaultState]);
 
-  const apiAction = async (endpoint: string, body: any, label: string) => {
+  const apiAction = async (endpoint: string, body: Record<string, unknown>, label: string) => {
     setActionLoading(label);
     try {
       const res = await fetchWithAuth(endpoint, {

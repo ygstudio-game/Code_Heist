@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { fetchWithAuth } from '../lib/api';
 import { useRouter } from 'next/navigation';
 
-export const useAntiCheat = (teamId: string, phase: string) => {
+export const useAntiCheat = (teamId: string, phase: string, solverName?: string) => {
   const [breaches, setBreaches] = useState(0);
   const router = useRouter();
   // Use a ref to prevent double-firing in StrictMode or rapid events
@@ -14,20 +14,19 @@ export const useAntiCheat = (teamId: string, phase: string) => {
   const reportBreach = useCallback(async (currentStrikes: number) => {
     if (teamId === 'default' || isReporting.current) return;
     isReporting.current = true;
-    
+
     try {
-      await fetchWithAuth('/admin/penalty', {
+      await fetchWithAuth('/teams/report-violation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          teamId,
-          strikes: 1,
-          reason: 'Tab Switch / Window Lost Focus Detected',
-          creditPenalty: 0, // No credit deduction
+          reason: `Tab Switch Detected (${solverName || 'Unknown Member'})`,
+          userName: solverName || 'Unknown'
         }),
       });
-      
-      if (currentStrikes >= 5) {
+
+      // Silent logging to admin only
+      if (currentStrikes >= 35) {
         toast.error('MAXIMUM STRIKES EXCEEDED. LOGGING OUT...', { duration: 5000 });
         setTimeout(() => {
           document.cookie = 'token=; Max-Age=0; path=/;';
@@ -47,10 +46,10 @@ export const useAntiCheat = (teamId: string, phase: string) => {
     const handleViolation = () => {
       setBreaches((prev) => {
         const next = prev + 1;
-        
+
         // Report breach to admin silently
         reportBreach(next);
-        
+
         return next;
       });
     };

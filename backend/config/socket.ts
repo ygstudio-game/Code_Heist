@@ -26,6 +26,12 @@ export const initSocket = (httpServer: HttpServer) => {
             console.log(`🎯 Socket ${socket.id} joined auction room`);
         });
 
+        // Join admin room
+        socket.on('join-admin', () => {
+            socket.join('admin-room');
+            console.log(`🛡️ Socket ${socket.id} joined admin room`);
+        });
+
         socket.on('disconnect', () => {
             console.log(`🔌 Session Terminated: ${socket.id}`);
         });

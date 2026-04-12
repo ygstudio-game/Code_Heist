@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getAllTeams, getTeamById, getMe } from '../controllers/teamController';
+import { reportViolation } from '../controllers/AdminController';
 import { authenticate } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -8,5 +9,6 @@ const router = Router();
 router.get('/', authenticate, getAllTeams);
 router.get('/me', authenticate, getMe);
 router.get('/:id', authenticate, getTeamById);
+router.post('/report-violation', authenticate, reportViolation);
 
 export default router;

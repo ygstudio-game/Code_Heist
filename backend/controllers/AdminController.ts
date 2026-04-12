@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
+import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { resolveAuction, clearInactivityTimer } from './AuctionController';
 import { getIO } from '../config/socket';
@@ -41,12 +42,89 @@ export const getAllSnippets = async (req: AuthRequest, res: Response) => {
         auctionRounds: {
           select: { id: true, status: true, winnerId: true },
         },
-      },
+      } as any,
       orderBy: { order: 'asc' },
     });
     res.json(snippets);
   } catch (error: any) {
-    res.status(500).json({ error: 'Failed to fetch snippets', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch admin logs', details: error.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// TEAM MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────
+
+export const getAllTeams = async (req: Request, res: Response) => {
+  try {
+    const teams = await prisma.team.findMany({
+      include: {
+        _count: {
+          select: { submissions: true, bids: true }
+        },
+        members: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(teams);
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to fetch teams', details: error.message });
+  }
+};
+
+export const createTeam = async (req: Request, res: Response) => {
+  const { name, accessKey, password, members } = req.body;
+
+  if (!name || !accessKey || !password) {
+    return res.status(400).json({ error: 'Missing name, accessKey, or password' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const team = await prisma.team.create({
+      data: {
+        name,
+        accessKey,
+        password: hashedPassword,
+        members: {
+          create: (members || []).map((m: any) => ({ name: typeof m === 'string' ? m : m.name }))
+        }
+      },
+      include: { members: true }
+    });
+    res.status(201).json(team);
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to create team', details: error.message });
+  }
+};
+
+export const deleteTeam = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await (prisma as any).team.delete({ where: { id: id as any } });
+    res.json({ message: 'Team deleted successfully' });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to delete team', details: error.message });
+  }
+};
+
+export const resetTeamPassword = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ error: 'New password is required' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.team.update({
+      where: { id },
+      data: { password: hashedPassword }
+    });
+    res.json({ message: 'Password reset successful' });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to reset password', details: error.message });
   }
 };
 
@@ -59,7 +137,7 @@ export const createSnippet = async (req: AuthRequest, res: Response) => {
 
   try {
     const snippet = await prisma.snippet.create({
-      data: { title, category, buggyCode, solution, hiddenInput, expected, order: order || 0 },
+      data: { title, category, buggyCode, solution, hiddenInput, expected, order: order || 0 } as any,
     });
     res.status(201).json(snippet);
   } catch (error: any) {
@@ -114,7 +192,7 @@ export const startAuction = async (req: AuthRequest, res: Response) => {
 
   try {
     // Check no active auction
-    const existing = await prisma.auctionRound.findFirst({
+    const existing = await (prisma as any).auctionRound.findFirst({
       where: { status: 'ACTIVE' },
     });
     if (existing) {
@@ -134,7 +212,7 @@ export const startAuction = async (req: AuthRequest, res: Response) => {
     // For now, let's use status: ACTIVE and a flag in the socket event
     const endTime = new Date(startTime.getTime() + (isPreviewOnly ? 30 : auctionDuration) * 1000);
 
-    const auction = await prisma.auctionRound.create({
+    const auction = await (prisma as any).auctionRound.create({
       data: {
         snippetId,
         status: 'ACTIVE',
@@ -151,10 +229,10 @@ export const startAuction = async (req: AuthRequest, res: Response) => {
          // After 30s preview, just end it or transition? 
          // PRD says "Admin triggers the 2-minute window" after preview. 
          // So we just close the preview.
-         await prisma.auctionRound.update({
-           where: { id: auction.id },
-           data: { status: 'COMPLETED', winnerId: null } // Mark as completed without winner to clear it
-         });
+          await (prisma as any).auctionRound.update({
+            where: { id: auction.id },
+            data: { status: 'COMPLETED', winnerId: null } // Mark as completed without winner to clear it
+          });
          const io = getIO();
          io.emit('auction:preview-ended', { auctionId: auction.id });
       } else {
@@ -188,7 +266,7 @@ export const startAuction = async (req: AuthRequest, res: Response) => {
 
 export const endAuction = async (req: AuthRequest, res: Response) => {
   try {
-    const auction = await prisma.auctionRound.findFirst({
+    const auction = await (prisma as any).auctionRound.findFirst({
       where: { status: 'ACTIVE' },
     });
 
@@ -245,18 +323,16 @@ export const applyPenalty = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Log credit penalty if any
-    if (creditPenalty) {
-      await prisma.creditLog.create({
-        data: {
-          teamId,
-          amount: -creditPenalty,
-          reason: reason || `Admin penalty: -${creditPenalty} credits`,
-        },
-      });
-    }
+    // Log penalty for history
+    await prisma.creditLog.create({
+      data: {
+        teamId,
+        amount: -creditPenalty,
+        reason: reason || `System warning/penalty`,
+      },
+    });
 
-    // Emit Socket.io event
+    // Emit Socket.io events
     const io = getIO();
     io.emit('team:penalty', {
       teamId,
@@ -264,6 +340,14 @@ export const applyPenalty = async (req: AuthRequest, res: Response) => {
       strikes: team.strikes,
       isEliminated: team.strikes >= 5,
       reason,
+    });
+
+    // Also log to admin ticker
+    io.to('admin-room').emit('admin:newLog', {
+      teamName: team.name,
+      problemTitle: reason || 'Violation',
+      status: 'WARNING',
+      timestamp: new Date(),
     });
 
     res.json({ message: 'Penalty applied', team });
@@ -303,7 +387,7 @@ export const getGameState = async (req: AuthRequest, res: Response) => {
         orderBy: { credits: 'desc' },
       }),
       prisma.snippet.count(),
-      prisma.auctionRound.findFirst({
+      (prisma as any).auctionRound.findFirst({
         where: { status: 'ACTIVE' },
         include: { snippet: { select: { title: true, category: true } } },
       }),
@@ -311,7 +395,7 @@ export const getGameState = async (req: AuthRequest, res: Response) => {
         by: ['status'],
         _count: true,
       }),
-      prisma.auctionRound.count({ where: { status: 'COMPLETED' } }),
+      (prisma as any).auctionRound.count({ where: { status: 'COMPLETED' } }),
     ]);
 
     res.json({
@@ -350,7 +434,7 @@ export const forceApproveSubmission = async (req: AuthRequest, res: Response) =>
     io.to('admin-room').emit('admin:newLog', {
       teamName: submission.team.name,
       problemTitle: submission.snippet.title,
-      status: 'ADMIN_APPROVE',
+      status: 'APPROVED',
       timestamp: new Date(),
     });
 
@@ -432,5 +516,81 @@ export const getAllSubmissions = async (req: AuthRequest, res: Response) => {
     res.json(submissions);
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to fetch submissions' });
+  }
+};
+
+export const getAdminLogs = async (req: AuthRequest, res: Response) => {
+  try {
+    const [submissions, creditLogs] = await Promise.all([
+      prisma.submission.findMany({
+        take: 50,
+        orderBy: { createdAt: 'desc' },
+        include: { 
+          team: { select: { name: true } }, 
+          snippet: { select: { title: true } } 
+        }
+      }),
+      prisma.creditLog.findMany({
+        take: 50,
+        orderBy: { createdAt: 'desc' },
+        include: { 
+          team: { select: { name: true } } 
+        }
+      })
+    ]);
+
+    const logs = [
+      ...submissions.map(s => ({
+        teamName: s.team.name,
+        problemTitle: s.snippet.title,
+        status: s.status === 'VERIFIED' ? 'SOLVED' : s.status,
+        timestamp: s.createdAt,
+        type: 'SUBMISSION'
+      })),
+      ...creditLogs.map(c => ({
+        teamName: c.team.name,
+        problemTitle: c.reason,
+        status: 'WARNING',
+        timestamp: c.createdAt,
+        type: 'PENALTY'
+      }))
+    ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 50);
+
+    res.json(logs);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch logs' });
+  }
+};
+
+export const reportViolation = async (req: AuthRequest, res: Response) => {
+  try {
+    const teamId = req.user?.teamId;
+    if (!teamId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { reason, userName } = req.body;
+    const team = await prisma.team.findUnique({ where: { id: teamId } });
+    if (!team) return res.status(404).json({ error: 'Team not found' });
+
+    // We don't increment strikes for tab switches as per user request "no maximum limit"
+    // But we still log it to the database and admin ticker
+    await prisma.creditLog.create({
+      data: {
+        teamId,
+        amount: 0,
+        reason: reason || `Tab Switch Detected (${userName || 'Unknown'})`,
+      },
+    });
+
+    const io = getIO();
+    io.to('admin-room').emit('admin:newLog', {
+      teamName: team.name,
+      problemTitle: reason || `Tab Switch Detected (${userName || 'Unknown'})`,
+      status: 'WARNING',
+      timestamp: new Date(),
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to report violation' });
   }
 };

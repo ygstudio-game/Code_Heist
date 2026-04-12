@@ -11,24 +11,13 @@ import SolverInfoModal from '@/components/SolverInfoModal';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
-import { Team } from '@/types';
+import { Team, Snippet, Submission } from '@/types';
 import { useSocket } from '@/context/SocketContext';
 import { useSystemState } from '@/hooks/useSystemState';
 import { useAntiCheat } from '@/hooks/useAntiCheat';
 import { useAuction } from '@/hooks/useAuction';
 
-interface Snippet {
-  id: string;
-  title: string;
-  category: string;
-  buggyCode: string;
-  expected?: string;
-  hiddenInput?: string;
-  reward?: number;
-  auctionWinAmount?: number;
-  submissionStatus?: string;
-  claimant?: string;
-}
+// Removed local Snippet interface in favor of import
 
 export default function DashboardPage() {
   const [team, setTeam] = useState<Team | null>(null);
@@ -42,7 +31,7 @@ export default function DashboardPage() {
   const { socket, isConnected } = useSocket();
   const { phase, codingStartTime } = useSystemState();
   const { active: activeAuction } = useAuction();
-  const { breaches } = useAntiCheat(team?.id || 'default', phase);
+  const { breaches } = useAntiCheat(team?.id || 'default', phase, activeSolver?.name);
   const router = useRouter();
   const [codingTimeLeft, setCodingTimeLeft] = useState<number | null>(null);
 
@@ -53,7 +42,7 @@ export default function DashboardPage() {
 
   // Submissions State
   const [activeConsoleTab, setActiveConsoleTab] = useState<'console' | 'submissions'>('console');
-  const [mySubmissions, setMySubmissions] = useState<any[]>([]);
+  const [mySubmissions, setMySubmissions] = useState<Submission[]>([]);
 
   // Fetch submissions whenever checking the submissions tab
   const fetchSubmissions = async () => {
@@ -62,7 +51,7 @@ export default function DashboardPage() {
       const res = await fetchWithAuth('/code/my-submissions');
       if (res.ok) {
         const data = await res.json();
-        setMySubmissions(data.filter((s: any) => s.snippetId === activeSnippet.id && s.status !== 'ACQUIRED'));
+        setMySubmissions(data.filter((s: Submission) => s.snippetId === activeSnippet.id && s.status !== 'ACQUIRED'));
       }
     } catch (error) {
       console.error('Failed to fetch submissions');
@@ -119,7 +108,7 @@ export default function DashboardPage() {
       socket.on('claim:new', ({ snippetId, solverName }) => {
         setSnippets(prev => prev.map(s => s.id === snippetId ? { ...s, claimant: solverName } : s));
         if (activeSnippet?.id === snippetId) {
-          toast.info(`Sector claimed by ${solverName}`);
+          toast.info(`Problem taken by ${solverName}`);
         }
       });
       socket.on('claim:released', ({ snippetId }) => {
@@ -154,9 +143,10 @@ export default function DashboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Test failed');
       setTestOutput({ stdout: data.stdout || '', stderr: data.stderr || '' });
-    } catch (error: any) {
-      toast.error('Test execution failed');
-      setTestOutput({ stdout: '', stderr: error.message });
+    } catch (error) {
+      toast.error('Could not run code');
+      const errorMessage = (error as Error).message || 'Unknown error';
+      setTestOutput({ stdout: '', stderr: errorMessage });
     } finally {
       setIsTesting(false);
     }
@@ -197,7 +187,7 @@ export default function DashboardPage() {
       return;
     }
     if (snippet.claimant && snippet.claimant !== activeSolver?.name) {
-      toast.error(`PROTECTION ACTIVE: Sector engaged by ${snippet.claimant}.`);
+      toast.error(`TAKEN: This problem is being solved by ${snippet.claimant}.`);
       return;
     }
     setActiveSnippet(snippet);
@@ -223,7 +213,7 @@ export default function DashboardPage() {
 
       const data = await response.json();
       if (response.ok) {
-        toast.success('Problem Claimed. Workspace Ready.');
+        toast.success('Problem Selected. Ready to Code.');
         setActiveSnippet(snippet);
         setCurrentCode(snippet.buggyCode);
       } else {
@@ -237,7 +227,7 @@ export default function DashboardPage() {
   const handleSolverSave = (name: string, role: string) => {
     setActiveSolver({ name, role });
     localStorage.setItem('activeSolver', JSON.stringify({ name, role }));
-    toast.success(`Solver Joined: ${name} (${role.replace('_', ' ')})`, {
+    toast.success(`Member Joined: ${name}`, {
       style: { background: '#131620', border: '1px solid #00D1FF', color: '#00D1FF' }
     });
   };
@@ -251,7 +241,7 @@ export default function DashboardPage() {
 
   const handleUpload = async () => {
     if (!activeSnippet || !activeSolver) {
-      toast.error('ERROR: No problem selected or solver identified.');
+      toast.error('ERROR: Select a problem first.');
       return;
     }
 
@@ -276,11 +266,11 @@ export default function DashboardPage() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(data.message || 'Code Verified. Submission Successful.', {
+        toast.success(data.message || 'Solved! Your answer was sent.', {
           duration: 4000
         });
       } else {
-        toast.error(data.error || 'Submission Failed: Check your code logic.');
+        toast.error(data.error || 'Wrong! Check your code and try again.');
       }
     } catch (error) {
       toast.error('ERROR: Connection lost during submission.');
@@ -300,7 +290,7 @@ export default function DashboardPage() {
           <div className="max-w-4xl mx-auto space-y-12 pb-20">
             <div className="text-center space-y-4 pt-12">
                <div className="inline-flex items-center gap-3 px-4 py-1 bg-primary/5 border border-primary/20 text-primary text-[10px] font-mono tracking-[6px] uppercase glow-text">
-                  [ Competition Briefing ]
+                  [ Rules ]
                </div>
                <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter">
                   Initial <span className="text-primary not-italic">Briefing</span>
@@ -310,7 +300,7 @@ export default function DashboardPage() {
             <div className="grid md:grid-cols-2 gap-8">
                <div className="terminal-card border-white/5 space-y-6">
                   <h3 className="text-primary font-bold uppercase tracking-widest text-sm flex items-center gap-2">
-                     <Shield size={18} /> THE CODE HEIST RULES
+                     <Shield size={18} /> THE RULES
                   </h3>
                   <div className="space-y-4 text-xs text-text/60 leading-relaxed uppercase tracking-tight">
                      <div className="flex gap-4 p-3 bg-white/[0.02] border border-white/5">
@@ -333,10 +323,10 @@ export default function DashboardPage() {
                      <div className="w-16 h-16 bg-primary/10 border border-primary/30 flex items-center justify-center text-primary mx-auto animate-pulse">
                         <Activity size={32} />
                      </div>
-                     <div className="space-y-2">
-                        <h4 className="text-xl font-bold text-white uppercase italic">Awaiting Rounds</h4>
-                        <p className="text-[10px] text-text/40 font-mono uppercase tracking-widest">The Auction is currently dormant.</p>
-                     </div>
+                      <div className="space-y-2">
+                        <h4 className="text-xl font-bold text-white uppercase italic">Next round soon</h4>
+                        <p className="text-[10px] text-text/40 font-mono uppercase tracking-widest">Waiting for problems.</p>
+                      </div>
                      {activeAuction && (
                         <button 
                           onClick={() => router.push('/auction')}
@@ -417,7 +407,7 @@ export default function DashboardPage() {
         onSave={handleSolverSave} 
       />
 
-      <main className="max-w-7xl mx-auto p-6 md:p-10 pt-32 grid-bg-subtle min-h-[calc(100vh-64px)]">
+      <main className="max-w-7xl mx-auto p-6 md:p-10 pt-36 grid-bg-subtle min-h-[calc(100vh-64px)]">
         {/* Statistics Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <StatCard icon={<Cpu size={16} />} label="Team Role" value={team.role} color="primary" />
@@ -513,10 +503,10 @@ export default function DashboardPage() {
           
           {/* Activity Monitor (compact version) */}
           <div className="h-1/3 terminal-card flex flex-col border-white/5 mt-4 overflow-hidden">
-            <h3 className="text-primary glow-text text-[10px] font-bold uppercase mb-2 border-b border-white/5 pb-2 tracking-[2px]">Activity Monitor</h3>
+            <h3 className="text-primary glow-text text-[10px] font-bold uppercase mb-2 border-b border-white/5 pb-2 tracking-[2px]">Activity</h3>
             <div className="flex-1 font-geist-mono text-[9px] space-y-2 text-text/40 overflow-y-auto custom-scrollbar">
-              <div className="text-success glow-text opacity-70 flex items-center gap-2"><div className="w-1 h-1 bg-success rounded-full"></div> [OK] CONNECTION SECURED</div>
-              {activeSolver && <div className="text-primary flex items-center gap-2"><div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div> [INFO] CODER {activeSolver.name.toUpperCase()} AUTHENTICATED</div>}
+              <div className="text-success glow-text opacity-70 flex items-center gap-2"><div className="w-1 h-1 bg-success rounded-full"></div> [OK] ONLINE</div>
+              {activeSolver && <div className="text-primary flex items-center gap-2"><div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div> [INFO] MEMBER {activeSolver.name.toUpperCase()} JOINED</div>}
             </div>
           </div>
         </div>
@@ -533,7 +523,7 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                   <div className="bg-black/40 p-4 border border-white/5 rounded-sm">
                     <p className="text-xs text-white/70 leading-relaxed font-geist-mono">
-                      Task: Analyze the buggy code provided during the auction and submit a fixed, fully working solution. Ensure your code passes all hidden constraints.
+                      Task: Fix the code and submit your answer. Make sure it passes all tests.
                     </p>
                   </div>
                   
@@ -567,7 +557,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-3">
                 <Database size={16} className="text-primary opacity-50" />
                 <span className="text-[10px] font-geist-mono text-text/40 uppercase tracking-[3px]">
-                  {activeSnippet ? `problem_node_${activeSnippet.id.slice(0, 8)}.ts` : 'workspace_main.ts'}
+                  {activeSnippet ? `problem_${activeSnippet.id.slice(0, 8)}.ts` : 'editor_main.ts'}
                 </span>
               </div>
               <div className="flex items-center gap-4">
@@ -614,7 +604,7 @@ export default function DashboardPage() {
                 <button 
                   onClick={() => setActiveConsoleTab('submissions')}
                   className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest ${activeConsoleTab === 'submissions' ? 'text-primary border-b border-primary' : 'text-white/40 border-b border-transparent hover:text-white'}`}
-                >Submissions</button>
+                >Answers</button>
               </div>
 
               {activeConsoleTab === 'console' && (
@@ -634,7 +624,7 @@ export default function DashboardPage() {
                     <div className="flex-1 bg-white/[0.02] border border-white/10 p-2 overflow-y-auto custom-scrollbar font-mono text-[11px]">
                         {isTesting ? (
                           <div className="flex items-center gap-2 text-primary/50 animate-pulse h-full justify-center">
-                            <Terminal size={12} /> EXECUTING PAYLOAD...
+                            <Terminal size={12} /> RUNNING CODE...
                           </div>
                         ) : testOutput ? (
                           <>
@@ -653,7 +643,7 @@ export default function DashboardPage() {
               {activeConsoleTab === 'submissions' && (
                 <div className="flex-1 overflow-y-auto custom-scrollbar bg-black cursor-default">
                   {mySubmissions.length === 0 ? (
-                    <div className="h-full flex items-center justify-center text-white/20 italic text-[10px]">No submissions recorded for this problem.</div>
+                    <div className="h-full flex items-center justify-center text-white/20 italic text-[10px]">No answers yet for this problem.</div>
                   ) : (
                     <table className="w-full text-left text-[10px] font-mono">
                       <thead className="bg-white/[0.02] text-white/40 border-b border-white/5 sticky top-0">
@@ -662,7 +652,7 @@ export default function DashboardPage() {
                            <th className="px-6 py-2 font-normal uppercase tracking-wider">Language</th>
                            <th className="px-6 py-2 font-normal uppercase tracking-wider">Runtime</th>
                            <th className="px-6 py-2 font-normal uppercase tracking-wider">Memory</th>
-                           <th className="px-6 py-2 font-normal uppercase tracking-wider text-right">Time Submitted</th>
+                           <th className="px-6 py-2 font-normal uppercase tracking-wider text-right">Time Sent</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -708,7 +698,7 @@ export default function DashboardPage() {
                 onClick={handleUpload}
                 className={`terminal-button text-[10px] py-2 px-8 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                >
-                 {isSubmitting ? 'SUBMITTING...' : 'Submit Solution'}
+                 {isSubmitting ? 'SENDING...' : 'Send Answer'}
                </button>
             </div>
           </div>

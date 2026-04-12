@@ -9,7 +9,10 @@ export interface Team {
   isEliminated: boolean;
   role: 'TEAM' | 'ADMIN';
   members?: string[];
-  createdAt: string;
+  submissions?: Submission[];
+  vaultTime?: number;
+  lifelinesUsed?: number;
+  lockPenalties?: number;
   _count?: {
     submissions: number;
     bids: number;
@@ -17,9 +20,60 @@ export interface Team {
   error?: string;
 }
 
-export interface StatCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number | React.ReactNode;
-  color?: 'primary' | 'success' | 'danger';
+export interface Snippet {
+  id: string;
+  title: string;
+  category: string;
+  buggyCode: string;
+  expected?: string;
+  hiddenInput?: string;
+  reward?: number;
+  auctionWinAmount?: number;
+  submissionStatus?: string;
+  claimant?: string;
+  auctionRounds?: { id: string; status: string; winnerId: string | null }[];
+}
+
+export interface Submission {
+  id: string;
+  teamId: string;
+  snippetId: string;
+  code: string;
+  status: 'ACQUIRED' | 'SUBMITTED' | 'TESTING' | 'VERIFIED' | 'FAILED';
+  stdout?: string;
+  stderr?: string;
+  solverName: string;
+  solverRole: string;
+  createdAt: string;
+  team: {
+    name: string;
+  };
+  snippet: {
+    title: string;
+  };
+}
+
+export interface AuctionBid {
+  id: string;
+  teamId: string;
+  amount: number;
+  teamName: string;
+  createdAt: string;
+  team: {
+    name: string;
+  };
+}
+
+export interface GameState {
+  teams: Team[];
+  totalSnippets: number;
+  activeAuction: { 
+    id: string; 
+    snippet: { title: string; category: string }; 
+    endTime: string;
+    bids?: AuctionBid[];
+    timeLeft?: number;
+  } | null;
+  submissions: Submission[];
+  completedAuctions: number;
 }

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchWithAuth } from '@/lib/api';
 import { useSocket } from '@/context/SocketContext';
 import Navbar from '@/components/Navbar';
+import { toast } from 'sonner';
 import { Timer, Trophy, Shield, AlertTriangle, Lock, Unlock, Zap, Clock, Skull, HeartPulse } from 'lucide-react';
 
 interface VaultTeam {
@@ -117,14 +118,14 @@ export default function Round2Page() {
 
       <Navbar />
 
-      <main className="max-w-6xl mx-auto p-6 md:p-10 pt-32 grid-bg-subtle min-h-screen">
+      <main className="max-w-6xl mx-auto p-4 md:p-10 pt-36 md:pt-40 grid-bg-subtle min-h-screen">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-2 text-primary font-mono text-[10px] tracking-[4px] uppercase mb-2">
             <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
             Round 2 // The Vault Escape
           </div>
-          <h1 className="text-5xl font-black uppercase tracking-tighter italic">
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter italic">
             Vault <span className="text-white/20">Escape</span>
           </h1>
           <p className="text-text/40 text-sm max-w-xl mx-auto uppercase tracking-widest font-light mt-2">
@@ -181,7 +182,7 @@ export default function Round2Page() {
 
                         {/* Stopwatch Display */}
                         <div className="bg-black/20 p-4 border border-white/5 rounded-sm mb-4">
-                          <div className="text-5xl font-black text-primary glow-text font-geist-mono tracking-tighter tabular-nums text-center">
+                          <div className="text-4xl md:text-5xl font-black text-primary glow-text font-geist-mono tracking-tighter tabular-nums text-center">
                             {formatTimePrecise(elapsed)}
                           </div>
                         </div>
@@ -210,13 +211,13 @@ export default function Round2Page() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-text/30">
-                      <th className="px-6 py-4 font-bold">Rank</th>
-                      <th className="px-6 py-4 font-bold">Squad</th>
-                      <th className="px-6 py-4 font-bold text-center">Vault Time</th>
-                      <th className="px-6 py-4 font-bold text-center">Lifelines</th>
-                      <th className="px-6 py-4 font-bold text-center">Lock Errors</th>
-                      <th className="px-6 py-4 font-bold text-center">Penalties</th>
-                      <th className="px-6 py-4 font-bold text-right">Total Time</th>
+                      <th className="px-3 md:px-6 py-4 font-bold">Rank</th>
+                      <th className="px-3 md:px-6 py-4 font-bold">Squad</th>
+                      <th className="px-3 md:px-6 py-4 font-bold text-center">Vault Time</th>
+                      <th className="px-3 md:px-6 py-4 font-bold text-center">Lifelines</th>
+                      <th className="px-3 md:px-6 py-4 font-bold text-center">Lock Errors</th>
+                      <th className="px-3 md:px-6 py-4 font-bold text-center">Penalties</th>
+                      <th className="px-3 md:px-6 py-4 font-bold text-right">Total Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/[0.02]">
@@ -229,7 +230,7 @@ export default function Round2Page() {
                     )}
                     {completedTeams.map((team, idx) => (
                       <tr key={team.id} className="group hover:bg-primary/[0.02] transition-colors">
-                        <td className="px-6 py-5">
+                        <td className="px-3 md:px-6 py-5">
                           <div
                             className={`w-8 h-8 flex items-center justify-center font-black italic rounded-sm border ${
                               idx === 0
@@ -244,15 +245,15 @@ export default function Round2Page() {
                             {idx + 1}
                           </div>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-3 md:px-6 py-5">
                           <div className="text-sm font-bold text-text group-hover:text-white uppercase transition-colors">
                             {team.name}
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-center">
+                        <td className="px-3 md:px-6 py-5 text-center">
                           <span className="text-sm font-geist-mono text-text/70">{formatTime(team.vaultTime)}</span>
                         </td>
-                        <td className="px-6 py-5 text-center">
+                        <td className="px-3 md:px-6 py-5 text-center">
                           <div className="flex items-center justify-center gap-1">
                             {[0, 1, 2].map((i) => (
                               <HeartPulse
@@ -263,17 +264,17 @@ export default function Round2Page() {
                             ))}
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-center">
+                        <td className="px-3 md:px-6 py-5 text-center">
                           <span className={`text-sm font-bold ${team.lockPenalties > 0 ? 'text-warning' : 'text-text/30'}`}>
                             {team.lockPenalties}
                           </span>
                         </td>
-                        <td className="px-6 py-5 text-center">
+                        <td className="px-3 md:px-6 py-5 text-center">
                           <span className="text-[10px] text-danger/70 font-mono">
                             +{formatTime(team.lifelinePenalty + team.lockPenalty)}
                           </span>
                         </td>
-                        <td className="px-6 py-5 text-right">
+                        <td className="px-3 md:px-6 py-5 text-right">
                           <div className="text-sm font-black text-primary glow-text italic tracking-tight">
                             {formatTime(team.totalTime)}
                           </div>

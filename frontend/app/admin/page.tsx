@@ -8,23 +8,14 @@ import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import BootSequence from '@/components/BootSequence';
 
-import { Team } from '@/types';
+import { Team, Submission, Snippet, AuctionBid, GameState } from '@/types';
 import { useSocket } from '@/context/SocketContext';
 import { useSystemState } from '@/hooks/useSystemState';
 
-interface GameState {
-  teams: Team[];
-  totalSnippets: number;
-  activeAuction: { id: string, snippet: { title: string, category: string }, endTime: string } | null;
-  submissions: any[];
-  completedAuctions: number;
+interface AdminGameState extends Omit<GameState, 'activeAuction'> {
+  activeAuction: { id: string; snippet: { title: string; category: string }; endTime: string } | null;
 }
 
-interface Snippet {
-  id: string;
-  title: string;
-  category: string;
-}
 
 interface LogEntry {
   teamName: string;
@@ -34,14 +25,16 @@ interface LogEntry {
 }
 
 export default function AdminDashboard() {
-  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [gameState, setGameState] = useState<AdminGameState | null>(null);
   const [snippets, setSnippets] = useState<Snippet[]>([]);
-  const [submissions, setSubmissions] = useState<any[]>([]);
-  const [activeAuctionBids, setActiveAuctionBids] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [activeAuctionBids, setActiveAuctionBids] = useState<AuctionBid[]>([]);
   const [auctionTimeLeft, setAuctionTimeLeft] = useState<number>(0);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [logFilter, setLogFilter] = useState<'ALL' | 'SOLVED' | 'WARNING'>('ALL');
   const [loading, setLoading] = useState(true);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isAutoPilot, setIsAutoPilot] = useState(false);
   const { socket, isConnected } = useSocket();
   const { phase, updatePhase } = useSystemState();
 
@@ -74,16 +67,14 @@ export default function AdminDashboard() {
         const initialSubs = await submissionsRes.json();
         setSubmissions(initialSubs);
         
-        // Populate initial logs from submissions
-        const initialLogs = initialSubs.map((s: any) => ({
-          teamName: s.team.name,
-          problemTitle: s.snippet.title,
-          status: s.status,
-          timestamp: s.createdAt
-        })).slice(0, 50);
-        setLogs(initialLogs);
+        // Fetch centralized logs
+        const logsRes = await fetchWithAuth('/admin/logs');
+        if (logsRes.ok) {
+           const initialLogs = await logsRes.json();
+           setLogs(initialLogs);
+        }
       } else {
-         toast.error('Failed to sync with Aegis network');
+         toast.error('Failed to sync with system');
       }
     } catch {
       toast.error('Network Error while syncing.');
@@ -109,23 +100,42 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (isConnected && socket) {
-      socket.on('team:penalty', () => loadDashboard());
+      socket.emit('join-admin');
+      
+      socket.on('team:penalty', (data) => {
+        loadDashboard();
+      });
       socket.on('auction:started', () => {
-         toast.info('NEW AUCTION BROADCAST DETECTED');
+         toast.info('NEW AUCTION STARTED');
          loadDashboard();
       });
-      socket.on('auction:new-bid', (bid: any) => {
+      socket.on('auction:new-bid', (bid: AuctionBid) => {
          setActiveAuctionBids(prev => [bid, ...prev]);
          loadDashboard();
       });
-      socket.on('auction:ended', (data: any) => {
-         toast.success(`AUCTION RESOLVED: ${data.winner?.name || 'CANCELLED'}`);
+      socket.on('auction:ended', (data: { winner?: { name: string } }) => {
+         toast.success(`AUCTION ENDED: ${data.winner?.name || 'CANCELLED'}`);
          setActiveAuctionBids([]);
          loadDashboard();
+
+         // Auto-Pilot Logic
+         if (isAutoPilot) {
+            setTimeout(() => {
+               startNextAuction();
+            }, 5000);
+         }
       });
-      socket.on('admin:newLog', (log: any) => {
-        setLogs(prev => [log, ...prev].slice(0, 50));
-        loadDashboard();
+      socket.on('admin:newLog', (log: LogEntry) => {
+        setLogs(prev => {
+          const exists = prev.some(p => 
+            p.teamName === log.teamName && 
+            p.problemTitle === log.problemTitle && 
+            new Date(p.timestamp).getTime() === new Date(log.timestamp).getTime()
+          );
+          if (exists) return prev;
+          return [log, ...prev].slice(0, 50);
+        });
+        // loadDashboard(); // Remove to avoid race condition overwrite
       });
       return () => {
         socket.off('team:penalty');
@@ -145,7 +155,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ snippetId, duration: 120, isPreviewOnly: isPreviewMode }),
       });
       if (res.ok) {
-        toast.success('Auction Phase Initiated');
+        toast.success('Auction Started');
         loadDashboard();
       } else {
         const data = await res.json();
@@ -156,11 +166,47 @@ export default function AdminDashboard() {
     }
   };
 
+  const startNextAuction = async () => {
+    // Refresh snippets to get latest status
+    const res = await fetchWithAuth('/admin/snippets');
+    if (!res.ok) return;
+    const allSnippets: Snippet[] = await res.json();
+    
+    // Find first snippet that hasn't been completed in an auction round
+    const nextSnippet = allSnippets.find(s => 
+      !s.auctionRounds?.some(r => r.status === 'COMPLETED')
+    );
+
+    if (nextSnippet) {
+      handleStartAuction(nextSnippet.id);
+    } else {
+      toast.info('All problems auctioned. Starting Coding Phase...');
+      setIsAutoPilot(false);
+      handleUpdatePhase('CODING');
+    }
+  };
+
+  const handleUpdatePhase = async (newPhase: string) => {
+    try {
+      const res = await fetchWithAuth('/system/phase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phase: newPhase }),
+      });
+      if (res.ok) {
+        toast.success(`Phase updated to ${newPhase}`);
+        loadDashboard();
+      }
+    } catch {
+      toast.error('Failed to update phase');
+    }
+  };
+
   const handleEndAuction = async () => {
     try {
       const res = await fetchWithAuth('/admin/auction/end', { method: 'POST' });
       if (res.ok) {
-        toast.success('Auction Phase Terminated');
+        toast.success('Auction Ended');
         loadDashboard();
       }
     } catch {
@@ -204,7 +250,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetchWithAuth(`/admin/submissions/${id}/force-approve`, { method: 'POST' });
       if (res.ok) {
-        toast.success('Manual Override: Fragment Verified');
+        toast.success('Answer approved');
         loadDashboard();
       }
     } catch {
@@ -216,7 +262,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetchWithAuth(`/admin/submissions/${id}/force-reject`, { method: 'POST' });
       if (res.ok) {
-        toast.success('Manual Override: Fragment Rejected');
+        toast.success('Answer rejected');
         loadDashboard();
       }
     } catch {
@@ -228,7 +274,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetchWithAuth(`/admin/submissions/${id}/force-reset`, { method: 'POST' });
       if (res.ok) {
-        toast.success('Manual Override: Fragment Reset to ACQUIRED');
+        toast.success('Answer reset');
         loadDashboard();
       }
     } catch {
@@ -244,7 +290,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ teamId, snippetId }),
       });
       if (res.ok) {
-        toast.success('Sector Claim Released');
+        toast.success('Problem released');
         loadDashboard();
       }
     } catch {
@@ -253,41 +299,52 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-space selection:bg-primary/30 data-stream-bg">
+    <div className="min-h-screen bg-background text-text selection:bg-primary/30 pt-20">
+      <Navbar />
       <BootSequence />
       <div className="scanline"></div>
       <div className="particle-bg"></div>
       
-      <Navbar />
-
-      <main className="max-w-7xl mx-auto p-6 md:p-10 pt-32 min-h-screen grid-bg-subtle">
+      <main className="max-w-7xl mx-auto p-6 md:p-10 pt-36 md:pt-40 grid-bg-subtle min-h-screen">
          {/* Admin Header Stats */}
          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <AdminStatCard icon={<Users size={18} />} label="Registered Teams" value={gameState?.teams.length || 0} color="primary" />
-          <AdminStatCard icon={<TrendingUp size={18} />} label="Total Credits Circulation" value={gameState?.teams.reduce((acc, t) => acc + (t.credits || 0), 0) || 0} color="success" />
-          <AdminStatCard icon={<AlertTriangle size={18} />} label="Active Incidents" value={gameState?.teams.reduce((acc, t) => acc + (t.strikes || 0), 0) || 0} color="danger" />
-          <AdminStatCard icon={<Activity size={18} />} label="System Load" value="OPTIMAL" color="success" />
+          <AdminStatCard icon={<Users size={18} />} label="Teams" value={gameState?.teams.length || 0} color="primary" />
+          <AdminStatCard icon={<TrendingUp size={18} />} label="Total Points" value={gameState?.teams.reduce((acc, t) => acc + (t.credits || 0), 0) || 0} color="success" />
+          <AdminStatCard icon={<AlertTriangle size={18} />} label="Warnings" value={gameState?.teams.reduce((acc, t) => acc + (t.strikes || 0), 0) || 0} color="danger" />
+          <AdminStatCard icon={<Activity size={18} />} label="Status" value="OPTIMAL" color="success" />
         </div>
 
         {/* Global Phase Control */}
         <div className="terminal-card bg-black/40 border-white/5 p-4 space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Competition Phase</span>
-            <span className="text-sm font-black text-primary animate-pulse">{phase}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {['AUCTION', 'CODING', 'VAULT', 'FINISHED'].map((p) => (
-              <button
-                key={p}
-                onClick={() => updatePhase(p)}
-                disabled={phase === p}
-                className={`text-[9px] py-1.5 font-bold uppercase transition-all border ${phase === p ? 'bg-primary text-black border-primary' : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'}`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        </div>
+                    <div className="flex gap-4 items-center">
+                       <button 
+                          onClick={() => {
+                             if (!isAutoPilot) {
+                                startNextAuction();
+                             }
+                             setIsAutoPilot(!isAutoPilot);
+                          }}
+                          className={`terminal-button ${isAutoPilot ? 'border-danger text-danger' : ''}`}
+                       >
+                          {isAutoPilot ? 'STOP AUTO-PILOT' : 'START AUTO AUCTION'}
+                       </button>
+
+                       <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-6 py-2">
+                          <span className="text-[10px] text-text/40 uppercase tracking-widest">Comp. Phase:</span>
+                          <div className="flex gap-1">
+                             {['AUCTION', 'CODING', 'VAULT', 'FINISHED'].map(p => (
+                                <button
+                                   key={p}
+                                   onClick={() => handleUpdatePhase(p)}
+                                   className={`px-3 py-1 text-[9px] font-bold border transition-all ${phase === p ? 'bg-primary text-black border-primary shadow-[0_0_10px_rgba(0,229,255,0.3)]' : 'text-text/30 border-white/10 hover:border-white/20'}`}
+                                >
+                                   {p}
+                                </button>
+                             ))}
+                          </div>
+                       </div>
+                    </div>
+                 </div>
 
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-8 border-b border-white/5 pb-6">
           <div className="space-y-2">
@@ -365,7 +422,7 @@ export default function AdminDashboard() {
                  <div className="px-6 py-4 border-b border-primary/20 bg-primary/10 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                        <Activity size={18} className="text-primary animate-pulse" />
-                       <span className="text-[10px] font-bold uppercase tracking-[4px] text-primary">Live Problem Auction</span>
+                       <span className="text-[10px] font-bold uppercase tracking-[4px] text-primary">Buy Problems Now</span>
                     </div>
                     <div className="flex items-center gap-4">
                        <div className="text-right">
@@ -415,21 +472,21 @@ export default function AdminDashboard() {
               <div className="col-span-12 lg:col-span-4 terminal-card border-white/5 bg-black/40 p-8 space-y-6 flex flex-col justify-center">
                  <div className="space-y-2 text-center">
                     <TrendingUp size={32} className="text-primary/40 mx-auto" />
-                    <h3 className="text-xl font-black text-white italic tracking-tighter uppercase">Market Statistics</h3>
+                    <h3 className="text-xl font-black text-white italic tracking-tighter uppercase">Details</h3>
                  </div>
                  <div className="space-y-4">
-                    <div className="flex justify-between items-center py-2 border-b border-white/5">
-                       <span className="text-[10px] text-white/40 uppercase">Total Round Bids</span>
-                       <span className="text-sm font-bold text-primary font-mono">{activeAuctionBids.length}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-white/5">
-                       <span className="text-[10px] text-white/40 uppercase">Min Increment</span>
-                       <span className="text-sm font-bold text-white font-mono">50 CR</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-white/5">
-                       <span className="text-[10px] text-white/40 uppercase">Extension Buffer</span>
-                       <span className="text-sm font-bold text-white font-mono">15s</span>
-                    </div>
+                     <div className="flex justify-between items-center py-2 border-b border-white/5">
+                        <span className="text-[10px] text-white/40 uppercase">Total Bids</span>
+                        <span className="text-sm font-bold text-primary font-mono">{activeAuctionBids.length}</span>
+                     </div>
+                     <div className="flex justify-between items-center py-2 border-b border-white/5">
+                        <span className="text-[10px] text-white/40 uppercase">Min Increase</span>
+                        <span className="text-sm font-bold text-white font-mono">1 CR</span>
+                     </div>
+                     <div className="flex justify-between items-center py-2 border-b border-white/5">
+                        <span className="text-[10px] text-white/40 uppercase">Time Added</span>
+                        <span className="text-sm font-bold text-white font-mono">15s</span>
+                     </div>
                  </div>
               </div>
            </div>
@@ -440,21 +497,20 @@ export default function AdminDashboard() {
              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="flex justify-between items-end">
-              <h2 className="text-[10px] font-bold uppercase tracking-[3px] text-text/40">Active Squad Streams</h2>
-              <button onClick={loadDashboard} className="text-[10px] text-primary/60 hover:text-primary flex items-center gap-2 font-mono uppercase transition-colors">
-                <RefreshCw size={10} className={loading ? "animate-spin" : ""} /> Syncing Live Data
-              </button>
+          <>
+            <div className="flex justify-between items-end mb-4">
+               <h2 className="text-[10px] font-bold uppercase tracking-[3px] text-text/40">Teams</h2>
+               <button onClick={loadDashboard} className="text-[10px] text-primary/60 hover:text-primary flex items-center gap-2 font-mono uppercase transition-colors">
+                 <RefreshCw size={10} className={loading ? "animate-spin" : ""} /> Checking online...
+               </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {gameState.teams.map(team => (
                 <div key={team.id} className="relative group">
                   <TeamCard team={team} />
-                  {/* Quick Admin Actions Overlay */}
                   <div className="absolute inset-0 bg-background/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity p-4 border border-primary/30 backdrop-blur-sm z-20">
-                    <p className="text-[10px] text-primary mb-4 tracking-widest uppercase font-bold text-center border-b border-primary/20 pb-2 w-full">Terminal: {team.name}</p>
+                    <p className="text-[10px] text-primary mb-4 tracking-widest uppercase font-bold text-center border-b border-primary/20 pb-2 w-full">Team: {team.name}</p>
                     <div className="grid grid-cols-2 gap-2 w-full mb-4">
                       <button onClick={() => handleAdjustCredits(team.id, 500)} className="bg-primary/10 border border-primary/50 text-primary hover:bg-primary/20 hover:text-white transition-colors text-[9px] font-bold py-2 uppercase tracking-widest">
                          +500 CR
@@ -466,52 +522,54 @@ export default function AdminDashboard() {
                          <ShieldAlert size={12} /> Issue Strike
                       </button>
                     </div>
-                    {/* Release Claims Section */}
-                    {team._count && team._count.submissions > 0 && (
-                      <div className="w-full">
-                        <p className="text-[7px] text-text/40 uppercase tracking-[2px] mb-2">Engaged Sectors</p>
-                        <div className="flex flex-wrap gap-1">
-                          <button 
-                            onClick={() => handleReleaseClaim(team.id)}
-                            className="text-[7px] border border-white/10 px-2 py-1 hover:bg-white/5 uppercase w-full"
-                          >
-                            Release All Claims
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Overwatch: Live Action Ticker & Submissions */}
             <div className="grid grid-cols-12 gap-8 mt-12">
                <div className="col-span-12 lg:col-span-4 terminal-card border-white/5">
-                  <h3 className="text-primary glow-text text-[10px] font-bold uppercase mb-4 border-b border-white/5 pb-2 tracking-[2px]">Live Overwatch Ticker</h3>
-                  <div className="h-96 overflow-y-auto font-geist-mono text-[9px] space-y-2 pr-2 custom-scrollbar">
-                     <p className="text-success/50">[OK] Aegis Network Sentinel Online</p>
-                     {logs.map((log, idx) => (
-                       <p key={idx} className={log.status === 'ADMIN_APPROVE' ? 'text-success' : 'text-primary'}>
-                         [{new Date(log.timestamp).toLocaleTimeString()}] {log.teamName}: {log.status} ON {log.problemTitle}
-                       </p>
-                     ))}
-                  </div>
+                   <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
+                      <h3 className="text-primary glow-text text-[10px] font-bold uppercase tracking-[2px]">Live Logs</h3>
+                      <div className="flex gap-2">
+                         {['ALL', 'SOLVED', 'WARNING'].map(f => (
+                            <button 
+                               key={f}
+                               onClick={() => setLogFilter(f as any)}
+                               className={`text-[8px] font-bold px-2 py-0.5 border ${logFilter === f ? 'bg-primary text-black border-primary' : 'text-text/40 border-white/10 hover:border-text/30'}`}
+                            >
+                               {f}
+                            </button>
+                         ))}
+                      </div>
+                   </div>
+                   <div className="h-96 overflow-y-auto font-geist-mono text-[9px] space-y-2 pr-2 custom-scrollbar">
+                      {logs.filter(log => {
+                         if (logFilter === 'ALL') return true;
+                         if (logFilter === 'SOLVED') return log.status === 'SOLVED' || log.status === 'APPROVED';
+                         if (logFilter === 'WARNING') return log.status === 'WARNING';
+                         return true;
+                      }).map((log, idx) => (
+                        <p key={idx} className={log.status === 'APPROVED' || log.status === 'SOLVED' ? 'text-success' : (log.status === 'WARNING' ? 'text-danger' : 'text-primary')}>
+                          [{new Date(log.timestamp).toLocaleTimeString()}] {log.teamName}: {log.status} {log.problemTitle}
+                        </p>
+                      ))}
+                   </div>
                </div>
                <div className="col-span-12 lg:col-span-8 terminal-card border-white/5">
-                  <h3 className="text-primary glow-text text-[10px] font-bold uppercase mb-4 border-b border-white/5 pb-2 tracking-[2px]">Recent Transmission Intercepts</h3>
+                  <h3 className="text-primary glow-text text-[10px] font-bold uppercase mb-4 border-b border-white/5 pb-2 tracking-[2px]">Recent Activity</h3>
                   <div className="h-96 overflow-y-auto custom-scrollbar">
                      <table className="w-full text-left border-collapse">
                         <thead>
                            <tr className="text-[8px] text-text/30 uppercase tracking-widest border-b border-white/5">
-                              <th className="py-2">Squad</th>
-                              <th className="py-2">Sector</th>
+                              <th className="py-2">Team</th>
+                              <th className="py-2">Problem</th>
                               <th className="py-2">Status</th>
                               <th className="py-2 text-right">Actions</th>
                            </tr>
                         </thead>
                         <tbody className="text-[10px] font-mono">
-                           {submissions && Array.isArray(submissions) && submissions.map((sub: any) => (
+                           {submissions.map((sub: Submission) => (
                              <tr key={sub.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                                 <td className="py-3 text-white font-bold">{sub.team.name}</td>
                                 <td className="py-3 text-text/60 italic">{sub.snippet.title}</td>
@@ -521,7 +579,7 @@ export default function AdminDashboard() {
                                       sub.status === 'FAILED' ? 'border-danger text-danger' : 
                                       'border-primary text-primary'
                                    }`}>
-                                      {sub.status}
+                                      {sub.status === 'VERIFIED' ? 'SOLVED' : sub.status}
                                    </span>
                                 </td>
                                 <td className="py-3 text-right flex justify-end gap-2">
@@ -540,7 +598,7 @@ export default function AdminDashboard() {
                   </div>
                </div>
             </div>
-          </div>
+          </>
         )}
       </main>
     </div>

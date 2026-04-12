@@ -27,13 +27,13 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
     }
 
     // 1.5 Verify Global Phase
-    const systemState = await prisma.systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
+    const systemState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
     if (systemState?.currentPhase !== 'CODING') {
       return res.status(403).json({ error: 'ACCESS DENIED: Coding round not active.' });
     }
 
     // 2. Create the submission
-    const submission = await prisma.submission.create({
+    const submission = await (prisma as any).submission.create({
       data: {
         teamId,
         snippetId,
@@ -47,39 +47,55 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
 
     // 3. Real Verification Logic
     let isCorrect = false;
-    let stdout = '';
-    let stderr = '';
+    let stdout;
+    let stderr;
 
     try {
-      if (snippet.category === 'C') {
-        const result = await compileRun.c.runSource(code, { stdin: snippet.hiddenInput || '' });
+      const expected = snippet.expected || '';
+      const isRegex = expected.startsWith('/') && expected.endsWith('/') && expected.length > 2;
+
+      // 1. If Regex Check is required, verify code signature instead of executing
+      if (isRegex) {
+        const regexStr = expected.slice(1, -1);
+        const regex = new RegExp(regexStr, 'mi');
+        isCorrect = regex.test(code);
+        stdout = isCorrect ? 'CODE SIGNATURE VERIFIED: Structural Fix Detected.' : 'VERIFICATION FAILED: Required implementation signatures missing.';
+      }
+      // 2. Otherwise, perform real execution for C, Python, CP
+      else if (snippet.category === 'C' || snippet.category === 'PYTHON' || snippet.category === 'CP') {
+        let result;
+        if (snippet.category === 'C') {
+          result = await compileRun.c.runSource(code, { stdin: snippet.hiddenInput || '' });
+        } else if (snippet.category === 'PYTHON') {
+          result = await compileRun.python.runSource(code, { stdin: snippet.hiddenInput || '' });
+        } else {
+          result = await compileRun.python.runSource(code, { stdin: snippet.hiddenInput || '' });
+
+        }
+
         stdout = result.stdout;
         stderr = result.stderr;
-        isCorrect = stdout.trim() === (snippet.expected?.trim() || '');
-      } else if (snippet.category === 'PYTHON') {
-        const result = await compileRun.python.runSource(code, { stdin: snippet.hiddenInput || '' });
-        stdout = result.stdout;
-        stderr = result.stderr;
-        isCorrect = stdout.trim() === (snippet.expected?.trim() || '');
-      } else if (snippet.category === 'CP') {
-        // DSA/CP uses C++ usually or Python, defaulting to C++ here if compile-run supports it
-        // and enforcing 2-second timeout
-        const result = await compileRun.cpp.runSource(code, { 
-          stdin: snippet.hiddenInput || '',
-          timeout: 2000 
-        });
-        stdout = result.stdout;
-        stderr = result.stderr;
-        isCorrect = stdout.trim() === (snippet.expected?.trim() || '');
+
+        // PRIORITIZE ERROR: If stderr exists, it's a failure (compilation or runtime)
+        if (stderr && stderr.trim().length > 0) {
+          isCorrect = false;
+        } else {
+          isCorrect = stdout.trim() === expected.trim();
+        }
       } else if (snippet.category === 'WEB') {
-        // For Web, we use a basic regex check for demonstration
-        // "Zero-Trace" requires us to be careful.
-        const requiredLogic = snippet.expected || '';
-        isCorrect = code.includes(requiredLogic);
-        stdout = isCorrect ? 'DOM Mutation Verified.' : 'Required Logic Missing.';
+        const expected = snippet.expected || '';
+        if (expected.startsWith('/') && expected.endsWith('/') && expected.length > 2) {
+          const regexStr = expected.slice(1, -1);
+          const regex = new RegExp(regexStr, 'mi');
+          isCorrect = regex.test(code);
+        } else {
+          isCorrect = code.includes(expected);
+        }
+        stdout = isCorrect ? 'DOM Mutation Verified.' : 'Required Logic Missing or Structural Violation Detected.';
       }
     } catch (err: any) {
-      stderr = 'SYSTEM ALERT: Execution Engine Failure.';
+      console.error('❌ Execution error:', err);
+      stderr = err.message || 'SYSTEM ALERT: Execution Engine Failure.';
       isCorrect = false;
     }
 
@@ -87,9 +103,9 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
       where: { id: submission.id },
       data: {
         status: isCorrect ? 'VERIFIED' : 'FAILED',
-        stdout: isCorrect 
-            ? `Accuracy: 100%\n5 / 5 test cases passed\nRuntime: ${Math.floor(Math.random() * 50 + 10)} ms\nMemory: ${Math.floor(Math.random() * 10 + 35)} MB` 
-            : `Accuracy: 20%\n1 / 5 test cases passed\nOutput Mismatch on Test Case 2.\n${stdout ? `Your Output:\n${stdout}` : ''}`,
+        stdout: isCorrect
+          ? `Accuracy: 100%\n5 / 5 test cases passed\nRuntime: ${Math.floor(Math.random() * 50 + 10)} ms\nMemory: ${Math.floor(Math.random() * 10 + 35)} MB`
+          : `Accuracy: 20%\n1 / 5 test cases passed\nOutput Mismatch on Test Case 2.\n${stdout ? `Your Output:\n${stdout}` : ''}`,
         stderr: stderr ? `Compilation/Execution Failed:\n${stderr}` : null,
       },
     });
@@ -101,12 +117,12 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
       });
 
       if (verifiedCount >= 4) {
-        const systemState = await prisma.systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
-        if ((systemState as any)?.codingStartTime) {
-          const elapsedSeconds = Math.floor((Date.now() - new Date((systemState as any).codingStartTime).getTime()) / 1000);
+        const systemState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
+        if (systemState?.codingStartTime) {
+          const elapsedSeconds = Math.floor((Date.now() - new Date(systemState.codingStartTime).getTime()) / 1000);
           await prisma.team.update({
             where: { id: teamId },
-            data: { vaultTime: elapsedSeconds },
+            data: { vaultTime: elapsedSeconds } as any,
           });
           console.log(`🏆 Team ${teamId} completed all 4 problems in ${elapsedSeconds}s`);
         }
@@ -118,13 +134,13 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
     io.to('admin-room').emit('admin:newLog', {
       teamName: submission.team.name,
       problemTitle: snippet.title,
-      status: isCorrect ? 'PASS' : 'FAIL',
+      status: isCorrect ? 'SOLVED' : 'FAILED',
       timestamp: new Date(),
     });
 
     res.json({
       message: isCorrect ? 'Payload Verified.' : 'SYSTEM ALERT: Payload Rejected.',
-      // Zero-trace: don't send back stdout/stderr to user if it fails
+      error: stderr || null,
       status: updatedSubmission.status
     });
   } catch (error: any) {
@@ -161,7 +177,7 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
 
   try {
     // 1. Check Global Phase
-    const systemState = await prisma.systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
+    const systemState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
     if (systemState?.currentPhase !== 'CODING') {
       return res.status(403).json({ error: 'ACCESS DENIED: Coding round not active.' });
     }
@@ -170,43 +186,43 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
     const snippet = await prisma.snippet.findUnique({ where: { id: snippetId } });
     if (!snippet) return res.status(404).json({ error: 'Snippet not found' });
 
-    const existingClaimForSnippet = await prisma.submission.findFirst({
-      where: { teamId, snippetId, status: { in: ['ACQUIRED', 'TESTING', 'VERIFIED'] } }
+    const existingClaimForSnippet = await (prisma as any).submission.findFirst({
+      where: { teamId, snippetId, status: { in: ['ACQUIRED', 'TESTING', 'VERIFIED'] } as any }
     });
 
     if (existingClaimForSnippet) {
-      return res.status(400).json({ 
-        error: `Sector already engaged by ${existingClaimForSnippet.solverName || 'a teammate'}.` 
+      return res.status(400).json({
+        error: `Sector already engaged by ${existingClaimForSnippet.solverName || 'a teammate'}.`
       });
     }
 
     // 3. Check if this SOLVER has already claimed ANY snippet
-    const existingClaimBySolver = await prisma.submission.findFirst({
-      where: { teamId, solverName, status: { in: ['ACQUIRED', 'TESTING', 'VERIFIED', 'FAILED'] } }
+    const existingClaimBySolver = await (prisma as any).submission.findFirst({
+      where: { teamId, solverName, status: { in: ['ACQUIRED', 'TESTING', 'VERIFIED', 'FAILED'] } as any }
     });
 
     if (existingClaimBySolver) {
-      return res.status(400).json({ 
-        error: `OPERATOR ALERT: ${solverName} is already assigned to Objective #${existingClaimBySolver.snippetId.slice(0, 8)}.` 
+      return res.status(400).json({
+        error: `OPERATOR ALERT: ${solverName} is already assigned to Objective #${existingClaimBySolver.snippetId.slice(0, 8)}.`
       });
     }
 
     // 4. Check if this CATEGORY has already been claimed by someone else in the team
-    const existingClaimForCategory = await prisma.submission.findFirst({
-      where: { 
-        teamId, 
+    const existingClaimForCategory = await (prisma as any).submission.findFirst({
+      where: {
+        teamId,
         snippet: { category: snippet.category },
-        status: { in: ['ACQUIRED', 'TESTING', 'VERIFIED'] }
+        status: { in: ['ACQUIRED', 'TESTING', 'VERIFIED'] } as any
       }
     });
 
     if (existingClaimForCategory) {
-       return res.status(400).json({
-         error: `CATEGORY LOCK: ${snippet.category} target is already being handled by ${existingClaimForCategory.solverName}.`
-       });
+      return res.status(400).json({
+        error: `CATEGORY LOCK: ${snippet.category} target is already being handled by ${existingClaimForCategory.solverName}.`
+      });
     }
 
-    const claim = await prisma.submission.create({
+    const claim = await (prisma as any).submission.create({
       data: {
         teamId,
         snippetId,
@@ -237,26 +253,26 @@ export const testCode = async (req: AuthRequest, res: Response) => {
     let stderr = '';
     // Normalize language string
     const lang = language.toUpperCase();
-    
+
     // Safety check - we shouldn't execute without limits, compile-run already sandboxes locally
     if (lang === 'C') {
-        const result = await compileRun.c.runSource(code, { stdin: customInput || '' });
-        stdout = result.stdout; stderr = result.stderr;
+      const result = await compileRun.c.runSource(code, { stdin: customInput || '' });
+      stdout = result.stdout; stderr = result.stderr;
     } else if (lang === 'PYTHON') {
-        const result = await compileRun.python.runSource(code, { stdin: customInput || '' });
-        stdout = result.stdout; stderr = result.stderr;
+      const result = await compileRun.python.runSource(code, { stdin: customInput || '' });
+      stdout = result.stdout; stderr = result.stderr;
     } else if (lang === 'CP' || lang === 'CPP') {
-        const result = await compileRun.cpp.runSource(code, { stdin: customInput || '', timeout: 2000 });
-        stdout = result.stdout; stderr = result.stderr;
+      const result = await compileRun.cpp.runSource(code, { stdin: customInput || '', timeout: 2000 });
+      stdout = result.stdout; stderr = result.stderr;
     } else {
-        // Javascript/WEB fallback
-        stdout = 'Test payload execution currently simulates success for JS/HTML.';
-        stderr = '';
+      // Javascript/WEB fallback
+      stdout = 'Test payload execution currently simulates success for JS/HTML.';
+      stderr = '';
     }
-    
-    res.json({ stdout, stderr });
+
+    res.json({ stdout, stderr, error: stderr || null });
   } catch (err: any) {
     console.error('❌ Test code error:', err);
-    res.json({ stderr: 'SYSTEM ALERT: Execution Engine Failure.' });
+    res.json({ stderr: err.message || 'SYSTEM ALERT: Execution Engine Failure.', error: err.message });
   }
 };

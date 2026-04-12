@@ -7,20 +7,20 @@ import Navbar from '@/components/Navbar';
 import { useSystemState } from '@/hooks/useSystemState';
 import { useSocket } from '@/context/SocketContext';
 
-import { Team } from '@/types';
+import { Team, Submission } from '@/types';
 
 export default function LeaderboardPage() {
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const { phase } = useSystemState();
   const { socket, isConnected } = useSocket();
-  const [displayMode, setDisplayMode] = useState<'AUCTION' | 'FINAL'>('AUCTION');
+  const [displayMode, setDisplayMode] = useState<'CODING' | 'FINAL'>('CODING');
 
   useEffect(() => {
     if (phase === 'FINISHED' || phase === 'VAULT') {
       setDisplayMode('FINAL');
     } else {
-      setDisplayMode('AUCTION');
+      setDisplayMode('CODING');
     }
   }, [phase]);
 
@@ -37,13 +37,13 @@ export default function LeaderboardPage() {
     }
   }, [isConnected, socket]);
 
-  const calculateGrandChampionStats = (team: any) => {
-    const verifiedSubmissions = team.submissions.filter((s: any) => s.status === 'VERIFIED');
-    const solvedCount = new Set(verifiedSubmissions.map((s: any) => s.snippetId)).size;
+  const calculateGrandChampionStats = (team: Team & { submissions: Submission[], vaultTime?: number, lifelinesUsed?: number, lockPenalties?: number }) => {
+    const verifiedSubmissions = team.submissions.filter((s: Submission) => s.status === 'VERIFIED');
+    const solvedCount = new Set(verifiedSubmissions.map((s: Submission) => s.snippetId)).size;
     
     // Average Time Calculation
     // Group by snippetId
-    const snippetsGrouped = team.submissions.reduce((acc: any, s: any) => {
+    const snippetsGrouped = team.submissions.reduce((acc: Record<string, Submission[]>, s: Submission) => {
       if (!acc[s.snippetId]) acc[s.snippetId] = [];
       acc[s.snippetId].push(s);
       return acc;
@@ -53,9 +53,9 @@ export default function LeaderboardPage() {
     let solvedSnippets = 0;
 
     Object.keys(snippetsGrouped).forEach(sid => {
-      const subs = snippetsGrouped[sid].sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-      const acquired = subs.find((s: any) => s.status === 'ACQUIRED');
-      const verified = subs.find((s: any) => s.status === 'VERIFIED');
+      const subs = snippetsGrouped[sid].sort((a: Submission, b: Submission) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      const acquired = subs.find((s: Submission) => s.status === 'ACQUIRED');
+      const verified = subs.find((s: Submission) => s.status === 'VERIFIED');
       
       if (acquired && verified) {
         totalSolveTime += (new Date(verified.createdAt).getTime() - new Date(acquired.createdAt).getTime()) / 1000;
@@ -66,7 +66,7 @@ export default function LeaderboardPage() {
     const avgTime = solvedSnippets > 0 ? totalSolveTime / solvedSnippets : Infinity;
     
     // Accuracy
-    const totalAttempts = team.submissions.filter((s: any) => s.status === 'VERIFIED' || s.status === 'FAILED').length;
+    const totalAttempts = team.submissions.filter((s: Submission) => s.status === 'VERIFIED' || s.status === 'FAILED').length;
     const accuracy = totalAttempts > 0 ? verifiedSubmissions.length / totalAttempts : 0;
 
     // Vault Phase Integration
@@ -103,11 +103,16 @@ export default function LeaderboardPage() {
   }, []);
 
   const sortedTeams = [...teams].sort((a, b) => {
-    if (displayMode === 'AUCTION') {
-      return (b.credits || 0) - (a.credits || 0);
+    if (displayMode === 'CODING') {
+      const statsA = calculateGrandChampionStats(a as Team & { submissions: Submission[] });
+      const statsB = calculateGrandChampionStats(b as Team & { submissions: Submission[] });
+
+      if (statsB.solvedCount !== statsA.solvedCount) return statsB.solvedCount - statsA.solvedCount;
+      if (statsA.avgTime !== statsB.avgTime) return statsA.avgTime - statsB.avgTime;
+      return statsB.accuracy - statsA.accuracy;
     } else {
-      const statsA = calculateGrandChampionStats(a);
-      const statsB = calculateGrandChampionStats(b);
+      const statsA = calculateGrandChampionStats(a as Team & { submissions: Submission[] });
+      const statsB = calculateGrandChampionStats(b as Team & { submissions: Submission[] });
 
       if (statsB.solvedCount !== statsA.solvedCount) return statsB.solvedCount - statsA.solvedCount;
       if (statsA.avgTime !== statsB.avgTime) return statsA.avgTime - statsB.avgTime;
@@ -123,19 +128,19 @@ export default function LeaderboardPage() {
       
       <Navbar />
 
-      <main className="max-w-5xl mx-auto p-6 md:p-10 pt-32 text-center grid-bg-subtle min-h-screen">
+      <main className="max-w-7xl mx-auto p-6 md:p-10 pt-36 grid-bg-subtle min-h-[calc(100vh-64px)]">
         <div className="mb-16">
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-primary font-mono text-[10px] tracking-[4px] uppercase">
                 <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                Uplink Active // Global Rankings
+                Live Leaderboard
               </div>
               <h1 className="text-5xl font-black uppercase tracking-tighter italic">
-                The <span className="text-white/20">Rankings</span>
+                Leader<span className="text-white/20">board</span>
               </h1>
             </div>
           <p className="text-text/40 text-sm max-w-xl mx-auto uppercase tracking-widest font-light">
-            Live point distribution and team rankings across the platform.
+            Team scores and rankings.
           </p>
         </div>
 
@@ -148,20 +153,20 @@ export default function LeaderboardPage() {
             <div className="bg-white/[0.03] p-6 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Target size={18} className="text-primary opacity-50" />
-                <span className="text-xs font-bold uppercase tracking-[3px] text-text/60">Squad Rankings</span>
+                <span className="text-xs font-bold uppercase tracking-[3px] text-text/60">Team Rankings</span>
               </div>
               <div className="flex gap-4">
                <button 
-                onClick={() => setDisplayMode('AUCTION')}
-                className={`px-6 py-2 border font-bold text-[10px] uppercase tracking-widest transition-all ${displayMode === 'AUCTION' ? 'bg-primary text-black border-primary' : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'}`}
+                onClick={() => setDisplayMode('CODING')}
+                className={`px-6 py-2 border font-bold text-[10px] uppercase tracking-widest transition-all ${displayMode === 'CODING' ? 'bg-primary text-black border-primary' : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'}`}
                >
-                 Auction Results
+                 Coding Leaderboard
                </button>
                <button 
                 onClick={() => setDisplayMode('FINAL')}
                 className={`px-6 py-2 border font-bold text-[10px] uppercase tracking-widest transition-all ${displayMode === 'FINAL' ? 'bg-primary text-black border-primary' : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'}`}
                >
-                 Final Standings
+                 Final Leaderboard
                </button>
             </div>
 
@@ -172,21 +177,17 @@ export default function LeaderboardPage() {
                 <thead>
                   <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-text/30">
                     <th className="px-4 md:px-8 py-4 font-bold">Rank</th>
-                    <th className="px-4 md:px-8 py-4 font-bold">Squad Identity</th>
-                    {displayMode === 'FINAL' && (
-                      <>
-                        <th className="px-4 md:px-8 py-4 font-bold text-center">Solved</th>
-                        <th className="px-4 md:px-8 py-4 font-bold text-center">Avg Time</th>
-                        <th className="px-4 md:px-8 py-4 font-bold text-center">Accuracy</th>
-                      </>
-                    )}
+                    <th className="px-4 md:px-8 py-4 font-bold">Team Name</th>
+                    <th className="px-4 md:px-8 py-4 font-bold text-center">Solved</th>
+                    <th className="px-4 md:px-8 py-4 font-bold text-center">Avg Time</th>
+                    <th className="px-4 md:px-8 py-4 font-bold text-center">Accuracy</th>
                     <th className="px-4 md:px-8 py-4 font-bold text-right">Status</th>
-                    <th className="px-4 md:px-8 py-4 font-bold text-right">{displayMode === 'AUCTION' ? 'Liquid Credits' : 'Final Points'}</th>
+                    <th className="px-4 md:px-8 py-4 font-bold text-right">{displayMode === 'CODING' ? 'Rank Pts' : 'Final Score'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.02]">
                    {sortedTeams.map((team, idx) => {
-                     const stats = calculateGrandChampionStats(team);
+                     const stats = calculateGrandChampionStats(team as Team & { submissions: Submission[] });
                      return (
                       <tr key={team.id} className={`group hover:bg-primary/[0.02] transition-colors ${team.strikes >= 3 ? 'opacity-50 grayscale' : ''}`}>
                         <td className="px-8 py-6">
@@ -209,12 +210,10 @@ export default function LeaderboardPage() {
                             </div>
                           </div>
                         </td>
-                        {displayMode === 'FINAL' && (
-                          <>
                             <td className="px-8 py-6 text-center">
                                <div className="flex items-center justify-center gap-1 text-white font-bold">
                                   <Zap size={10} className="text-primary" /> {stats.solvedCount}
-                               </div>
+                                </div>
                             </td>
                             <td className="px-8 py-6 text-center text-[10px] text-text/60">
                                {stats.avgTime === Infinity ? '--' : `${stats.avgTime.toFixed(1)}s`}
@@ -222,11 +221,9 @@ export default function LeaderboardPage() {
                             <td className="px-8 py-6 text-center">
                                <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden mx-auto">
                                   <div className="h-full bg-primary" style={{ width: `${stats.accuracy * 100}%` }}></div>
-                               </div>
+                                </div>
                                <span className="text-[8px] text-text/30">{(stats.accuracy * 100).toFixed(0)}%</span>
                             </td>
-                          </>
-                        )}
                         <td className="px-8 py-6 text-right">
                           <div className="flex flex-col items-end gap-1">
                             <span className={`text-[10px] px-2 py-0.5 rounded-sm border ${
@@ -234,16 +231,16 @@ export default function LeaderboardPage() {
                               team.strikes > 0 ? 'bg-warning/10 border-warning/30 text-warning' :
                               'bg-success/10 border-success/30 text-success'
                             } uppercase font-bold tracking-tighter`}>
-                              {team.strikes >= 3 ? 'Compromised' : 'Active'}
+                              {team.strikes >= 3 ? 'Stopped' : 'Ok'}
                             </span>
-                            {team.strikes > 0 && <span className="text-[8px] text-danger/60 font-mono">STRIKE_PENALTY: -{team.strikes * 50}</span>}
+                            {team.strikes > 0 && <span className="text-[8px] text-danger/60 font-mono">WARNING_PENALTY: -{team.strikes * 50}</span>}
                           </div>
                         </td>
                         <td className="px-8 py-6 text-right">
                           <div className="text-sm font-black text-primary glow-text italic tracking-tight">
-                            {displayMode === 'AUCTION' ? `${team.credits.toLocaleString()} CR` : `${Math.max(0, stats.solvedCount * 1000 - team.strikes * 50).toLocaleString()} PTS`}
+                            {displayMode === 'CODING' ? `${Math.max(0, stats.solvedCount * 1000 - team.strikes * 50).toLocaleString()} PTS` : `${Math.max(0, stats.solvedCount * 1000 - team.strikes * 50 + (1000 - (stats.totalVaultTime || 0))).toLocaleString()} PTS`}
                           </div>
-                          <div className="text-[8px] text-text/20 uppercase tracking-widest">{displayMode === 'AUCTION' ? 'Liquid Capital' : 'Network Authority'}</div>
+                          <div className="text-[8px] text-text/20 uppercase tracking-widest">{displayMode === 'CODING' ? 'Coding Rating' : 'Final Ranking'}</div>
                         </td>
                       </tr>
                      );
@@ -255,9 +252,9 @@ export default function LeaderboardPage() {
         )}
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <HighlightCard icon={<TrendingUp size={16} />} label="Total Economy" value={`${teams.reduce((acc, t) => acc + (t.credits || 0), 0).toLocaleString()} CR`} />
-          <HighlightCard icon={<Users size={16} />} label="Active Operators" value={teams.length * 4} />
-          <HighlightCard icon={<Target size={16} />} label="Heist Progress" value="64%" />
+           <HighlightCard icon={<TrendingUp size={16} />} label="Total Points" value={`${teams.reduce((acc, t) => acc + (t.credits || 0), 0).toLocaleString()} PTS`} />
+          <HighlightCard icon={<Users size={16} />} label="Total Players" value={teams.length * 4} />
+          <HighlightCard icon={<Target size={16} />} label="Progress" value="100%" />
         </div>
       </main>
     </div>

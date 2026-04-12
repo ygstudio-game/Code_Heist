@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express, { Application } from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
-import { initSocket } from './config/socket';
+import { initSocket, getIO } from './config/socket';
 import pool from './config/db';
 import authRoutes from './routes/authRoutes';
 import creditsRoutes from './routes/creditsRoutes';
@@ -46,12 +46,42 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
     try {
-        // Initialize System State if not exists
-        await prisma.systemState.upsert({
-            where: { id: 'CURRENT_STATE' },
-            update: {},
-            create: { currentPhase: 'AUCTION' },
-        });
+        // Ensure global system state exists
+    const state = await (prisma as any).systemState.findUnique({
+      where: { id: 'CURRENT_STATE' }
+    });
+    
+    if (!state) {
+      await (prisma as any).systemState.create({
+        data: { id: 'CURRENT_STATE', currentPhase: 'AUCTION' }
+      });
+      console.log('🏁 System State Initialized: AUCTION');
+    }
+    const currentState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
+        if (currentState?.currentPhase === 'CODING' && (currentState as any).codingStartTime) {
+            const elapsed = Date.now() - new Date((currentState as any).codingStartTime).getTime();
+            const remaining = (60 * 60 * 1000) - elapsed;
+            
+            if (remaining > 0) {
+                // We need to import the timer logic or expose it from SystemController
+                // For simplicity, let's just trigger a logic block here
+                console.log(`⏰ Resuming coding timer. ${Math.floor(remaining/1000/60)}m remaining.`);
+                setTimeout(async () => {
+                    await (prisma as any).systemState.update({
+                        where: { id: 'CURRENT_STATE' },
+                        data: { currentPhase: 'VAULT' },
+                    });
+                    const io = getIO();
+                    io.emit('system:phase-change', { phase: 'VAULT' });
+                }, remaining);
+            } else {
+                // Timer expired while server was offline
+                await (prisma as any).systemState.update({
+                    where: { id: 'CURRENT_STATE' },
+                    data: { currentPhase: 'VAULT' },
+                });
+            }
+        }
 
         httpServer.listen(PORT, () => {
             console.log(`🚀 Aegis Terminal [TS] active on port ${PORT}`);

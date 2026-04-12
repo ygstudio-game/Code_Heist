@@ -15,6 +15,11 @@ import {
   forceRejectSubmission,
   forceResetSubmission,
   releaseProblemClaim,
+  getAdminLogs,
+  getAllTeams,
+  createTeam,
+  deleteTeam,
+  resetTeamPassword
 } from '../controllers/AdminController';
 import { adminAdjustCredits } from '../controllers/creditsController';
 
@@ -49,5 +54,12 @@ router.post('/credits/adjust', adminAdjustCredits);
 // Game state
 router.get('/game-state', getGameState);
 router.get('/submissions', getAllSubmissions);
+router.get('/logs', getAdminLogs);
+
+// Team management
+router.get('/teams-list', getAllTeams);
+router.post('/teams', createTeam);
+router.delete('/teams/:id', deleteTeam);
+router.post('/teams/:id/reset-password', resetTeamPassword);
 
 export default router;

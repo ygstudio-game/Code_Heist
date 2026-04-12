@@ -45,7 +45,14 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       setIsConnected(false);
     });
 
-    setSocket(socketInstance);
+    if (socket !== socketInstance) {
+      // Use timeout to resolve cascading render warning
+      const timer = setTimeout(() => setSocket(socketInstance), 0);
+      return () => {
+        clearTimeout(timer);
+        socketInstance.disconnect();
+      };
+    }
 
     return () => {
       socketInstance.disconnect();

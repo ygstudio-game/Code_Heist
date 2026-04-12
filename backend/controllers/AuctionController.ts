@@ -19,7 +19,7 @@ export const clearInactivityTimer = (auctionId: string) => {
 // ─── Get the currently active auction round ──────────────────────────
 export const getActiveAuction = async (req: AuthRequest, res: Response) => {
   try {
-    const auction = await prisma.auctionRound.findFirst({
+    const auction = await (prisma as any).auctionRound.findFirst({
       where: { status: 'ACTIVE' },
       include: {
         snippet: true,
@@ -66,7 +66,7 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
 
   try {
     // 1. Find active auction
-    const auction = await prisma.auctionRound.findFirst({
+    const auction = await (prisma as any).auctionRound.findFirst({
       where: { status: 'ACTIVE' },
       include: {
         snippet: true,
@@ -86,19 +86,19 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
     }
 
     // 2.5. Check 4-problem bidding cap
-    const wonCount = await prisma.auctionRound.count({
+    const wonCount = await (prisma as any).auctionRound.count({
       where: { winnerId: teamId, status: 'COMPLETED' },
     });
     if (wonCount >= 4) {
       return res.status(400).json({ error: 'BIDDING LOCKED: Your team has already acquired the maximum 4 problems.' });
     }
 
-    // 3. Check minimum bid (250 floor, then +50 increments)
+    // 3. Check minimum bid (1 floor, then +1 increments)
     const currentHighest = auction.bids[0]?.amount || 0;
-    const minBid = currentHighest === 0 ? 250 : currentHighest + 50;
+    const minBid = currentHighest === 0 ? 1 : currentHighest + 1;
     if (amount < minBid) {
       return res.status(400).json({
-        error: `Bid must be at least ${minBid} CR (current highest: ${currentHighest} CR)`,
+        error: `Bid must be at least ${minBid} CR`,
       });
     }
 
@@ -110,7 +110,7 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
 
     // 5. Refund previous bid by this team in this auction round
     const previousBid = await prisma.bid.findFirst({
-      where: { teamId, auctionRoundId: auction.id },
+      where: { teamId, auctionRoundId: auction.id } as any,
       orderBy: { amount: 'desc' },
     });
 
@@ -138,11 +138,11 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
         snippetId: auction.snippetId,
         auctionRoundId: auction.id,
         amount,
-      },
+      } as any,
       include: {
         team: { select: { id: true, name: true, credits: true } },
       },
-    });
+    }) as any;
 
     // 7. 15-second inactivity auto-close timer
     // Clear any existing inactivity timer, then start a new 15s countdown
@@ -180,7 +180,7 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
 // ─── Get auction history ─────────────────────────────────────────────
 export const getAuctionHistory = async (req: AuthRequest, res: Response) => {
   try {
-    const rounds = await prisma.auctionRound.findMany({
+    const rounds = await (prisma as any).auctionRound.findMany({
       where: { status: { in: ['COMPLETED', 'CANCELLED'] } },
       include: {
         snippet: { select: { id: true, title: true, category: true } },
@@ -204,7 +204,7 @@ export const getAuctionHistory = async (req: AuthRequest, res: Response) => {
 // ─── Resolve auction (called by timer or admin) ──────────────────────
 export const resolveAuction = async (auctionId: string) => {
   try {
-    const auction = await prisma.auctionRound.findUnique({
+    const auction = await (prisma as any).auctionRound.findUnique({
       where: { id: auctionId },
       include: {
         bids: { orderBy: { amount: 'desc' }, take: 1 },
@@ -227,7 +227,7 @@ export const resolveAuction = async (auctionId: string) => {
       });
 
       // Mark auction as completed with winner
-      const resolved = await prisma.auctionRound.update({
+      const resolved = await (prisma as any).auctionRound.update({
         where: { id: auctionId },
         data: {
           status: 'COMPLETED',
@@ -245,7 +245,7 @@ export const resolveAuction = async (auctionId: string) => {
         where: {
           auctionRoundId: auctionId,
           id: { not: highestBid.id },
-        },
+        } as any,
       });
 
       for (const bid of losingBids) {
@@ -274,7 +274,7 @@ export const resolveAuction = async (auctionId: string) => {
       return resolved;
     } else {
       // No bids — cancel auction
-      const cancelled = await prisma.auctionRound.update({
+      const cancelled = await (prisma as any).auctionRound.update({
         where: { id: auctionId },
         data: { status: 'CANCELLED' },
       });

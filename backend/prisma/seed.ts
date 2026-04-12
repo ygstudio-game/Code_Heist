@@ -89,7 +89,7 @@ int main() {
 #include <string.h>
 
 void hack(char *input) {
-  char buffer[64];
+  char buffer[10];
   // [EDITABLE ZONE START]
   strncpy(buffer, input, sizeof(buffer) - 1);
   buffer[sizeof(buffer) - 1] = '\\0';
@@ -97,11 +97,15 @@ void hack(char *input) {
 }
 
 int main() {
-  char payload[256];
-  scanf("%s", payload);
-  hack(payload);
+  char payload[100];
+  if (scanf("%99s", payload) == 1) {
+    hack(payload);
+    printf("BUFFER_SAFE_OP");
+  }
   return 0;
 }`,
+      hiddenInput: 'VeryLongPayloadThatMightOverflowIfUsingStrcpy',
+      expected: 'BUFFER_SAFE_OP',
       order: 1,
     },
     {
@@ -133,11 +137,11 @@ app.get('/user', (req, res) => {
     res.json(result);
   });
 });`,
+      expected: '/\\$1|query,\\s*\\[userId\\]/',
       order: 2,
     },
     {
       title: 'Binary Search Fix',
-      category: 'CP' as const,
       buggyCode: `def binary_search(arr, target):
     left, right = 0, len(arr) - 1
     while left <= right:
@@ -163,7 +167,19 @@ app.get('/user', (req, res) => {
         else:
             right = mid - 1
         # [EDITABLE ZONE END]
-    return -1`,
+    return -1
+
+if __name__ == "__main__":
+    import sys
+    data = sys.stdin.read().split()
+    if data:
+        n = int(data[0])
+        target = int(data[1])
+        arr = [int(x) for x in data[2:]]
+        print(binary_search(arr, target))`,
+      category: 'PYTHON' as const,
+      hiddenInput: '5 3\n1 2 3 4 5',
+      expected: '2',
       order: 3,
     },
     {
@@ -199,7 +215,12 @@ app.get('/user', (req, res) => {
         return [x * 2 for x in self.data]
     
     def get_result(self):
-        return self.processed`,
+        return self.processed
+
+if __name__ == "__main__":
+    dp = DataProcessor([1, 2, 3])
+    print("OBJECT_INITIALIZED")`,
+      expected: 'OBJECT_INITIALIZED',
       order: 4,
     },
     {
@@ -243,11 +264,22 @@ void* thread_func(void* arg) {
     pthread_mutex_lock(&lock2);
     // [EDITABLE ZONE END]
     shared_data++;
-    printf("Thread %d: %d\\n", id, shared_data);
     pthread_mutex_unlock(&lock2);
     pthread_mutex_unlock(&lock1);
     return NULL;
+}
+
+int main() {
+    pthread_t t1, t2;
+    int id1 = 0, id2 = 1;
+    pthread_create(&t1, NULL, thread_func, &id1);
+    pthread_create(&t2, NULL, thread_func, &id2);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    printf("THREADS_COMPLETED_SAFELY");
+    return 0;
 }`,
+      expected: 'THREADS_COMPLETED_SAFELY',
       order: 5,
     },
     {
@@ -268,7 +300,50 @@ void* thread_func(void* arg) {
   container.appendChild(div);
   // [EDITABLE ZONE END]
 }`,
+      expected: '/textContent|createElement/',
       order: 6,
+    },
+    {
+      title: 'The Phantom Counter',
+      category: 'WEB' as const,
+      buggyCode: `let count = 0;
+document.getElementById('btn').onclick = function() {
+   // [EDITABLE ZONE START]
+   let count = count + 1; // Bug: shadowed variable and NaN error
+   // [EDITABLE ZONE END]
+   document.getElementById('display').innerText = count;
+};`,
+      solution: `let count = 0;
+document.getElementById('btn').onclick = function() {
+   // [EDITABLE ZONE START]
+   count = count + 1; 
+   // [EDITABLE ZONE END]
+   document.getElementById('display').innerText = count;
+};`,
+      expected: '/(count\\s*=\\s*count\\s*\\+\\s*1|count\\+\\+)/',
+      order: 7,
+    },
+    {
+      title: 'The Invisible Alert',
+      category: 'WEB' as const,
+      buggyCode: `function validate() {
+   const val = document.querySelector('input').value;
+   if(!val) {
+      // [EDITABLE ZONE START]
+      document.getElementById('error-msg').style.visibility = 'hidden'; 
+      // [EDITABLE ZONE END]
+   }
+}`,
+      solution: `function validate() {
+   const val = document.querySelector('input').value;
+   if(!val) {
+      // [EDITABLE ZONE START]
+      document.getElementById('error-msg').style.visibility = 'visible'; 
+      // [EDITABLE ZONE END]
+   }
+}`,
+      expected: '/(style\\.visibility\\s*=\\s*[\'"]visible[\'"]|style\\.display\\s*=\\s*[\'"]block[\'"])/',
+      order: 8,
     },
   ];
 
