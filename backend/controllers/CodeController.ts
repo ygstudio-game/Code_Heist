@@ -109,14 +109,14 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
     }
 
 
-    const updatedSubmission = await prisma.submission.update({
+    const updatedSubmission = await (prisma as any).submission.update({
       where: { id: submission.id },
       data: {
         status: isCorrect ? 'VERIFIED' : 'FAILED',
         stdout: isCorrect
           ? `Accuracy: 100%\n5 / 5 test cases passed\nRuntime: ${Math.floor(Math.random() * 50 + 10)} ms\nMemory: ${Math.floor(Math.random() * 10 + 35)} MB`
-          : `Accuracy: 20%\n1 / 5 test cases passed\nOutput Mismatch on Test Case 2.\n${stdout ? `Your Output:\n${stdout}` : ''}`,
-        stderr: stderr ? `Compilation/Execution Failed:\n${stderr}` : null,
+          : `Accuracy: 20%\n1 / 5 test cases passed\nOutput Mismatch detected.`,
+        stderr: stderr ? `SYSTEM ALERT: Execution Engine Failure.` : null,
       },
     });
 
@@ -153,7 +153,7 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
 
     res.json({
       message: isCorrect ? 'Payload Verified.' : 'SYSTEM ALERT: Payload Rejected.',
-      error: stderr || null,
+      error: isCorrect ? null : (stderr ? 'ENGINE ERROR: Execution Failure.' : 'LOGIC ERROR: Output Mismatch.'),
       status: updatedSubmission.status
     });
   } catch (error: any) {
@@ -204,6 +204,9 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
     });
 
     if (existingClaimForSnippet) {
+      if (existingClaimForSnippet.solverName === solverName) {
+        return res.json({ message: 'Welcome back, Operator. Resuming engagement.', claim: existingClaimForSnippet });
+      }
       return res.status(400).json({
         error: `Sector already engaged by ${existingClaimForSnippet.solverName || 'a teammate'}.`
       });
@@ -215,6 +218,9 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
     });
 
     if (existingClaimBySolver) {
+      if (existingClaimBySolver.snippetId === snippetId) {
+        return res.json({ message: 'Welcome back, Operator. Resuming engagement.', claim: existingClaimBySolver });
+      }
       return res.status(400).json({
         error: `OPERATOR ALERT: ${solverName} is already assigned to Objective #${existingClaimBySolver.snippetId.slice(0, 8)}.`
       });
@@ -230,6 +236,9 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
     });
 
     if (existingClaimForCategory) {
+      if (existingClaimForCategory.solverName === solverName && existingClaimForCategory.snippetId === snippetId) {
+         return res.json({ message: 'Welcome back, Operator. Resuming engagement.', claim: existingClaimForCategory });
+      }
       return res.status(400).json({
         error: `CATEGORY LOCK: ${snippet.category} target is already being handled by ${existingClaimForCategory.solverName}.`
       });

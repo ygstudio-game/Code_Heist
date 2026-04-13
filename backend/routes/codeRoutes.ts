@@ -35,6 +35,7 @@ router.get('/my-snippets', authenticate, async (req: AuthRequest, res: Response)
         ...auction.snippet,
         auctionWinAmount: auction.winningBid,
         submissionStatus: latestSubmission?.status || null,
+        claimant: latestSubmission?.solverName || null,
         submissionCount: snippetSubmissions.length,
         isVerified: snippetSubmissions.some(s => s.status === 'VERIFIED'),
       };

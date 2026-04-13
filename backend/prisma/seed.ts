@@ -83,10 +83,12 @@ async function main() {
       buggyCode: `#include <stdio.h>
 
 int main() {
+// [EDITABLE ZONE START]
     int a = 10
     int b = 20;
 
     printf("Sum is %d", a + b)
+// [EDITABLE ZONE END]
 
     return 0;
 }`,
@@ -109,12 +111,14 @@ int main() {
       buggyCode: `#include <stdio.h>
 
 int main() {
+// [EDITABLE ZONE START]
     int i;
 
     for(i = 1; i <= 5; i++);
     {
         printf("%d ", i);
     }
+// [EDITABLE ZONE END]
 
     return 0;
 }`,
@@ -165,9 +169,11 @@ int main() {
     int n = 5;
     int sum = 0;
 
+// [EDITABLE ZONE START]
     for(int i = 1; i < n; i++) {
         sum += i;
     }
+// [EDITABLE ZONE END]
 
     cout << sum;
     return 0;

@@ -4,7 +4,7 @@ import { authenticate, requireAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
 
-router.get('/state', authenticate, getSystemState);
+router.get('/state', getSystemState);
 router.post('/phase', authenticate, requireAdmin, updateSystemPhase);
 
 export default router;
