@@ -108,7 +108,7 @@ export function useAuction() {
               highestBid: {
                 id: data.bidId,
                 amount: data.amount,
-                team: { id: data.teamId, name: data.teamName },
+                team: data.team || { id: data.teamId, name: data.teamName },
                 createdAt: data.timestamp,
               },
               totalBids: prev.auction.totalBids + 1,
@@ -123,7 +123,7 @@ export function useAuction() {
         setHistory(prev => [{
             id: data.bidId,
             amount: data.amount,
-            team: { id: data.teamId, name: data.teamName },
+            team: data.team || { id: data.teamId, name: data.teamName || 'Unknown Team' },
             createdAt: data.timestamp,
           }, ...prev]);
       });

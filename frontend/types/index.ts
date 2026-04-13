@@ -13,6 +13,15 @@ export interface Team {
   vaultTime?: number;
   lifelinesUsed?: number;
   lockPenalties?: number;
+  auctionWins?: {
+    id: string;
+    winningBid: number;
+    snippet: {
+      id: string;
+      title: string;
+      category: string;
+    }
+  }[];
   _count?: {
     submissions: number;
     bids: number;
@@ -69,9 +78,11 @@ export interface GameState {
   totalSnippets: number;
   activeAuction: { 
     id: string; 
+    status: string;
     snippet: { title: string; category: string }; 
     endTime: string;
-    bids?: AuctionBid[];
+    highestBid?: AuctionBid | null;
+    totalBids?: number;
     timeLeft?: number;
   } | null;
   submissions: Submission[];

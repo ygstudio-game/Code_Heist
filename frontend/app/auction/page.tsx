@@ -126,20 +126,36 @@ export default function AuctionPage() {
                       </div>
                     )}
                   </div>
+
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">
+                      {auction.snippet.title}
+                    </h2>
+                    <div className="p-1 px-3 bg-primary/20 border-l-2 border-primary text-[10px] font-bold text-primary uppercase tracking-widest inline-block">
+                      {auction.snippet.category} Fragment
+                    </div>
+                  </div>
+
+                  <div className="terminal-card bg-black/60 border-white/10 p-6 font-mono text-sm overflow-x-auto custom-scrollbar group relative">
+                    <div className="absolute top-0 right-0 p-2 text-[8px] text-white/20 uppercase tracking-widest">Compromised_Source.dec</div>
+                    <pre className="text-primary/90 leading-relaxed">
+                      {auction.snippet.buggyCode || "// CODE UNAVAILABLE"}
+                    </pre>
+                  </div>
                   
-                  <div className="mt-12 p-4 bg-primary/5 border border-primary/10 flex items-center justify-between relative z-10">
+                  <div className="p-4 bg-primary/5 border border-primary/10 flex items-center justify-between relative z-10">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
                         <Users size={14} />
                       </div>
                       <div>
-                        <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">Team</p>
+                        <p className="text-[10px] text-text/40 uppercase font-mono tracking-widest leading-none mb-1">Current Holder</p>
                         <p className="text-xs md:text-sm font-bold text-white uppercase truncate max-w-[100px] md:max-w-[200px]">{highestBidder}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                       <p className="text-[8px] text-text/40 uppercase font-mono tracking-widest leading-none">Price</p>
-                       <p className="text-lg md:text-xl font-black text-primary font-mono lowercase">{currentBid}</p>
+                       <p className="text-[10px] text-text/40 uppercase font-mono tracking-widest leading-none mb-1">Current Price</p>
+                       <p className="text-lg md:text-xl font-black text-primary font-mono lowercase">{currentBid} CR</p>
                     </div>
                   </div>
                 </div>

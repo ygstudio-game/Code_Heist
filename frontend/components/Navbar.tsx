@@ -60,7 +60,9 @@ export default function Navbar() {
   const round1Links = isAdmin
     ? [
       { name: 'Dashboard', href: '/admin', icon: <LayoutDashboard size={14} /> },
-      { name: 'Teams', href: '/admin/teams', icon: <Shield size={14} /> }
+      { name: 'Teams', href: '/admin/teams', icon: <Shield size={14} /> },
+      { name: 'Leaderboard', href: '/leaderboard', icon: <Trophy size={14} /> }
+
     ]
     : [
       { name: 'Home', href: '/dashboard', icon: <LayoutDashboard size={14} /> },
@@ -73,7 +75,7 @@ export default function Navbar() {
     : [{ name: 'My Vault', href: '/round2/team', icon: <Zap size={14} /> }];
 
   const publicLinks = [
-    { name: 'Leaderboard', href: '/leaderboard', icon: <Trophy size={14} /> },
+    // { name: 'Leaderboard', href: '/leaderboard', icon: <Trophy size={14} /> },
     { name: 'Vault Rankings', href: '/round2', icon: <Lock size={14} /> }
   ];
 

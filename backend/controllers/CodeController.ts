@@ -62,15 +62,14 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
         stdout = isCorrect ? 'CODE SIGNATURE VERIFIED: Structural Fix Detected.' : 'VERIFICATION FAILED: Required implementation signatures missing.';
       }
       // 2. Otherwise, perform real execution for C, Python, CP
-      else if (snippet.category === 'C' || snippet.category === 'PYTHON' || snippet.category === 'CP') {
+      else if ((snippet.category as string) === 'C' || (snippet.category as string) === 'PYTHON' || (snippet.category as string) === 'CP' || (snippet.category as string) === 'CPP') {
         let result;
-        if (snippet.category === 'C') {
+        if ((snippet.category as string) === 'C') {
           result = await compileRun.c.runSource(code, { stdin: snippet.hiddenInput || '' });
-        } else if (snippet.category === 'PYTHON') {
+        } else if ((snippet.category as string) === 'PYTHON') {
           result = await compileRun.python.runSource(code, { stdin: snippet.hiddenInput || '' });
         } else {
-          result = await compileRun.python.runSource(code, { stdin: snippet.hiddenInput || '' });
-
+          result = await compileRun.cpp.runSource(code, { stdin: snippet.hiddenInput || '', timeout: 3000 });
         }
 
         stdout = result.stdout;
@@ -82,7 +81,7 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
         } else {
           isCorrect = stdout.trim() === expected.trim();
         }
-      } else if (snippet.category === 'WEB') {
+      } else if ((snippet.category as string) === 'WEB') {
         const expected = snippet.expected || '';
         if (expected.startsWith('/') && expected.endsWith('/') && expected.length > 2) {
           const regexStr = expected.slice(1, -1);

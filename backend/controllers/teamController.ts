@@ -19,6 +19,17 @@ export const getAllTeams = async (req: Request, res: Response) => {
               }
             }
           }
+        },
+        auctionWins: {
+          include: {
+            snippet: {
+              select: {
+                id: true,
+                title: true,
+                category: true,
+              }
+            }
+          }
         }
       },
     });

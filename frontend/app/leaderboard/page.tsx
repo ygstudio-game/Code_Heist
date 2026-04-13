@@ -14,7 +14,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const { phase } = useSystemState();
   const { socket, isConnected } = useSocket();
-  const [displayMode, setDisplayMode] = useState<'CODING' | 'FINAL'>('CODING');
+  const [displayMode, setDisplayMode] = useState<'CODING' | 'AUCTION' | 'FINAL'>('CODING');
 
   useEffect(() => {
     if (phase === 'FINISHED' || phase === 'VAULT') {
@@ -160,13 +160,19 @@ export default function LeaderboardPage() {
                 onClick={() => setDisplayMode('CODING')}
                 className={`px-6 py-2 border font-bold text-[10px] uppercase tracking-widest transition-all ${displayMode === 'CODING' ? 'bg-primary text-black border-primary' : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'}`}
                >
-                 Coding Leaderboard
+                 Coding
+               </button>
+               <button 
+                onClick={() => setDisplayMode('AUCTION')}
+                className={`px-6 py-2 border font-bold text-[10px] uppercase tracking-widest transition-all ${displayMode === 'AUCTION' ? 'bg-primary text-black border-primary' : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'}`}
+               >
+                 Auction Results
                </button>
                <button 
                 onClick={() => setDisplayMode('FINAL')}
                 className={`px-6 py-2 border font-bold text-[10px] uppercase tracking-widest transition-all ${displayMode === 'FINAL' ? 'bg-primary text-black border-primary' : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'}`}
                >
-                 Final Leaderboard
+                 Final Standings
                </button>
             </div>
 
@@ -178,11 +184,23 @@ export default function LeaderboardPage() {
                   <tr className="border-b border-white/5 text-[10px] uppercase tracking-widest text-text/30">
                     <th className="px-4 md:px-8 py-4 font-bold">Rank</th>
                     <th className="px-4 md:px-8 py-4 font-bold">Team Name</th>
-                    <th className="px-4 md:px-8 py-4 font-bold text-center">Solved</th>
-                    <th className="px-4 md:px-8 py-4 font-bold text-center">Avg Time</th>
-                    <th className="px-4 md:px-8 py-4 font-bold text-center">Accuracy</th>
+                    {displayMode === 'AUCTION' ? (
+                      <>
+                        <th className="px-4 md:px-8 py-4 font-bold text-center">Wins</th>
+                        <th className="px-4 md:px-8 py-4 font-bold">Acquired Assets</th>
+                        <th className="px-4 md:px-8 py-4 font-bold text-right">Investment</th>
+                      </>
+                    ) : (
+                      <>
+                        <th className="px-4 md:px-8 py-4 font-bold text-center">Solved</th>
+                        <th className="px-4 md:px-8 py-4 font-bold text-center">Avg Time</th>
+                        <th className="px-4 md:px-8 py-4 font-bold text-center">Accuracy</th>
+                      </>
+                    )}
                     <th className="px-4 md:px-8 py-4 font-bold text-right">Status</th>
-                    <th className="px-4 md:px-8 py-4 font-bold text-right">{displayMode === 'CODING' ? 'Rank Pts' : 'Final Score'}</th>
+                    <th className="px-4 md:px-8 py-4 font-bold text-right">
+                      {displayMode === 'AUCTION' ? 'Remaining Credits' : (displayMode === 'CODING' ? 'Rank Pts' : 'Final Score')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.02]">
@@ -206,24 +224,59 @@ export default function LeaderboardPage() {
                             </div>
                             <div>
                               <div className="text-sm font-bold text-text group-hover:text-white uppercase transition-colors">{team.name}</div>
-                              <div className="text-[9px] text-text/20 font-geist-mono tracking-widest">OBJ_COUNT: {stats.solvedCount}</div>
+                              <div className="text-[9px] text-text/20 font-geist-mono tracking-widest">
+                                {displayMode === 'AUCTION' ? `CREDITS_EXP: ${team.auctionWins?.reduce((acc, win) => acc + (win.winningBid || 0), 0) || 0}` : `OBJ_COUNT: ${stats.solvedCount}`}
+                              </div>
                             </div>
                           </div>
                         </td>
+
+                        {displayMode === 'AUCTION' ? (
+                          <>
                             <td className="px-8 py-6 text-center">
-                               <div className="flex items-center justify-center gap-1 text-white font-bold">
-                                  <Zap size={10} className="text-primary" /> {stats.solvedCount}
-                                </div>
+                              <div className="flex items-center justify-center gap-1 text-white font-bold font-mono">
+                                {team.auctionWins?.length || 0}
+                              </div>
+                            </td>
+                            <td className="px-8 py-6">
+                              <div className="flex flex-wrap gap-2 max-w-[300px]">
+                                {team.auctionWins && team.auctionWins.length > 0 ? team.auctionWins.map((win, index) => (
+                                  <div key={index} className="px-2 py-1 bg-white/5 border border-white/10 flex flex-col items-start gap-1">
+                                    <span className="text-[9px] font-black text-primary truncate max-w-[120px] uppercase">
+                                      {win.snippet.title}
+                                    </span>
+                                    <span className="text-[8px] text-white/40 font-mono tracking-tighter italic">
+                                      {win.winningBid} CR
+                                    </span>
+                                  </div>
+                                )) : (
+                                  <span className="text-[10px] text-white/20 italic">No assets acquired</span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-8 py-6 text-right font-mono text-primary font-bold">
+                              {team.auctionWins?.reduce((acc, win) => acc + (win.winningBid || 0), 0) || 0} CR
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="px-8 py-6 text-center">
+                              <div className="flex items-center justify-center gap-1 text-white font-bold">
+                                <Zap size={10} className="text-primary" /> {stats.solvedCount}
+                              </div>
                             </td>
                             <td className="px-8 py-6 text-center text-[10px] text-text/60">
-                               {stats.avgTime === Infinity ? '--' : `${stats.avgTime.toFixed(1)}s`}
+                              {stats.avgTime === Infinity ? '--' : `${stats.avgTime.toFixed(1)}s`}
                             </td>
                             <td className="px-8 py-6 text-center">
-                               <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden mx-auto">
-                                  <div className="h-full bg-primary" style={{ width: `${stats.accuracy * 100}%` }}></div>
-                                </div>
-                               <span className="text-[8px] text-text/30">{(stats.accuracy * 100).toFixed(0)}%</span>
+                              <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden mx-auto">
+                                <div className="h-full bg-primary" style={{ width: `${stats.accuracy * 100}%` }}></div>
+                              </div>
+                              <span className="text-[8px] text-text/30">{(stats.accuracy * 100).toFixed(0)}%</span>
                             </td>
+                          </>
+                        )}
+
                         <td className="px-8 py-6 text-right">
                           <div className="flex flex-col items-end gap-1">
                             <span className={`text-[10px] px-2 py-0.5 rounded-sm border ${
@@ -238,9 +291,13 @@ export default function LeaderboardPage() {
                         </td>
                         <td className="px-8 py-6 text-right">
                           <div className="text-sm font-black text-primary glow-text italic tracking-tight">
-                            {displayMode === 'CODING' ? `${Math.max(0, stats.solvedCount * 1000 - team.strikes * 50).toLocaleString()} PTS` : `${Math.max(0, stats.solvedCount * 1000 - team.strikes * 50 + (1000 - (stats.totalVaultTime || 0))).toLocaleString()} PTS`}
+                            {displayMode === 'AUCTION' ? `${team.credits.toLocaleString()} CR` : 
+                             displayMode === 'CODING' ? `${Math.max(0, stats.solvedCount * 1000 - team.strikes * 50).toLocaleString()} PTS` : 
+                             `${Math.max(0, stats.solvedCount * 1000 - team.strikes * 50 + (1000 - (stats.totalVaultTime || 0))).toLocaleString()} PTS`}
                           </div>
-                          <div className="text-[8px] text-text/20 uppercase tracking-widest">{displayMode === 'CODING' ? 'Coding Rating' : 'Final Ranking'}</div>
+                          <div className="text-[8px] text-text/20 uppercase tracking-widest">
+                            {displayMode === 'AUCTION' ? 'Current Balance' : (displayMode === 'CODING' ? 'Coding Rating' : 'Final Ranking')}
+                          </div>
                         </td>
                       </tr>
                      );

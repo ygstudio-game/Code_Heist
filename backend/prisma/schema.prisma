@@ -18,6 +18,7 @@ enum Category {
   WEB
   C
   PYTHON
+  CPP
 }
 
 enum SubmissionStatus {
@@ -29,6 +30,7 @@ enum SubmissionStatus {
 
 enum AuctionStatus {
   PENDING
+  PREVIEW
   ACTIVE
   COMPLETED
   CANCELLED

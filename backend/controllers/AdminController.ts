@@ -109,7 +109,7 @@ export const deleteTeam = async (req: Request, res: Response) => {
 };
 
 export const resetTeamPassword = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { password } = req.body;
 
   if (!password) {
@@ -193,10 +193,22 @@ export const startAuction = async (req: AuthRequest, res: Response) => {
   try {
     // Check no active auction
     const existing = await (prisma as any).auctionRound.findFirst({
-      where: { status: 'ACTIVE' },
+      where: { status: { in: ['ACTIVE', 'PREVIEW'] } },
     });
+    
     if (existing) {
-      return res.status(400).json({ error: 'An auction is already active. End it first.' });
+       // If existing is a preview, we can end it and start a real one or just reject
+       if (existing.status === 'PREVIEW' && !isPreviewOnly) {
+         console.log(`⏹️ Ending preview ${existing.id} to start real auction`);
+         await (prisma as any).auctionRound.update({
+            where: { id: existing.id },
+            data: { status: 'COMPLETED', winnerId: null }
+         });
+         clearInactivityTimer(existing.id);
+         clearAuctionTimer(existing.id);
+       } else {
+         return res.status(400).json({ error: 'An auction is already active. End it first.' });
+       }
     }
 
     // Verify snippet exists
@@ -215,7 +227,7 @@ export const startAuction = async (req: AuthRequest, res: Response) => {
     const auction = await (prisma as any).auctionRound.create({
       data: {
         snippetId,
-        status: 'ACTIVE',
+        status: isPreviewOnly ? 'PREVIEW' : 'ACTIVE',
         startTime,
         endTime,
         duration: isPreviewOnly ? 30 : auctionDuration,
@@ -267,7 +279,7 @@ export const startAuction = async (req: AuthRequest, res: Response) => {
 export const endAuction = async (req: AuthRequest, res: Response) => {
   try {
     const auction = await (prisma as any).auctionRound.findFirst({
-      where: { status: 'ACTIVE' },
+      where: { status: { in: ['ACTIVE', 'PREVIEW'] } },
     });
 
     if (!auction) {
@@ -388,8 +400,14 @@ export const getGameState = async (req: AuthRequest, res: Response) => {
       }),
       prisma.snippet.count(),
       (prisma as any).auctionRound.findFirst({
-        where: { status: 'ACTIVE' },
-        include: { snippet: { select: { title: true, category: true } } },
+        where: { status: { in: ['ACTIVE', 'PREVIEW'] } },
+        include: { 
+          snippet: { select: { title: true, category: true } },
+          bids: {
+            include: { team: { select: { name: true } } },
+            orderBy: { amount: 'desc' },
+          }
+        },
       }),
       prisma.submission.groupBy({
         by: ['status'],
@@ -403,8 +421,11 @@ export const getGameState = async (req: AuthRequest, res: Response) => {
       totalSnippets: snippets,
       activeAuction: activeAuction ? {
         id: activeAuction.id,
+        status: activeAuction.status,
         snippet: activeAuction.snippet,
         endTime: activeAuction.endTime,
+        highestBid: activeAuction.bids[0] || null,
+        totalBids: activeAuction.bids.length,
       } : null,
       submissions: submissions.reduce((acc, s) => ({ ...acc, [s.status]: s._count }), {}),
       completedAuctions,

@@ -20,7 +20,7 @@ export const clearInactivityTimer = (auctionId: string) => {
 export const getActiveAuction = async (req: AuthRequest, res: Response) => {
   try {
     const auction = await (prisma as any).auctionRound.findFirst({
-      where: { status: 'ACTIVE' },
+      where: { status: { in: ['ACTIVE', 'PREVIEW'] } },
       include: {
         snippet: true,
         bids: {
@@ -43,6 +43,7 @@ export const getActiveAuction = async (req: AuthRequest, res: Response) => {
       active: true,
       auction: {
         ...auction,
+        isPreview: auction.status === 'PREVIEW',
         timeLeft,
         highestBid: auction.bids[0] || null,
         totalBids: auction.bids.length,
@@ -67,7 +68,7 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
   try {
     // 1. Find active auction
     const auction = await (prisma as any).auctionRound.findFirst({
-      where: { status: 'ACTIVE' },
+      where: { status: { in: ['ACTIVE', 'PREVIEW'] } },
       include: {
         snippet: true,
         bids: { orderBy: { amount: 'desc' }, take: 1 },
@@ -76,6 +77,9 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
 
     if (!auction) {
       return res.status(400).json({ error: 'No active auction to bid on' });
+    }
+    if (auction.status === 'PREVIEW') {
+       return res.status(400).json({ error: 'BIDDING LOCKED: Auction is in preview mode.' });
     }
 
     // 2. Check timer hasn't expired
@@ -102,17 +106,23 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // 4. Check team can afford
-    const affordable = await canAfford(teamId, amount);
-    if (!affordable) {
-      return res.status(400).json({ error: 'Insufficient credits for this bid' });
-    }
-
-    // 5. Refund previous bid by this team in this auction round
+    // 4. Get previous bid to calculate effective balance
     const previousBid = await prisma.bid.findFirst({
       where: { teamId, auctionRoundId: auction.id } as any,
       orderBy: { amount: 'desc' },
     });
+
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+      select: { credits: true },
+    });
+    const currentBalance = team?.credits || 0;
+    const effectiveBalance = currentBalance + (previousBid ? previousBid.amount : 0);
+
+    // 5. Check if effective balance covers the amount
+    if (amount > effectiveBalance) {
+      return res.status(400).json({ error: 'Insufficient credits for this bid' });
+    }
 
     if (previousBid) {
       // Refund the previous bid
@@ -159,10 +169,10 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
     const io = getIO();
     io.emit('auction:new-bid', {
       bidId: bid.id,
-      teamName: bid.team.name,
       teamId: bid.teamId,
       amount: bid.amount,
       timestamp: bid.createdAt,
+      team: { name: bid.team.name },
       inactivityDeadline: new Date(now + 15 * 1000).toISOString(),
     });
 
@@ -212,7 +222,7 @@ export const resolveAuction = async (auctionId: string) => {
       },
     });
 
-    if (!auction || auction.status !== 'ACTIVE') return null;
+    if (!auction || (auction.status !== 'ACTIVE' && auction.status !== 'PREVIEW')) return null;
 
     // Clear inactivity timer on resolve
     clearInactivityTimer(auctionId);

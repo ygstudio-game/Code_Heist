@@ -13,7 +13,14 @@ import { useSocket } from '@/context/SocketContext';
 import { useSystemState } from '@/hooks/useSystemState';
 
 interface AdminGameState extends Omit<GameState, 'activeAuction'> {
-  activeAuction: { id: string; snippet: { title: string; category: string }; endTime: string } | null;
+  activeAuction: { 
+    id: string; 
+    status: string;
+    snippet: { title: string; category: string }; 
+    endTime: string;
+    highestBid?: AuctionBid | null;
+    totalBids?: number;
+  } | null;
 }
 
 
@@ -220,18 +227,21 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     loadDashboard();
-  }, []);
+  }, [loadDashboard]);
 
   // Auction Timer Sync
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (gameState?.activeAuction && auctionTimeLeft > 0) {
-      timer = setInterval(() => {
-        setAuctionTimeLeft(prev => Math.max(0, prev - 1));
-      }, 1000);
-    }
+    if (!gameState?.activeAuction) return;
+
+    const timer = setInterval(() => {
+      setAuctionTimeLeft(prev => {
+        if (prev <= 0) return 0;
+        return prev - 1;
+      });
+    }, 1000);
+
     return () => clearInterval(timer);
-  }, [gameState?.activeAuction, auctionTimeLeft]);
+  }, [gameState?.activeAuction?.id]);
 
   useEffect(() => {
     if (isConnected && socket) {
@@ -244,9 +254,19 @@ export default function AdminDashboard() {
          toast.info('NEW AUCTION STARTED');
          loadDashboard();
       });
-      socket.on('auction:new-bid', (bid: AuctionBid) => {
+      socket.on('auction:new-bid', (bidData: any) => {
+         // Create the AuctionBid object with proper structure if it's flat
+         const bid: AuctionBid = {
+            id: bidData.bidId,
+            teamId: bidData.teamId,
+            teamName: bidData.team?.name || bidData.teamName || 'Unknown',
+            amount: bidData.amount,
+            team: bidData.team || { name: bidData.teamName || 'Unknown' },
+            createdAt: bidData.timestamp
+         };
          setActiveAuctionBids(prev => [bid, ...prev]);
-         loadDashboard();
+         // Optional refetch if we need full data sync
+         // loadDashboard(); 
       });
       socket.on('auction:ended', (data: { winner?: { name: string } }) => {
          toast.success(`AUCTION ENDED: ${data.winner?.name || 'CANCELLED'}`);
@@ -432,11 +452,11 @@ export default function AdminDashboard() {
                        <div className="grid grid-cols-2 gap-4">
                           <div className="p-4 bg-white/5 border border-white/5">
                              <p className="text-[8px] text-white/30 uppercase mb-1">Current High Bid</p>
-                             <p className="text-xl font-black text-primary font-mono">{activeAuctionBids[0]?.amount || 0} CR</p>
+                             <p className="text-xl font-black text-primary font-mono">{activeAuctionBids[0]?.amount || gameState.activeAuction.highestBid?.amount || 0} CR</p>
                           </div>
                           <div className="p-4 bg-white/5 border border-white/5">
                              <p className="text-[8px] text-white/30 uppercase mb-1">Bidder</p>
-                             <p className="text-sm font-bold text-white uppercase truncate">{activeAuctionBids[0]?.teamName || 'N/A'}</p>
+                             <p className="text-sm font-bold text-white uppercase truncate">{activeAuctionBids[0]?.team.name || gameState.activeAuction.highestBid?.team.name || 'N/A'}</p>
                           </div>
                        </div>
                     </div>
@@ -446,7 +466,7 @@ export default function AdminDashboard() {
                        <div className="h-32 overflow-y-auto custom-scrollbar space-y-2">
                           {activeAuctionBids.length > 0 ? activeAuctionBids.map((bid, idx) => (
                              <div key={idx} className="flex justify-between items-center text-[10px] bg-white/[0.02] p-2 border-l-2 border-primary/20">
-                                <span className={idx === 0 ? 'text-primary font-bold' : 'text-white/60'}>{bid.teamName}</span>
+                                <span className={idx === 0 ? 'text-primary font-bold' : 'text-white/60'}>{bid.team.name}</span>
                                 <span className="text-primary font-mono font-bold">{bid.amount} CR</span>
                              </div>
                           )) : (

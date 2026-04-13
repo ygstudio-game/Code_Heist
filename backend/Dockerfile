@@ -1,7 +1,7 @@
 # Use Node.js 20
 FROM node:20-alpine
 
-# Install system dependencies
+# Install system dependencies for Puppeteer & Prisma
 RUN apk add --no-cache \
       chromium \
       nss \
@@ -14,16 +14,17 @@ RUN apk add --no-cache \
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 WORKDIR /app
 
-# Copy package files (Note: we only copy package.json since you don't have a lockfile)
+# Copy package files
 COPY package.json ./
+# If you have a lockfile (pnpm-lock.yaml or package-lock.json), copy it too!
 
-# 1. Install dependencies using npm
+# 1. Install dependencies
 RUN npm install
 
 # 2. Copy the rest of the code
 COPY . .
 
-# 3. Generate Prisma Client
+# 3. Generate Prisma Client (Must happen before build)
 RUN npx prisma generate
 
 # 4. Build the TypeScript code
