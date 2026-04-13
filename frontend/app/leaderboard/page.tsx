@@ -16,6 +16,25 @@ export default function LeaderboardPage() {
   const { socket, isConnected } = useSocket();
   const [displayMode, setDisplayMode] = useState<'CODING' | 'AUCTION' | 'FINAL'>('CODING');
 
+  const loadTeams = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetchWithAuth('/teams');
+      if (res.ok) {
+        const data = await res.json();
+        setTeams(data);
+      }
+    } catch (error) {
+      console.error('Failed to load leaderboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTeams();
+  }, [loadTeams]);
+
   useEffect(() => {
     if (phase === 'FINISHED' || phase === 'VAULT') {
       setDisplayMode('FINAL');
@@ -35,7 +54,9 @@ export default function LeaderboardPage() {
         socket.off('claim:new');
       };
     }
-  }, [isConnected, socket]);
+  }, [isConnected, socket, loadTeams]);
+
+
 
   const calculateGrandChampionStats = (team: Team & { submissions: Submission[], vaultTime?: number, lifelinesUsed?: number, lockPenalties?: number }) => {
     const verifiedSubmissions = team.submissions.filter((s: Submission) => s.status === 'VERIFIED');
@@ -82,25 +103,6 @@ export default function LeaderboardPage() {
 
     return { solvedCount, avgTime, accuracy, credits: team.credits, strikes: team.strikes, vaultTime, totalVaultTime, grandTotalTime };
   };
-
-  const loadTeams = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await fetchWithAuth('/teams');
-      if (res.ok) {
-        const data = await res.json();
-        setTeams(data);
-      }
-    } catch (error) {
-      console.error('Failed to load leaderboard:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadTeams();
-  }, [loadTeams]);
 
   const sortedTeams = [...teams].sort((a, b) => {
     if (displayMode === 'CODING') {

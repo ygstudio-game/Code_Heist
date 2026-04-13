@@ -96,7 +96,7 @@ export default function AdminTeams() {
         const data = await res.json();
         notify('error', data.error || 'Uplink failed.');
       }
-    } catch (_err) {
+    } catch {
       notify('error', 'Network failure.');
     }
   };
@@ -112,7 +112,7 @@ export default function AdminTeams() {
       } else {
         notify('error', 'Decommissioning failed.');
       }
-    } catch (_err) {
+    } catch {
       notify('error', 'Network failure.');
     }
   };
@@ -134,7 +134,7 @@ export default function AdminTeams() {
       } else {
         notify('error', 'Credential update failed.');
       }
-    } catch (_err) {
+    } catch {
       notify('error', 'Network failure.');
     }
   };

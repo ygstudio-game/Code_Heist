@@ -31,7 +31,7 @@ export default function DashboardPage() {
   const { socket, isConnected } = useSocket();
   const { phase, codingStartTime } = useSystemState();
   const { active: activeAuction } = useAuction();
-  const { breaches: _breaches } = useAntiCheat(team?.id || 'default', phase, activeSolver?.name);
+  useAntiCheat(team?.id || 'default', phase, activeSolver?.name);
   const router = useRouter();
   const [codingTimeLeft, setCodingTimeLeft] = useState<number | null>(null);
 
@@ -53,7 +53,7 @@ export default function DashboardPage() {
         const data = await res.json();
         setMySubmissions(data.filter((s: Submission) => s.snippetId === activeSnippet.id && s.status !== 'ACQUIRED'));
       }
-    } catch (_error) {
+    } catch {
       console.error('Failed to fetch submissions');
     }
   }, [activeSnippet]);
@@ -101,7 +101,7 @@ export default function DashboardPage() {
         }
       })
       .catch(err => console.error('Auth sync failed:', err));
-  }, []);
+  }, [team]);
 
   useEffect(() => {
     if (isConnected && socket) {
@@ -219,7 +219,7 @@ export default function DashboardPage() {
       } else {
         toast.error(data.error || 'Claim Failed.');
       }
-    } catch (_error) {
+    } catch {
       toast.error('Connection Failed.');
     }
   };
@@ -272,7 +272,7 @@ export default function DashboardPage() {
       } else {
         toast.error(data.error || 'Wrong! Check your code and try again.');
       }
-    } catch (_error) {
+    } catch {
       toast.error('ERROR: Connection lost during submission.');
     } finally {
       setIsSubmitting(false);

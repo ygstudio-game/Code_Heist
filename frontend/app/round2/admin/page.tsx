@@ -132,7 +132,7 @@ export default function AdminVaultPage() {
       } else {
         toast.error(data.error || `${label} failed`);
       }
-    } catch (_error) {
+    } catch {
       toast.error(`Network error: ${label}`);
     } finally {
       setActionLoading(null);

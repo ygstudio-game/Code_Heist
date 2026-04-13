@@ -38,7 +38,7 @@ export const useAntiCheat = (teamId: string, phase: string, solverName?: string)
     } finally {
       setTimeout(() => { isReporting.current = false; }, 2000); // Debounce
     }
-  }, [teamId, router]);
+  }, [teamId, router, solverName]);
 
   useEffect(() => {
     if (phase !== 'CODING') return;

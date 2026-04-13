@@ -61,8 +61,8 @@ export function useAuction() {
           setHistory([]);
         }
       }
-    } catch (error) {
-      console.error('Failed to fetch active auction:', error);
+    } catch {
+      console.error('Failed to fetch active auction:');
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +163,7 @@ export function useAuction() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [auctionState.active]);
+  }, [auctionState.active, auctionState.auction]);
 
   // Inactivity countdown timer (15s after each bid)
   useEffect(() => {
@@ -209,11 +209,11 @@ export function useAuction() {
           const team = JSON.parse(teamStr);
           team.credits = data.newBalance;
           localStorage.setItem('team', JSON.stringify(team));
-        } catch (e) {}
+        } catch {}
       }
       
       return true;
-    } catch (error) {
+    } catch {
       toast.error('Uplink failed. Network error.');
       return false;
     }

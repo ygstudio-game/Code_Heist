@@ -5,7 +5,7 @@ import { fetchWithAuth } from '@/lib/api';
 import { useSocket } from '@/context/SocketContext';
 import Navbar from '@/components/Navbar';
 import { toast } from 'sonner';
-import { Timer, Trophy, Shield, AlertTriangle, Lock, Zap, Clock, Skull, HeartPulse } from 'lucide-react';
+import { Timer, Trophy, AlertTriangle, Lock, Zap, Clock, Skull, HeartPulse } from 'lucide-react';
 
 interface VaultTeam {
   id: string;

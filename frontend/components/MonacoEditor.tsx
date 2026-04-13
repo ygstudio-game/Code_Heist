@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import Editor, { OnMount, Monaco } from '@monaco-editor/react';
 import { toast } from 'sonner';
 import { useAntiCheat } from '../hooks/useAntiCheat';

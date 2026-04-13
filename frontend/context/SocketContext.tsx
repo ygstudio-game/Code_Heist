@@ -57,7 +57,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       socketInstance.disconnect();
     };
-  }, []);
+  }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const joinTeamRoom = (teamId: string) => {
     if (socket) {

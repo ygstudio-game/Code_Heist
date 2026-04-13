@@ -241,7 +241,7 @@ export default function AdminDashboard() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gameState?.activeAuction?.id]);
+  }, [gameState?.activeAuction]);
 
   useEffect(() => {
     if (isConnected && socket) {
@@ -254,7 +254,14 @@ export default function AdminDashboard() {
          toast.info('NEW AUCTION STARTED');
          loadDashboard();
       });
-      socket.on('auction:new-bid', (bidData: any) => {
+      socket.on('auction:new-bid', (bidData: { 
+        bidId: string; 
+        teamId: string; 
+        amount: number; 
+        timestamp: string; 
+        team?: { name: string }; 
+        teamName?: string; 
+      }) => {
          // Create the AuctionBid object with proper structure if it's flat
          const bid: AuctionBid = {
             id: bidData.bidId,

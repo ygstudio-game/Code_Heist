@@ -19,8 +19,8 @@ export function useSystemState() {
         setPhase(data.currentPhase);
         setCodingStartTime(data.codingStartTime || null);
       }
-    } catch (error) {
-      console.error('Failed to fetch system state:', error);
+    } catch {
+      console.error('Failed to fetch system state:');
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +60,7 @@ export function useSystemState() {
       } else {
         toast.error('Phase transition failed');
       }
-    } catch (error) {
+    } catch {
       toast.error('Network error during phase change');
     }
   };

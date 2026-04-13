@@ -139,7 +139,7 @@ export default function TeamVaultPage() {
       } else {
         toast.error(data.error || "Failed to start timer");
       }
-    } catch (err) {
+    } catch {
       toast.error("Network error starting timer");
     } finally {
       setActionLoading(false);
@@ -161,7 +161,7 @@ export default function TeamVaultPage() {
       } else {
         toast.error(data.error || "Failed to stop timer");
       }
-    } catch (err) {
+    } catch {
       toast.error("Network error stopping timer");
     } finally {
       setActionLoading(false);
