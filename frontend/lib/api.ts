@@ -36,8 +36,14 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
   });
 
   if (response.status === 401) {
-    clearAuthToken();
-    if (typeof window !== 'undefined') window.location.href = '/login';
+    const isPublicEndpoint = ['/system/state', '/auth/login'].some(ep => endpoint.includes(ep));
+    
+    if (!isPublicEndpoint) {
+      clearAuthToken();
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
   }
 
   return response;

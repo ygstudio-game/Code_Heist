@@ -118,6 +118,10 @@ export default function DashboardPage() {
         setSnippets(prev => prev.map(s => 
           s.id === snippetId ? { ...s, submissionStatus: data.status } : s
         ));
+        // Refresh submissions list if the user is looking at this snippet
+        if (activeSnippet?.id === snippetId) {
+          fetchSubmissions();
+        }
       });
       socket.on('team:update', (updatedTeam: Team) => {
         if (team?.id === updatedTeam.id) {
@@ -498,6 +502,8 @@ export default function DashboardPage() {
                     <span className="text-[9px] font-geist-mono">
                       {snippet.submissionStatus === 'VERIFIED' ? (
                           <span className="text-success glow-text uppercase font-bold">SOLVED</span>
+                      ) : snippet.claimant === activeSolver?.name ? (
+                          <span className="text-primary glow-text uppercase font-bold animate-pulse">RESUME WORK</span>
                       ) : snippet.claimant ? (
                           <span className="text-primary/50 uppercase tracking-tighter">ENGAGED BY: {snippet.claimant}</span>
                       ) : (
