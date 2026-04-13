@@ -23,6 +23,8 @@ import Cursor from "@/components/Cursor";
 import { Toaster } from 'sonner';
 import { SocketProvider } from '@/context/SocketContext';
 
+import { SystemProvider } from '@/context/SystemContext';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,9 +36,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased selection:bg-primary/30`}
       >
         <SocketProvider>
-          <Cursor />
-          <Toaster position="top-center" expand={false} richColors theme="dark" />
-          {children}
+          <SystemProvider>
+            <Cursor />
+            <Toaster position="top-center" expand={false} richColors theme="dark" />
+            {children}
+          </SystemProvider>
         </SocketProvider>
       </body>
     </html>

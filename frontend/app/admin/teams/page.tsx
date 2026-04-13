@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import { fetchWithAuth } from '@/lib/api';
 import { 
@@ -17,6 +17,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import { useSocket } from '@/context/SocketContext';
 
 interface TeamMember {
   id: string;
@@ -45,6 +46,7 @@ export default function AdminTeams() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const { socket, isConnected } = useSocket();
 
   // Create Form State
   const [newTeam, setNewTeam] = useState({
@@ -58,11 +60,7 @@ export default function AdminTeams() {
   const [resetPassword, setResetPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
 
-  useEffect(() => {
-    fetchTeams();
-  }, []);
-
-  const fetchTeams = async () => {
+  const fetchTeams = useCallback(async () => {
     try {
       const res = await fetchWithAuth('/admin/teams-list');
       if (res.ok) {
@@ -74,7 +72,20 @@ export default function AdminTeams() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTeams();
+  }, [fetchTeams]);
+
+  useEffect(() => {
+    if (isConnected && socket) {
+      socket.on('teams:reload', fetchTeams);
+      return () => {
+        socket.off('teams:reload', fetchTeams);
+      };
+    }
+  }, [isConnected, socket, fetchTeams]);
 
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();

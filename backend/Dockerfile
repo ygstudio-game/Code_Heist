@@ -1,7 +1,7 @@
 # Use Node.js 20
 FROM node:20-alpine
 
-# Install system dependencies for Puppeteer & Prisma
+# Install system dependencies for Puppeteer, Prisma, AND Code Compilation
 RUN apk add --no-cache \
       chromium \
       nss \
@@ -9,7 +9,11 @@ RUN apk add --no-cache \
       harfbuzz \
       ca-certificates \
       ttf-freefont \
-      openssl 
+      openssl \
+      gcc \
+      g++ \
+      musl-dev \
+      python3
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 WORKDIR /app

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middleware/authMiddleware';
-import { resolveAuction, clearInactivityTimer } from './AuctionController';
+import { resolveAuction, clearInactivityTimer, inactivityDeadlines } from './AuctionController';
 import { getIO } from '../config/socket';
 
 // In-memory auction timer store
@@ -93,6 +93,7 @@ export const createTeam = async (req: Request, res: Response) => {
       include: { members: true }
     });
     res.status(201).json(team);
+    getIO().emit('teams:reload');
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to create team', details: error.message });
   }
@@ -103,6 +104,7 @@ export const deleteTeam = async (req: Request, res: Response) => {
   try {
     await (prisma as any).team.delete({ where: { id: id as any } });
     res.json({ message: 'Team deleted successfully' });
+    getIO().emit('teams:reload');
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to delete team', details: error.message });
   }
@@ -377,6 +379,11 @@ export const resetStrikes = async (req: AuthRequest, res: Response) => {
       where: { id: teamId },
       data: { strikes: 0, isEliminated: false, lastStrikeAt: null },
     });
+    
+    const io = getIO();
+    io.emit('team:update', team);
+    io.emit('teams:reload');
+    
     res.json({ message: 'Strikes reset', team });
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to reset strikes', details: error.message });
@@ -426,6 +433,7 @@ export const getGameState = async (req: AuthRequest, res: Response) => {
         endTime: activeAuction.endTime,
         highestBid: activeAuction.bids[0] || null,
         totalBids: activeAuction.bids.length,
+        inactivityDeadline: inactivityDeadlines.get(activeAuction.id) || null,
       } : null,
       submissions: submissions.reduce((acc, s) => ({ ...acc, [s.status]: s._count }), {}),
       completedAuctions,

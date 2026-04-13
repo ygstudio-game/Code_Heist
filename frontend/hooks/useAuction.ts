@@ -48,8 +48,6 @@ export function useAuction() {
         setAuctionState(data);
         if (data.active && data.auction) {
           // Fetch bids for history if auction is active
-          // To keep it simple, we just set the highest bid in the history for now
-          // A full history endpoint could be fetched here if needed
           if (data.auction.highestBid) {
             setHistory([{
               ...data.auction.highestBid,
@@ -57,8 +55,19 @@ export function useAuction() {
           } else {
              setHistory([]);
           }
+
+          // Initialize inactivity deadline if exists
+          if (data.auction.inactivityDeadline) {
+             const deadline = new Date(data.auction.inactivityDeadline).getTime();
+             const now = Date.now();
+             const diff = Math.max(0, Math.floor((deadline - now) / 1000));
+             setInactivityTimeLeft(diff > 0 ? diff : null);
+          } else {
+             setInactivityTimeLeft(null);
+          }
         } else {
           setHistory([]);
+          setInactivityTimeLeft(null);
         }
       }
     } catch {

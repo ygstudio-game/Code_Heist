@@ -14,8 +14,8 @@ interface SocketContextData {
 const SocketContext = createContext<SocketContextData>({
   socket: null,
   isConnected: false,
-  joinTeamRoom: () => {},
-  joinAuctionRoom: () => {},
+  joinTeamRoom: () => { },
+  joinAuctionRoom: () => { },
 });
 
 export const useSocket = () => useContext(SocketContext);
@@ -29,10 +29,11 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     const token = getAuthToken();
     if (!token) return;
 
-    const socketUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
-    
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
     const socketInstance = io(socketUrl, {
       transports: ['websocket', 'polling'], // Fallback to polling if websocket fails
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
     });
 
     socketInstance.on('connect', () => {

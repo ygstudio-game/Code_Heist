@@ -20,6 +20,7 @@ interface AdminGameState extends Omit<GameState, 'activeAuction'> {
     endTime: string;
     highestBid?: AuctionBid | null;
     totalBids?: number;
+    inactivityDeadline?: string | null;
   } | null;
 }
 
@@ -42,8 +43,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isAutoPilot, setIsAutoPilot] = useState(false);
+  const [inactivityTimeLeft, setInactivityTimeLeft] = useState<number | null>(null);
   const { socket, isConnected } = useSocket();
-  const { phase } = useSystemState();
+  const { phase, updatePhase } = useSystemState();
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -80,6 +82,16 @@ export default function AdminDashboard() {
            const initialLogs = await logsRes.json();
            setLogs(initialLogs);
         }
+
+        // Initialize inactivity countdown if exists
+        if (state.activeAuction?.inactivityDeadline) {
+           const deadline = new Date(state.activeAuction.inactivityDeadline).getTime();
+           const now = Date.now();
+           const diff = Math.max(0, Math.floor((deadline - now) / 1000));
+           setInactivityTimeLeft(diff > 0 ? diff : null);
+        } else {
+           setInactivityTimeLeft(null);
+        }
       } else {
          toast.error('Failed to sync with system');
       }
@@ -91,20 +103,11 @@ export default function AdminDashboard() {
   }, []);
 
   const handleUpdatePhase = useCallback(async (newPhase: string) => {
-    try {
-      const res = await fetchWithAuth('/system/phase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phase: newPhase }),
-      });
-      if (res.ok) {
-        toast.success(`Phase updated to ${newPhase}`);
-        loadDashboard();
-      }
-    } catch {
-      toast.error('Failed to update phase');
+    const success = await updatePhase(newPhase);
+    if (success) {
+       loadDashboard();
     }
-  }, [loadDashboard]);
+  }, [updatePhase, loadDashboard]);
 
   const handleStartAuction = useCallback(async (snippetId: string) => {
     try {
@@ -243,6 +246,20 @@ export default function AdminDashboard() {
     return () => clearInterval(timer);
   }, [gameState?.activeAuction]);
 
+  // Inactivity Timer Sync
+  useEffect(() => {
+    if (inactivityTimeLeft === null || inactivityTimeLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setInactivityTimeLeft(prev => {
+        if (prev === null || prev <= 0) return null;
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [inactivityTimeLeft]);
+
   useEffect(() => {
     if (isConnected && socket) {
       socket.emit('join-admin');
@@ -272,12 +289,14 @@ export default function AdminDashboard() {
             createdAt: bidData.timestamp
          };
          setActiveAuctionBids(prev => [bid, ...prev]);
+         setInactivityTimeLeft(15);
          // Optional refetch if we need full data sync
          // loadDashboard(); 
       });
       socket.on('auction:ended', (data: { winner?: { name: string } }) => {
          toast.success(`AUCTION ENDED: ${data.winner?.name || 'CANCELLED'}`);
          setActiveAuctionBids([]);
+         setInactivityTimeLeft(null);
          loadDashboard();
 
          // Auto-Pilot Logic
@@ -379,7 +398,12 @@ export default function AdminDashboard() {
                        <Timer size={20} />
                     </div>
                     <div>
-                       <p className="text-[10px] text-primary uppercase font-mono tracking-widest leading-none mb-1">Auction Live: {formatTime(auctionTimeLeft)}</p>
+                       <p className="text-[10px] text-primary uppercase font-mono tracking-widest leading-none mb-1">
+                          Auction Live: {formatTime(auctionTimeLeft)}
+                          {inactivityTimeLeft !== null && inactivityTimeLeft > 0 && (
+                             <span className="text-danger ml-2 animate-pulse">[CLOSING: {inactivityTimeLeft}s]</span>
+                          )}
+                       </p>
                        <p className="text-sm font-bold text-white uppercase italic">{gameState.activeAuction.snippet.title}</p>
                     </div>
                   </div>
@@ -440,8 +464,14 @@ export default function AdminDashboard() {
                        <span className="text-[10px] font-bold uppercase tracking-[4px] text-primary">Buy Problems Now</span>
                     </div>
                     <div className="flex items-center gap-4">
+                       {inactivityTimeLeft !== null && inactivityTimeLeft > 0 && (
+                          <div className="text-right px-4 border-r border-white/5 animate-pulse">
+                             <p className="text-[8px] text-danger uppercase font-mono tracking-widest">Inactivity Lock</p>
+                             <p className="text-xl font-black text-danger font-mono">{inactivityTimeLeft}s</p>
+                          </div>
+                       )}
                        <div className="text-right">
-                          <p className="text-[8px] text-primary/60 uppercase font-mono tracking-widest">Time Remaining</p>
+                          <p className="text-[8px] text-primary/60 uppercase font-mono tracking-widest">Hard Limit</p>
                           <p className="text-xl font-black text-white font-mono">{formatTime(auctionTimeLeft)}</p>
                        </div>
                        <button onClick={handleEndAuction} className="bg-danger/20 hover:bg-danger text-danger hover:text-white border border-danger/30 px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all">

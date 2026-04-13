@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { clearAuthToken } from '@/lib/api';
 import { Team } from '@/types';
+import { useSystemState } from '@/hooks/useSystemState';
 
 export default function Navbar() {
   const [team, setTeam] = useState<Team | null>(null);
@@ -25,6 +26,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const dropdownTimer = useRef<NodeJS.Timeout | null>(null);
+  const { phase } = useSystemState();
 
   useEffect(() => {
     const savedTeam = localStorage.getItem('team');
@@ -96,8 +98,10 @@ export default function Navbar() {
           <div className="h-4 w-px bg-white/10 mx-2 hidden sm:block"></div>
 
           <div className="hidden sm:flex items-center gap-2">
-            <span className="text-[10px] text-text/40 uppercase tracking-widest">{isAdmin ? 'Admin' : 'Team'}:</span>
-            <span className="text-[10px] font-geist-mono text-primary font-bold px-2 py-0.5 bg-primary/5 border border-primary/20 rounded-sm">
+            <span className={`text-[10px] font-geist-mono font-bold px-2 py-0.5 border rounded-sm transition-all animate-pulse ${phase === 'AUCTION' ? 'text-primary bg-primary/5 border-primary/20' : 'text-danger bg-danger/5 border-danger/20'}`}>
+              ROUND: {phase}
+            </span>
+            <span className="text-[10px] font-geist-mono text-white/40 font-bold px-2 py-0.5 bg-white/5 border border-white/10 rounded-sm">
               {team.name}
             </span>
           </div>

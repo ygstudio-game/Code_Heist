@@ -48,10 +48,12 @@ export default function LeaderboardPage() {
       socket.on('submission:update', () => loadTeams());
       socket.on('team:penalty', () => loadTeams());
       socket.on('claim:new', () => loadTeams());
+      socket.on('teams:reload', () => loadTeams());
       return () => {
         socket.off('submission:update');
         socket.off('team:penalty');
         socket.off('claim:new');
+        socket.off('teams:reload');
       };
     }
   }, [isConnected, socket, loadTeams]);

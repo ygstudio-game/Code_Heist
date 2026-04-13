@@ -119,10 +119,17 @@ export default function DashboardPage() {
           s.id === snippetId ? { ...s, submissionStatus: data.status } : s
         ));
       });
+      socket.on('team:update', (updatedTeam: Team) => {
+        if (team?.id === updatedTeam.id) {
+          setTeam(updatedTeam);
+          localStorage.setItem('team', JSON.stringify(updatedTeam));
+        }
+      });
       return () => {
         socket.off('claim:new');
         socket.off('claim:released');
         socket.off('submission:status');
+        socket.off('team:update');
       };
     }
   }, [isConnected, socket, activeSnippet]);
@@ -181,47 +188,63 @@ export default function DashboardPage() {
     }
   }, [activeSnippet, currentCode]);
 
-  const handleSnippetSelect = (snippet: Snippet) => {
+  const handleSnippetSelect = async (snippet: Snippet) => {
     if (phase !== 'CODING') {
       toast.error(`PHASE LOCK: The ${phase} phase is currently active. Access to nodes is restricted.`);
       return;
     }
-    if (snippet.claimant && snippet.claimant !== activeSolver?.name) {
-      toast.error(`TAKEN: This problem is being solved by ${snippet.claimant}.`);
-      return;
-    }
-    setActiveSnippet(snippet);
-    setCurrentCode(snippet.buggyCode);
-  };
 
-  const handleClaim = async (snippet: Snippet) => {
     if (!activeSolver) {
       setIsSolverModalOpen(true);
       return;
     }
 
-    try {
-      const response = await fetchWithAuth('/code/claim', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          snippetId: snippet.id,
-          solverName: activeSolver.name,
-          solverRole: activeSolver.role
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        toast.success('Problem Selected. Ready to Code.');
-        setActiveSnippet(snippet);
-        setCurrentCode(snippet.buggyCode);
-      } else {
-        toast.error(data.error || 'Claim Failed.');
-      }
-    } catch {
-      toast.error('Connection Failed.');
+    // 1. If we have an active snippet that is 'ACQUIRED' (not yet verified/failed), release it first
+    if (activeSnippet && activeSnippet.id !== snippet.id && activeSnippet.submissionStatus === 'ACQUIRED' && activeSolver) {
+       try {
+         await fetchWithAuth('/code/release', {
+           method: 'POST',
+           body: JSON.stringify({
+             snippetId: activeSnippet.id,
+             solverName: activeSolver.name
+           })
+         });
+       } catch (err) {
+         console.error('Failed to release previous snippet:', err);
+       }
     }
+
+    // 2. Check if the target snippet is taken by another teammate
+    if (snippet.claimant && snippet.claimant !== activeSolver?.name) {
+      toast.error(`TAKEN: This problem is being handled by ${snippet.claimant}.`);
+      return;
+    }
+
+    // 3. If not claimed by us, try to claim it
+    if (snippet.claimant !== activeSolver?.name && activeSolver) {
+      try {
+        const res = await fetchWithAuth('/code/claim', {
+          method: 'POST',
+          body: JSON.stringify({
+            snippetId: snippet.id,
+            solverName: activeSolver.name,
+            solverRole: activeSolver.role
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.error || 'Failed to engage target.');
+          return;
+        }
+      } catch (err) {
+        toast.error('Uplink failed. Check connection.');
+        return;
+      }
+    }
+
+    // 4. Set as active
+    setActiveSnippet(snippet);
+    setCurrentCode(snippet.buggyCode);
   };
 
   const handleSolverSave = (name: string, role: string) => {
@@ -471,28 +494,16 @@ export default function DashboardPage() {
                     <span className="text-[8px] bg-primary/10 text-primary px-2 py-0.5 border border-primary/20">{snippet.category}</span>
                   </div>
                   <h4 className="text-xs font-bold group-hover:text-primary transition-colors uppercase tracking-tight">{snippet.title}</h4>
-                  <div className="mt-3 flex items-center justify-between">
-                    {!snippet.claimant && snippet.submissionStatus !== 'VERIFIED' ? (
-                      <button 
-                        disabled={isCategoryClaimedByOther}
-                        onClick={(e) => { e.stopPropagation(); handleClaim(snippet); }}
-                        className={`text-[8px] border px-2 py-1 transition-all font-bold uppercase ${
-                          isCategoryClaimedByOther 
-                          ? 'border-white/10 text-white/20 cursor-not-allowed' 
-                          : 'text-primary border-primary/30 hover:bg-primary hover:text-black'
-                        }`}
-                      >
-                        {isCategoryClaimedByOther ? 'Category Taken' : 'Choose Problem'}
-                      </button>
-                    ) : (
-                      <span className="text-[9px] text-text/30 font-geist-mono">
-                        {snippet.submissionStatus === 'VERIFIED' ? (
-                           <span className="text-success glow-text uppercase">SOLVED</span>
-                        ) : (
-                           <span className="text-primary/50 uppercase">ASSIGNED TO: {snippet.claimant}</span>
-                        )}
-                      </span>
-                    )}
+                  <div className="mt-4 flex items-center justify-between min-h-[22px] border-t border-white/5 pt-3">
+                    <span className="text-[9px] font-geist-mono">
+                      {snippet.submissionStatus === 'VERIFIED' ? (
+                          <span className="text-success glow-text uppercase font-bold">SOLVED</span>
+                      ) : snippet.claimant ? (
+                          <span className="text-primary/50 uppercase tracking-tighter">ENGAGED BY: {snippet.claimant}</span>
+                      ) : (
+                          <span className="text-text/20 uppercase tracking-widest text-[8px]">Available</span>
+                      )}
+                    </span>
                     <span className="text-[10px] text-primary font-bold">{snippet.auctionWinAmount || 0} CR</span>
                   </div>
                 </div>

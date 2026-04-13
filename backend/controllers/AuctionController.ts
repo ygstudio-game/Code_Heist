@@ -6,6 +6,7 @@ import { getIO } from '../config/socket';
 import { updateAuctionTimer, clearAuctionTimer } from './AdminController';
 
 // ─── 15-second inactivity timer store ────────────────────────────────
+export const inactivityDeadlines: Map<string, string> = new Map();
 const inactivityTimers: Map<string, NodeJS.Timeout> = new Map();
 
 export const clearInactivityTimer = (auctionId: string) => {
@@ -14,6 +15,7 @@ export const clearInactivityTimer = (auctionId: string) => {
     clearTimeout(timer);
     inactivityTimers.delete(auctionId);
   }
+  inactivityDeadlines.delete(auctionId);
 };
 
 // ─── Get the currently active auction round ──────────────────────────
@@ -47,6 +49,7 @@ export const getActiveAuction = async (req: AuthRequest, res: Response) => {
         timeLeft,
         highestBid: auction.bids[0] || null,
         totalBids: auction.bids.length,
+        inactivityDeadline: inactivityDeadlines.get(auction.id) || null,
       },
     });
   } catch (error: any) {
@@ -165,6 +168,9 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
     }, 15 * 1000);
     inactivityTimers.set(auction.id, inactivityTimer);
 
+    const deadline = new Date(now + 15 * 1000).toISOString();
+    inactivityDeadlines.set(auction.id, deadline);
+
     // 8. Emit Socket.io event
     const io = getIO();
     io.emit('auction:new-bid', {
@@ -173,13 +179,18 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
       amount: bid.amount,
       timestamp: bid.createdAt,
       team: { name: bid.team.name },
-      inactivityDeadline: new Date(now + 15 * 1000).toISOString(),
+      inactivityDeadline: deadline,
     });
+    
+    // Sync team credits on dashboard
+    io.emit('team:update', bid.team);
+    io.emit('teams:reload');
 
     res.json({
       message: 'Bid placed. 15s countdown started.',
       bid,
       newBalance: bid.team.credits,
+      inactivityDeadline: deadline,
     });
   } catch (error: any) {
     console.error('❌ Place bid error:', error);
@@ -280,6 +291,11 @@ export const resolveAuction = async (auctionId: string) => {
         winningBid: resolved.winningBid,
         snippet: resolved.snippet,
       });
+      
+      io.emit('teams:reload');
+      if (resolved.winner) {
+         io.emit('team:update', resolved.winner);
+      }
 
       return resolved;
     } else {

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { submitSnippet, getMySubmissions, claimSnippet, testCode } from '../controllers/CodeController';
+import { submitSnippet, getMySubmissions, claimSnippet, releaseSnippet, testCode } from '../controllers/CodeController';
 import { authenticate, requireTeam } from '../middleware/authMiddleware';
 import prisma from '../lib/prisma';
 import { AuthRequest } from '../middleware/authMiddleware';
@@ -49,6 +49,7 @@ router.get('/my-snippets', authenticate, async (req: AuthRequest, res: Response)
 
 router.post('/submit', authenticate, requireTeam, submitSnippet);
 router.post('/claim', authenticate, requireTeam, claimSnippet);
+router.post('/release', authenticate, requireTeam, releaseSnippet);
 router.post('/run', authenticate, requireTeam, testCode);
 router.get('/my-submissions', authenticate, getMySubmissions);
 

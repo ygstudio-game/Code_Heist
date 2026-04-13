@@ -158,6 +158,7 @@ export const stopVaultTimer = async (req: AuthRequest, res: Response) => {
       teamName: team.name, 
       vaultTime: elapsedSeconds 
     });
+    io.emit('teams:reload');
 
     res.json({ message: 'Vault timer stopped and saved', teamId: targetTeamId, vaultTime: elapsedSeconds });
   } catch (error: any) {
@@ -191,6 +192,7 @@ export const syncVaultTime = async (req: AuthRequest, res: Response) => {
       teamName: team.name,
       vaultTime: team.vaultTime,
     });
+    io.emit('teams:reload');
 
     res.json({ message: 'Vault time synced', team });
   } catch (error: any) {
@@ -243,6 +245,7 @@ export const logLifeline = async (req: AuthRequest, res: Response) => {
       lifelinesUsed: team.lifelinesUsed,
       remaining: 3 - team.lifelinesUsed,
     });
+    io.emit('teams:reload');
 
     res.json({ message: 'Lifeline logged', team, eliminated: false });
   } catch (error: any) {
@@ -270,6 +273,7 @@ export const logLockPenalty = async (req: AuthRequest, res: Response) => {
       teamName: team.name,
       lockPenalties: team.lockPenalties,
     });
+    io.emit('teams:reload');
 
     res.json({ message: 'Lock penalty logged', team });
   } catch (error: any) {
@@ -300,6 +304,7 @@ export const resetVaultData = async (req: AuthRequest, res: Response) => {
 
     const io = getIO();
     io.emit('vault:team-reset', { teamId, teamName: team.name });
+    io.emit('teams:reload');
 
     res.json({ message: 'Vault data reset', team });
   } catch (error: any) {

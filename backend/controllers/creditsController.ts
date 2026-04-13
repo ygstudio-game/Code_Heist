@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
+import { getIO } from '../config/socket';
 
 export const getCredits = async (req: any, res: Response) => {
   try {
@@ -57,6 +58,10 @@ export const adminAdjustCredits = async (req: Request, res: Response) => {
     });
 
     res.json(team);
+
+    const io = getIO();
+    io.emit('team:update', team);
+    io.emit('teams:reload');
   } catch (error) {
     res.status(500).json({ error: 'Failed to adjust credits' });
   }

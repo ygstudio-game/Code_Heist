@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Timer, Gavel, Shield, TrendingUp, Users } from 'lucide-react';
 import { useAuction, AuctionBid } from '@/hooks/useAuction';
+import { useSystemState } from '@/hooks/useSystemState';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 
@@ -16,6 +18,9 @@ export default function AuctionPage() {
     inactivityTimeLeft,
     placeBid 
   } = useAuction();
+  
+  const { phase } = useSystemState();
+  const router = useRouter();
   
   const [bidAmount, setBidAmount] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,6 +59,15 @@ export default function AuctionPage() {
       }
     }
   }, [active, auction, recommendedBid, bidAmount]);
+
+  useEffect(() => {
+    if (phase === 'CODING') {
+      router.push('/dashboard');
+      toast.info('Auction ended. Transitioning to coding round.');
+    } else if (phase === 'VAULT') {
+        router.push('/round2');
+    }
+  }, [phase, router]);
 
   return (
     <div className="min-h-screen bg-background text-text font-space">

@@ -3,6 +3,9 @@ import prisma from '../lib/prisma';
 import { AuthRequest } from '../middleware/authMiddleware';
 import * as compileRun from 'compile-run';
 import { getIO } from '../config/socket';
+import pLimit from 'p-limit';
+
+const executionLimit = pLimit(5);
 
 export const submitSnippet = async (req: AuthRequest, res: Response) => {
   const { snippetId, code, solverName, solverRole } = req.body;
@@ -45,58 +48,66 @@ export const submitSnippet = async (req: AuthRequest, res: Response) => {
       include: { team: { select: { name: true } } }
     });
 
-    // 3. Real Verification Logic
+    // 3. Real Verification Logic (Wrapped in concurrency limit)
     let isCorrect = false;
-    let stdout;
-    let stderr;
+    let stdout = '';
+    let stderr = '';
 
     try {
-      const expected = snippet.expected || '';
-      const isRegex = expected.startsWith('/') && expected.endsWith('/') && expected.length > 2;
-
-      // 1. If Regex Check is required, verify code signature instead of executing
-      if (isRegex) {
-        const regexStr = expected.slice(1, -1);
-        const regex = new RegExp(regexStr, 'mi');
-        isCorrect = regex.test(code);
-        stdout = isCorrect ? 'CODE SIGNATURE VERIFIED: Structural Fix Detected.' : 'VERIFICATION FAILED: Required implementation signatures missing.';
-      }
-      // 2. Otherwise, perform real execution for C, Python, CP
-      else if ((snippet.category as string) === 'C' || (snippet.category as string) === 'PYTHON' || (snippet.category as string) === 'CP' || (snippet.category as string) === 'CPP') {
-        let result;
-        if ((snippet.category as string) === 'C') {
-          result = await compileRun.c.runSource(code, { stdin: snippet.hiddenInput || '' });
-        } else if ((snippet.category as string) === 'PYTHON') {
-          result = await compileRun.python.runSource(code, { stdin: snippet.hiddenInput || '' });
-        } else {
-          result = await compileRun.cpp.runSource(code, { stdin: snippet.hiddenInput || '', timeout: 3000 });
-        }
-
-        stdout = result.stdout;
-        stderr = result.stderr;
-
-        // PRIORITIZE ERROR: If stderr exists, it's a failure (compilation or runtime)
-        if (stderr && stderr.trim().length > 0) {
-          isCorrect = false;
-        } else {
-          isCorrect = stdout.trim() === expected.trim();
-        }
-      } else if ((snippet.category as string) === 'WEB') {
+      await executionLimit(async () => {
         const expected = snippet.expected || '';
-        if (expected.startsWith('/') && expected.endsWith('/') && expected.length > 2) {
+        const isRegex = expected.startsWith('/') && expected.endsWith('/') && expected.length > 2;
+
+        // 1. If Regex Check is required, verify code signature instead of executing
+        if (isRegex) {
           const regexStr = expected.slice(1, -1);
           const regex = new RegExp(regexStr, 'mi');
           isCorrect = regex.test(code);
-        } else {
-          isCorrect = code.includes(expected);
+          stdout = isCorrect ? 'CODE SIGNATURE VERIFIED: Structural Fix Detected.' : 'VERIFICATION FAILED: Required implementation signatures missing.';
         }
-        stdout = isCorrect ? 'DOM Mutation Verified.' : 'Required Logic Missing or Structural Violation Detected.';
-      }
+        // 2. Otherwise, perform real execution for C, Python, CP
+        else if (['C', 'PYTHON', 'CP', 'CPP'].includes(snippet.category as string)) {
+          let result;
+          const options = { 
+            stdin: snippet.hiddenInput || '',
+            timeout: 5000, // Execution timeout
+            compileTimeout: 3000 // Compilation timeout
+          };
+
+          if ((snippet.category as string) === 'C') {
+            result = await compileRun.c.runSource(code, options);
+          } else if ((snippet.category as string) === 'PYTHON') {
+            result = await compileRun.python.runSource(code, options);
+          } else {
+            result = await compileRun.cpp.runSource(code, options);
+          }
+
+          stdout = result.stdout;
+          stderr = result.stderr;
+
+          if (stderr && stderr.trim().length > 0) {
+            isCorrect = false;
+          } else {
+            isCorrect = stdout.trim() === expected.trim();
+          }
+        } else if ((snippet.category as string) === 'WEB') {
+          const expected = snippet.expected || '';
+          if (expected.startsWith('/') && expected.endsWith('/') && expected.length > 2) {
+            const regexStr = expected.slice(1, -1);
+            const regex = new RegExp(regexStr, 'mi');
+            isCorrect = regex.test(code);
+          } else {
+            isCorrect = code.includes(expected);
+          }
+          stdout = isCorrect ? 'DOM Mutation Verified.' : 'Required Logic Missing or Structural Violation Detected.';
+        }
+      });
     } catch (err: any) {
       console.error('❌ Execution error:', err);
       stderr = err.message || 'SYSTEM ALERT: Execution Engine Failure.';
       isCorrect = false;
     }
+
 
     const updatedSubmission = await prisma.submission.update({
       where: { id: submission.id },
@@ -242,6 +253,48 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
   } catch (error: any) {
     console.error('❌ Claim error:', error);
     res.status(500).json({ error: 'Failed to acquire target' });
+  }
+};
+
+export const releaseSnippet = async (req: AuthRequest, res: Response) => {
+  const { snippetId } = req.body;
+  const teamId = req.user?.teamId;
+  const solverName = req.body.solverName; // Front-end should provide the solverName it has
+
+  if (!teamId) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+    // 1. Check Global Phase
+    const systemState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
+    if (systemState?.currentPhase !== 'CODING') {
+      return res.status(403).json({ error: 'ACCESS DENIED: Coding round not active.' });
+    }
+
+    // 2. Find and delete the ACQUIRED submission for this solver/snippet
+    const claim = await (prisma as any).submission.findFirst({
+      where: { 
+        teamId, 
+        snippetId, 
+        solverName,
+        status: 'ACQUIRED'
+      }
+    });
+
+    if (claim) {
+      await (prisma as any).submission.delete({
+        where: { id: claim.id }
+      });
+
+      const io = getIO();
+      io.to(`team:${teamId}`).emit('claim:released', { snippetId });
+      
+      return res.json({ message: 'Target released.' });
+    }
+
+    res.status(404).json({ error: 'No active claim found to release.' });
+  } catch (error: any) {
+    console.error('❌ Release error:', error);
+    res.status(500).json({ error: 'Failed to release target' });
   }
 };
 
