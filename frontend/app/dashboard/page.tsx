@@ -101,7 +101,7 @@ export default function DashboardPage() {
         }
       })
       .catch(err => console.error('Auth sync failed:', err));
-  }, [team]);
+  }, []);
 
   useEffect(() => {
     if (isConnected && socket) {
@@ -237,7 +237,7 @@ export default function DashboardPage() {
     if (savedSolver) {
       setActiveSolver(JSON.parse(savedSolver));
     }
-  }, [team]);
+  }, []);
 
   const handleUpload = async () => {
     if (!activeSnippet || !activeSolver) {

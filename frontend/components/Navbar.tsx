@@ -33,7 +33,7 @@ export default function Navbar() {
         setTeam(JSON.parse(savedTeam));
       }, 0);
     }
-  }, [team]);
+  }, []);
 
   const handleLogout = () => {
     clearAuthToken();

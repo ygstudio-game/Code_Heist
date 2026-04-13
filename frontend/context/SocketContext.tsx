@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { getAuthToken } from '@/lib/api';
 
@@ -45,31 +45,24 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       setIsConnected(false);
     });
 
-    if (socket !== socketInstance) {
-      // Use timeout to resolve cascading render warning
-      const timer = setTimeout(() => setSocket(socketInstance), 0);
-      return () => {
-        clearTimeout(timer);
-        socketInstance.disconnect();
-      };
-    }
+    setSocket(socketInstance);
 
     return () => {
       socketInstance.disconnect();
     };
-  }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  const joinTeamRoom = (teamId: string) => {
+  const joinTeamRoom = useCallback((teamId: string) => {
     if (socket) {
       socket.emit('join-team', teamId);
     }
-  };
+  }, [socket]);
 
-  const joinAuctionRoom = () => {
+  const joinAuctionRoom = useCallback(() => {
     if (socket) {
       socket.emit('join-auction');
     }
-  };
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, joinTeamRoom, joinAuctionRoom }}>
