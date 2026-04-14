@@ -207,9 +207,16 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
       if (existingClaimForSnippet.solverName === solverName) {
         return res.json({ message: 'Welcome back, Operator. Resuming engagement.', claim: existingClaimForSnippet });
       }
-      return res.status(400).json({
-        error: `Sector already engaged by ${existingClaimForSnippet.solverName || 'a teammate'}.`
+      
+      // Remove other user's claim so this user can take it.
+      // The previous user can still work and submit on this problem since their session stays active, 
+      // but they are freed up to claim another problem if needed.
+      await (prisma as any).submission.delete({
+        where: { id: existingClaimForSnippet.id }
       });
+      
+      const io = getIO();
+      io.to(`team:${teamId}`).emit('claim:released', { snippetId });
     }
 
     // 3. Check if this SOLVER has already claimed ANY snippet
@@ -221,9 +228,15 @@ export const claimSnippet = async (req: AuthRequest, res: Response) => {
       if (existingClaimBySolver.snippetId === snippetId) {
         return res.json({ message: 'Welcome back, Operator. Resuming engagement.', claim: existingClaimBySolver });
       }
-      return res.status(400).json({
-        error: `OPERATOR ALERT: ${solverName} is already assigned to Objective #${existingClaimBySolver.snippetId.slice(0, 8)}.`
+      
+      // Remove all claims from this solver on OTHER snippets so they can switch
+      await (prisma as any).submission.deleteMany({
+        where: { teamId, solverName, snippetId: { not: snippetId } }
       });
+      
+      const io = getIO();
+      // Emit release for the old snippet they were assigned to
+      io.to(`team:${teamId}`).emit('claim:released', { snippetId: existingClaimBySolver.snippetId });
     }
 
     // 4. Check if this CATEGORY has already been claimed by someone else in the team

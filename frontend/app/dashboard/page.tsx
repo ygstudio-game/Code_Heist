@@ -219,10 +219,13 @@ export default function DashboardPage() {
     }
 
     // 2. Check if the target snippet is taken by another teammate
+    // Removed to allow taking over the problem
+    /*
     if (snippet.claimant && snippet.claimant !== activeSolver?.name) {
       toast.error(`TAKEN: This problem is being handled by ${snippet.claimant}.`);
       return;
     }
+    */
 
     // 3. If not claimed by us, try to claim it
     if (snippet.claimant !== activeSolver?.name && activeSolver) {
@@ -475,21 +478,30 @@ export default function DashboardPage() {
                 return (
                 <div 
                   key={snippet.id} 
-                  onClick={() => !isClaimedByOther && !isCategoryClaimedByOther && handleSnippetSelect(snippet)}
+                  onClick={() => !isCategoryClaimedByOther && handleSnippetSelect(snippet)}
                   className={`p-4 border transition-all relative group rounded-sm ${
                     activeSnippet?.id === snippet.id 
                     ? 'border-primary bg-primary/5 shadow-[0_0_15px_rgba(0,229,255,0.1)]' 
                     : snippet.submissionStatus === 'VERIFIED'
                     ? 'border-success/30 bg-success/5 hover:border-success/60'
-                    : (isClaimedByOther || isCategoryClaimedByOther)
+                    : isCategoryClaimedByOther
                     ? 'border-danger/20 bg-danger/5 opacity-80 cursor-not-allowed'
+                    : isClaimedByOther
+                    ? 'border-primary/20 bg-primary/5 hover:border-primary/40 hover:bg-primary/10 cursor-pointer'
                     : 'border-white/5 bg-white/[0.02] hover:border-primary/40 hover:bg-primary/5 cursor-pointer'
                   }`}
                 >
-                  {(isClaimedByOther || isCategoryClaimedByOther) && (
+                  {isCategoryClaimedByOther && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 backdrop-blur-[1px]">
                       <span className="text-[7px] text-danger font-bold uppercase tracking-[2px] rotate-[-5deg] border border-danger p-1 bg-black text-center max-w-[80%]">
-                        {isClaimedByOther ? `Taken by ${snippet.claimant}` : `Category Taken: ${snippet.category}`}
+                        Category Taken: {snippet.category}
+                      </span>
+                    </div>
+                  )}
+                  {isClaimedByOther && !isCategoryClaimedByOther && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[8px] text-primary font-bold uppercase tracking-[2px] border border-primary p-1 bg-black text-center max-w-[80%]">
+                        Click to Take Over from {snippet.claimant}
                       </span>
                     </div>
                   )}
