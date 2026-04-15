@@ -7,8 +7,15 @@ import { Users, RefreshCw, AlertTriangle, Activity, TrendingUp, ShieldAlert, Tim
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import BootSequence from '@/components/BootSequence';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
-import { Submission, Snippet, AuctionBid, GameState } from '@/types';
+
+import { Submission, Snippet, AuctionBid, GameState, Team } from '@/types';
 import { useSocket } from '@/context/SocketContext';
 import { useSystemState } from '@/hooks/useSystemState';
 
@@ -43,6 +50,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isAutoPilot, setIsAutoPilot] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [inactivityTimeLeft, setInactivityTimeLeft] = useState<number | null>(null);
   const { socket, isConnected } = useSocket();
   const { phase, updatePhase } = useSystemState();
@@ -552,25 +560,64 @@ export default function AdminDashboard() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {gameState.teams.map(team => (
-                <div key={team.id} className="relative group">
-                  <TeamCard team={team} />
-                  <div className="absolute inset-0 bg-background/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity p-4 border border-primary/30 backdrop-blur-sm z-20">
-                    <p className="text-[10px] text-primary mb-4 tracking-widest uppercase font-bold text-center border-b border-primary/20 pb-2 w-full">Team: {team.name}</p>
-                    <div className="grid grid-cols-2 gap-2 w-full mb-4">
-                      <button onClick={() => handleAdjustCredits(team.id, 500)} className="bg-primary/10 border border-primary/50 text-primary hover:bg-primary/20 hover:text-white transition-colors text-[9px] font-bold py-2 uppercase tracking-widest">
-                         +500 CR
-                      </button>
-                      <button onClick={() => handleAdjustCredits(team.id, -500)} className="bg-danger/10 border border-danger/50 text-danger hover:bg-danger/20 hover:text-white transition-colors text-[9px] font-bold py-2 uppercase tracking-widest">
-                         -500 CR
-                      </button>
-                      <button onClick={() => handlePenalty(team.id, 1, 0)} className="bg-warning/10 border border-warning/50 text-warning hover:bg-warning/20 hover:text-white transition-colors text-[9px] font-bold py-2 col-span-2 uppercase tracking-widest flex items-center justify-center gap-2">
-                         <ShieldAlert size={12} /> Issue Strike
-                      </button>
-                    </div>
-                  </div>
+                <div key={team.id} className="relative cursor-pointer" onClick={() => setSelectedTeam(team)}>
+                  <TeamCard team={team} adminView />
                 </div>
               ))}
             </div>
+
+            <Dialog open={!!selectedTeam} onOpenChange={(open) => !open && setSelectedTeam(null)}>
+              <DialogContent className="sm:max-w-md bg-background border-primary/30 backdrop-blur-xl">
+                <DialogHeader>
+                  <DialogTitle className="text-primary tracking-widest uppercase font-bold text-center border-b border-primary/20 pb-4">
+                    Team Management: {selectedTeam?.name}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-2 gap-4 py-4">
+                  <button 
+                    onClick={() => {
+                      if (selectedTeam) {
+                        handleAdjustCredits(selectedTeam.id, 500);
+                        setSelectedTeam(null);
+                      }
+                    }} 
+                    className="bg-primary/10 border border-primary/50 text-primary hover:bg-primary/20 hover:text-white transition-colors text-xs font-bold py-4 uppercase tracking-widest"
+                  >
+                     +500 CR
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (selectedTeam) {
+                        handleAdjustCredits(selectedTeam.id, -500);
+                        setSelectedTeam(null);
+                      }
+                    }} 
+                    className="bg-danger/10 border border-danger/50 text-danger hover:bg-danger/20 hover:text-white transition-colors text-xs font-bold py-4 uppercase tracking-widest"
+                  >
+                     -500 CR
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (selectedTeam) {
+                        handlePenalty(selectedTeam.id, 1, 0);
+                        setSelectedTeam(null);
+                      }
+                    }} 
+                    className="bg-warning/10 border border-warning/50 text-warning hover:bg-warning/20 hover:text-white transition-colors text-xs font-bold py-4 col-span-2 uppercase tracking-widest flex items-center justify-center gap-2"
+                  >
+                     <ShieldAlert size={16} /> Issue Strike
+                  </button>
+                </div>
+                <div className="flex justify-center mt-2">
+                  <button 
+                    onClick={() => setSelectedTeam(null)}
+                    className="text-[10px] text-white/40 uppercase tracking-widest hover:text-white transition-colors"
+                  >
+                    [ Close Terminal ]
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
 
             <div className="grid grid-cols-12 gap-8 mt-12">
                <div className="col-span-12 lg:col-span-4 terminal-card border-white/5">
