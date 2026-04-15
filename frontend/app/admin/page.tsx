@@ -364,7 +364,7 @@ export default function AdminDashboard() {
                        </button>
 
                        <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-6 py-2">
-                          <span className="text-[10px] text-text/40 uppercase tracking-widest">Comp. Phase:</span>
+                          <span className="text-[10px] text-text/40 uppercase tracking-widest">Game Phase:</span>
                           <div className="flex gap-1">
                              {['AUCTION', 'CODING', 'VAULT', 'FINISHED'].map(p => (
                                 <button
@@ -384,7 +384,7 @@ export default function AdminDashboard() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-primary font-mono text-[10px] tracking-[4px] uppercase border-b border-white/5 pb-2 mb-4">
               <span className="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-              System Active // Competition Management
+              System Working // Manage Game
             </div>
             <h1 className="text-4xl font-black uppercase tracking-tighter italic">
               Admin <span className="text-white/20">Dashboard</span>
@@ -401,7 +401,7 @@ export default function AdminDashboard() {
                        <p className="text-[10px] text-primary uppercase font-mono tracking-widest leading-none mb-1">
                           Auction Live: {formatTime(auctionTimeLeft)}
                           {inactivityTimeLeft !== null && inactivityTimeLeft > 0 && (
-                             <span className="text-danger ml-2 animate-pulse">[CLOSING: {inactivityTimeLeft}s]</span>
+                             <span className="text-danger ml-2 animate-pulse">[CLOSING SOON: {inactivityTimeLeft}s]</span>
                           )}
                        </p>
                        <p className="text-sm font-bold text-white uppercase italic">{gameState.activeAuction.snippet.title}</p>
@@ -412,13 +412,13 @@ export default function AdminDashboard() {
                     <div className="w-10 h-10 bg-danger/5 border border-danger/20 flex items-center justify-center text-danger/40">
                        <ShieldAlert size={20} />
                     </div>
-                    <p className="text-[10px] text-danger/40 uppercase font-mono tracking-widest">Auction Dormant</p>
+                    <p className="text-[10px] text-danger/40 uppercase font-mono tracking-widest">No Active Auction</p>
                   </div>
                )}
              </div>
              
              {gameState?.activeAuction ? (
-                <button onClick={handleEndAuction} className="terminal-button text-[10px] py-2 px-6 border-danger/40 text-danger hover:bg-danger/10">FORCE END AUCTION</button>
+                <button onClick={handleEndAuction} className="terminal-button text-[10px] py-2 px-6 border-danger/40 text-danger hover:bg-danger/10">STOP AUCTION NOW</button>
              ) : (
                 <div className="terminal-card bg-black/40 border-white/5 p-4 space-y-4">
                    <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest block mb-4">Start Auction Round</span>
@@ -461,7 +461,7 @@ export default function AdminDashboard() {
                  <div className="px-6 py-4 border-b border-primary/20 bg-primary/10 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                        <Activity size={18} className="text-primary animate-pulse" />
-                       <span className="text-[10px] font-bold uppercase tracking-[4px] text-primary">Buy Problems Now</span>
+                       <span className="text-[10px] font-bold uppercase tracking-[4px] text-primary">Current Auction</span>
                     </div>
                     <div className="flex items-center gap-4">
                        {inactivityTimeLeft !== null && inactivityTimeLeft > 0 && (
@@ -471,7 +471,7 @@ export default function AdminDashboard() {
                           </div>
                        )}
                        <div className="text-right">
-                          <p className="text-[8px] text-primary/60 uppercase font-mono tracking-widest">Hard Limit</p>
+                          <p className="text-[8px] text-primary/60 uppercase font-mono tracking-widest">Time Limit</p>
                           <p className="text-xl font-black text-white font-mono">{formatTime(auctionTimeLeft)}</p>
                        </div>
                        <button onClick={handleEndAuction} className="bg-danger/20 hover:bg-danger text-danger hover:text-white border border-danger/30 px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all">

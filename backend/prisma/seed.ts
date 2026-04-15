@@ -73,12 +73,10 @@ async function main() {
     });
   }
 
-
-
   const snippets = [
     // --- EASY QUESTIONS ---
     {
-      title: 'C Syntax: Simple Sum',
+      title: 'Simple Sum',
       category: 'C',
       buggyCode: `#include <stdio.h>
 
@@ -106,7 +104,7 @@ int main() {
       order: 1,
     },
     {
-      title: 'C Logic: Semicolon Trap',
+      title: 'Loop Iteration',
       category: 'C',
       buggyCode: `#include <stdio.h>
 
@@ -138,7 +136,7 @@ int main() {
       order: 2,
     },
     {
-      title: 'CPP Syntax: Value Print',
+      title: 'Value Print',
       category: 'CPP',
       buggyCode: `#include <iostream>
 using namespace std;
@@ -160,7 +158,7 @@ int main() {
       order: 3,
     },
     {
-      title: 'CPP Logic: Inclusive Sum',
+      title: 'Inclusive Sum',
       category: 'CPP',
       buggyCode: `#include <iostream>
 using namespace std;
@@ -196,7 +194,7 @@ int main() {
       order: 4,
     },
     {
-      title: 'CPP Syntax: Array Bounds',
+      title: 'Array Printing',
       category: 'CPP',
       buggyCode: `#include <iostream>
 using namespace std;
@@ -226,7 +224,7 @@ int main() {
       order: 5,
     },
     {
-      title: 'Python Syntax: Condition Check',
+      title: 'Condition Check',
       category: 'PYTHON',
       buggyCode: `a = 10
 b = 20
@@ -242,7 +240,7 @@ if a < b:
       order: 6,
     },
     {
-      title: 'Python Logic: Factorial Init',
+      title: 'Factorial Calculation',
       category: 'PYTHON',
       buggyCode: `n = 5
 fact = 0
@@ -263,7 +261,7 @@ print(fact)`,
     },
     // --- MEDIUM QUESTIONS ---
     {
-      title: 'C Syntax: Comparison Fork',
+      title: 'Greater Number',
       category: 'C',
       buggyCode: `#include<stdio.h>
 
@@ -289,7 +287,7 @@ int main() {
       order: 8,
     },
     {
-      title: 'C Logic: Accumulator Loop',
+      title: 'Summation Loop',
       category: 'C',
       buggyCode: `#include<stdio.h>
 
@@ -315,7 +313,7 @@ int main() {
       order: 9,
     },
     {
-      title: 'CPP Syntax: Output Missing',
+      title: 'Value Output',
       category: 'CPP',
       buggyCode: `#include<iostream>
 using namespace std;
@@ -337,7 +335,7 @@ int main() {
       order: 10,
     },
     {
-      title: 'CPP Logic: Max Element Init',
+      title: 'Max Element',
       category: 'CPP',
       buggyCode: `#include<iostream>
 #include<vector>
@@ -377,7 +375,7 @@ int main() {
       order: 11,
     },
     {
-      title: 'CPP Logic: Vector Bounds',
+      title: 'Vector Iteration',
       category: 'CPP',
       buggyCode: `#include<iostream>
 #include<vector>
@@ -407,7 +405,7 @@ int main() {
       order: 12,
     },
     {
-      title: 'Python Syntax: Function Def',
+      title: 'Even/Odd Checker',
       category: 'PYTHON',
       buggyCode: `def check_even(n)
   if n % 2 == 0:
@@ -427,7 +425,7 @@ check_even(5)`,
       order: 13,
     },
     {
-      title: 'Python Logic: Shadowing Max',
+      title: 'Maximum Finder',
       category: 'PYTHON',
       buggyCode: `def find_max(arr):
   max = arr[0]
@@ -450,7 +448,7 @@ print(find_max([-10, -20, -3, -50]))`,
     },
     // --- WEB QUESTIONS ---
     {
-      title: 'The Phantom Counter',
+      title: 'Click Counter',
       category: 'WEB',
       buggyCode: `let count = 0;
 document.getElementById('btn').onclick = function() {
@@ -466,7 +464,7 @@ document.getElementById('btn').onclick = function() {
       order: 15,
     },
     {
-      title: 'The Invisible Alert',
+      title: 'Form Validation Alert',
       category: 'WEB',
       buggyCode: `function validate() {
    const val = document.querySelector('input').value;
@@ -484,7 +482,7 @@ document.getElementById('btn').onclick = function() {
       order: 16,
     },
     {
-      title: 'The Leaking Form',
+      title: 'Search Submission',
       category: 'WEB',
       buggyCode: `document.querySelector('form').addEventListener('submit', (e) => {
    const query = document.getElementById('search').value;
@@ -499,7 +497,7 @@ document.getElementById('btn').onclick = function() {
       order: 17,
     },
     {
-      title: 'The Array Multiplier',
+      title: 'Array Multiplier',
       category: 'WEB',
       buggyCode: `function doubleArray(arr) {
    arr.forEach(num => {
@@ -513,7 +511,7 @@ document.getElementById('btn').onclick = function() {
       order: 18,
     },
     {
-      title: 'The Broken Navigation',
+      title: 'Navigation Menu',
       category: 'WEB',
       buggyCode: `const nav = document.querySelector('.nav-links');
 document.querySelector('.menu-icon').onclick = () => {
@@ -527,7 +525,7 @@ document.querySelector('.menu-icon').onclick = () => {
       order: 19,
     },
     {
-      title: 'The Race Condition Fetch',
+      title: 'API Data Fetch',
       category: 'WEB',
       buggyCode: `async function loadData() {
    const data = fetch('https://api.heist.com/v1/targets'); 
@@ -542,7 +540,7 @@ document.querySelector('.menu-icon').onclick = () => {
       order: 20,
     },
     {
-      title: 'The Z-Index Nightmare',
+      title: 'Modal Overlay',
       category: 'WEB',
       buggyCode: `.overlay { z-index: 10; position: fixed; }
 .modal { 
@@ -556,6 +554,170 @@ document.querySelector('.menu-icon').onclick = () => {
 }`,
       expected: '/z-index:\\s*1[1-9]/',
       order: 21,
+    },
+
+    // --- NEW C QUESTIONS ---
+    {
+      title: 'Array Initialization Sequence',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main() {\n    int i, n = 5;\n    int arr[5];\n\n    for(i = 0; i <= 5; i++) {\n        arr[i] = i * 2\n    }\n\n    for(i = 0; i < n; i++) {\n        printf("%d ", arr[i]);\n    }\n\n    int sum;\n    for(i = 0; i < n; i++) {\n        sum = sum + arr[i];\n    }\n\n    if(sum = 10) {\n        printf("Sum is 10");\n    }\n\n    int x = 0;\n    while(x < 5) {\n        printf("%d", x);\n    }\n\n    int y = 10 / 0;\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main() {\n    int i, n = 5;\n    int arr[5];\n\n    for(i = 0; i < n; i++) {\n        arr[i] = i * 2;\n    }\n\n    for(i = 0; i < n; i++) {\n        printf("%d ", arr[i]);\n    }\n\n    int sum = 0;\n    for(i = 0; i < n; i++) {\n        sum = sum + arr[i];\n    }\n\n    if(sum == 20) {\n        printf("Sum is 20 ");\n    }\n\n    int x = 0;\n    while(x < 5) {\n        printf("%d", x);\n        x++;\n    }\n\n    return 0;\n}`,
+      expected: '0 2 4 6 8 Sum is 20 01234',
+      order: 22,
+    },
+    {
+      title: 'Data Accumulation Logic',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i, fact = 1, n = 5;\n\n    for (i = 1; i <= n; i++)\n        fact = fact * i;\n\n    printf("Factorial = %d\\n", fact)\n\n    int arr[3] = {1, 2, 3};\n    for (i = 0; i <= 3; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int a;\n    if (a > 0)\n    {\n        printf("Positive");\n    }\n\n    while (n > 0)\n    {\n        printf("%d", n);\n    }\n\n    int b = 10 / 0;\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i, fact = 1, n = 5;\n\n    for (i = 1; i <= n; i++)\n        fact = fact * i;\n\n    printf("Factorial = %d\\n", fact);\n\n    int arr[3] = {1, 2, 3};\n    for (i = 0; i < 3; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int a = 1;\n    if (a > 0)\n    {\n        printf("Positive");\n    }\n\n    while (n > 0)\n    {\n        printf("%d", n);\n        n--;\n    }\n\n    return 0;\n}`,
+      expected: 'Factorial = 120\n123Positive54321',
+      order: 23,
+    },
+    {
+      title: 'Nested Matrix Retrieval',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i, j;\n    int arr[4];\n\n    for (i = 0; i < 4; i++)\n    {\n        arr[i] = i;\n    }\n\n    for (i = 0; i < 4; i++)\n    {\n        for (j = 0; j < 4; j++)\n        {\n            printf("%d", arr[i]);\n        }\n    }\n\n    int sum = 0;\n    for (i = 0; i <= 4; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 0)\n        ;\n    printf("Zero");\n\n    int x = 5;\n    while (x >= 0)\n    {\n        printf("%d", x);\n    }\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i;\n    int arr[4];\n\n    for (i = 0; i < 4; i++)\n    {\n        arr[i] = i;\n    }\n\n    for (i = 0; i < 4; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int sum = 0;\n    for (i = 0; i < 4; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 6)\n        printf("Six ");\n\n    int x = 5;\n    while (x >= 0)\n    {\n        printf("%d", x);\n        x--;\n    }\n\n    return 0;\n}`,
+      expected: '0123Six 543210',
+      order: 24,
+    },
+    {
+      title: 'Counter Control Flow',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i = 0;\n\n    for (i = 0; i < 5; i++)\n        ;\n    {\n        printf("%d", i);\n    }\n\n    int arr[5];\n    for (i = 0; i < 5; i++)\n    {\n        arr[i] = i;\n    }\n\n    int total;\n    for (i = 0; i < 5; i++)\n    {\n        total = total + arr[i];\n    }\n\n    if (total == 15)\n        printf("Correct");\n\n    int z = 0;\n    while (z < 5)\n    {\n        printf("%d", z);\n    }\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i = 0;\n\n    for (i = 0; i < 5; i++)\n    {\n        printf("%d", i);\n    }\n\n    int arr[5];\n    for (i = 0; i < 5; i++)\n    {\n        arr[i] = i;\n    }\n\n    int total = 0;\n    for (i = 0; i < 5; i++)\n    {\n        total = total + arr[i];\n    }\n\n    if (total == 10)\n        printf("Correct");\n\n    int z = 0;\n    while (z < 5)\n    {\n        printf("%d", z);\n        z++;\n    }\n\n    return 0;\n}`,
+      expected: '01234Correct01234',
+      order: 25,
+    },
+    {
+      title: 'Data State Validation',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 5;\n    int arr[5];\n\n    for (i = 0; i < n; i++)\n    {\n        arr[i] = i * 3;\n    }\n\n    for (i = 0; i <= n; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int sum = 0;\n    for (i = 0; i < n; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 30)\n    {\n        printf("Sum correct");\n    }\n\n    int x;\n    if (x == 0)\n    {\n        printf("Zero");\n    }\n\n    int y = 20 / 0;\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 5;\n    int arr[5];\n\n    for (i = 0; i < n; i++)\n    {\n        arr[i] = i * 3;\n    }\n\n    for (i = 0; i < n; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int sum = 0;\n    for (i = 0; i < n; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 30)\n    {\n        printf("Sum correct");\n    }\n\n    int x = 0;\n    if (x == 0)\n    {\n        printf("Zero");\n    }\n\n    return 0;\n}`,
+      expected: '036912Sum correctZero',
+      order: 26,
+    },
+    {
+      title: 'Statistical Operation',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 5;\n    int arr[5];\n\n    for (i = 0; i < n; i++)\n    {\n        arr[i] = i + 1;\n    }\n\n    for (i = 0; i <= n; i++)\n    {\n        printf("%d ", arr[i]);\n    }\n\n    int avg;\n    for (i = 0; i < n; i++)\n    {\n        avg += arr[i];\n    }\n\n    avg = avg / n;\n\n    if (avg = 3)\n    {\n        printf("Average is 3");\n    }\n\n    int x = 0;\n    while (x < 5)\n    {\n        printf("%d", x);\n    }\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 5;\n    int arr[5];\n\n    for (i = 0; i < n; i++)\n    {\n        arr[i] = i + 1;\n    }\n\n    for (i = 0; i < n; i++)\n    {\n        printf("%d ", arr[i]);\n    }\n\n    int avg = 0;\n    for (i = 0; i < n; i++)\n    {\n        avg += arr[i];\n    }\n\n    avg = avg / n;\n\n    if (avg == 3)\n    {\n        printf("Average is 3 ");\n    }\n\n    int x = 0;\n    while (x < 5)\n    {\n        printf("%d", x);\n        x++;\n    }\n\n    return 0;\n}`,
+      expected: '1 2 3 4 5 Average is 3 01234',
+      order: 27,
+    },
+    {
+      title: 'Peak Detection Sequence',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 4;\n    int arr[4] = {1, 2, 3, 4};\n\n    for (i = 0; i < n; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int max;\n    for (i = 0; i < n; i++)\n    {\n        if (arr[i] > max)\n        {\n            max = arr[i];\n        }\n    }\n\n    printf("Max = %d", max)\n\n    int j = 0;\n    while (j < n)\n    {\n        printf("%d", j);\n    }\n\n    int z = 5 / 0;\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 4;\n    int arr[4] = {1, 2, 3, 4};\n\n    for (i = 0; i < n; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int max = arr[0];\n    for (i = 1; i < n; i++)\n    {\n        if (arr[i] > max)\n        {\n            max = arr[i];\n        }\n    }\n\n    printf("Max = %d", max);\n\n    int j = 0;\n    while (j < n)\n    {\n        printf("%d", j);\n        j++;\n    }\n\n    return 0;\n}`,
+      expected: '1234Max = 40123',
+      order: 28,
+    },
+    {
+      title: 'Condition Processing Block',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i;\n    int arr[3] = {1, 2, 3};\n\n    for (i = 0; i <= 3; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int sum = 0;\n    for (i = 0; i < 3; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 6)\n        ;\n    printf("Correct");\n\n    int x = 1;\n    while (x <= 5)\n    {\n        printf("%d", x);\n    }\n\n    int a;\n    if (a < 0)\n    {\n        printf("Negative");\n    }\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i;\n    int arr[3] = {1, 2, 3};\n\n    for (i = 0; i < 3; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int sum = 0;\n    for (i = 0; i < 3; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 6)\n        printf("Correct");\n\n    int x = 1;\n    while (x <= 5)\n    {\n        printf("%d", x);\n        x++;\n    }\n\n    int a = -1;\n    if (a < 0)\n    {\n        printf("Negative");\n    }\n\n    return 0;\n}`,
+      expected: '123Correct12345Negative',
+      order: 29,
+    },
+    {
+      title: 'Buffer Iteration Protocol',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 5;\n    int arr[5];\n\n    for (i = 0; i < n; i++)\n    {\n        arr[i] = i;\n    }\n\n    for (i = 0; i < n; i++)\n    {\n        printf("%d", arr[i])\n    }\n\n    int total = 0;\n    for (i = 0; i <= n; i++)\n    {\n        total += arr[i];\n    }\n\n    if (total == 10)\n    {\n        printf("OK");\n    }\n\n    int x = 10;\n    while (x > 0)\n    {\n        printf("%d", x);\n    }\n\n    int y = 10 / 0;\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i, n = 5;\n    int arr[5];\n\n    for (i = 0; i < n; i++)\n    {\n        arr[i] = i;\n    }\n\n    for (i = 0; i < n; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int total = 0;\n    for (i = 0; i < n; i++)\n    {\n        total += arr[i];\n    }\n\n    if (total == 10)\n    {\n        printf("OK");\n    }\n\n    int x = 10;\n    while (x > 0)\n    {\n        printf("%d ", x);\n        x--;\n    }\n\n    return 0;\n}`,
+      expected: '01234OK10 9 8 7 6 5 4 3 2 1 ',
+      order: 30,
+    },
+    {
+      title: 'Numerical Evaluation Engine',
+      category: 'C',
+      buggyCode: `#include <stdio.h>\n\nint main()\n{\n    int i;\n    int arr[5];\n\n    for (i = 0; i < 5; i++)\n    {\n        arr[i] = i * 2;\n    }\n\n    for (i = 0; i < 5; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int sum;\n    for (i = 0; i < 5; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 20)\n    {\n        printf("Correct");\n    }\n\n    int k = 0;\n    while (k < 5)\n    {\n        printf("%d", k);\n    }\n\n    int d = 0 / 0;\n\n    return 0;\n}`,
+      solution: `#include <stdio.h>\n\nint main()\n{\n    int i;\n    int arr[5];\n\n    for (i = 0; i < 5; i++)\n    {\n        arr[i] = i * 2;\n    }\n\n    for (i = 0; i < 5; i++)\n    {\n        printf("%d", arr[i]);\n    }\n\n    int sum = 0;\n    for (i = 0; i < 5; i++)\n    {\n        sum += arr[i];\n    }\n\n    if (sum == 20)\n    {\n        printf("Correct");\n    }\n\n    int k = 0;\n    while (k < 5)\n    {\n        printf("%d", k);\n        k++;\n    }\n\n    return 0;\n}`,
+      expected: '02468Correct01234',
+      order: 31,
+    },
+
+    // --- NEW PYTHON QUESTIONS ---
+    {
+      title: 'List Generation Script',
+      category: 'PYTHON',
+      buggyCode: `n = 5\narr = [0]*5\n\nfor i in range(0, 6):\n    arr[i] = i * 2\n\nfor i in range(n):\n    print(arr[i])\n\nsum = 0\nfor i in range(n):\n    sum = sum + arr[i]\n\nif sum = 10:\n    print("Sum is 10")\n\nx = 0\nwhile x < 5:\n    print(x)\n\ny = 10/0`,
+      solution: `n = 5\narr = [0]*5\n\nfor i in range(5):\n    arr[i] = i * 2\n\nfor i in range(n):\n    print(arr[i], end="")\n\nsum = 0\nfor i in range(n):\n    sum = sum + arr[i]\n\nif sum == 20:\n    print("Sum is 20", end="")\n\nx = 0\nwhile x < 5:\n    print(x, end="")\n    x += 1`,
+      expected: '02468Sum is 2001234',
+      order: 32,
+    },
+    {
+      title: 'Math Iteration Block',
+      category: 'PYTHON',
+      buggyCode: `n = 5\nfact = 1\n\nfor i in range(1, n+1):\n    fact = fact * i\n\nprint("Factorial:", fact\n\narr = [1,2,3]\n\nfor i in range(0,4):\n    print(arr[i])\n\na\nif a > 0:\n    print("Positive")\n\nwhile n > 0:\n    print(n)\n\nb = 10/0`,
+      solution: `n = 5\nfact = 1\n\nfor i in range(1, n+1):\n    fact = fact * i\n\nprint("Factorial:", fact)\n\narr = [1,2,3]\nfor i in range(0,3):\n    print(arr[i], end="")\n\na = 1\nif a > 0:\n    print("Positive")\n\nwhile n > 0:\n    print(n, end="")\n    n -= 1`,
+      expected: 'Factorial: 120\n123Positive\n54321',
+      order: 33,
+    },
+    {
+      title: 'Matrix Parsing Rule',
+      category: 'PYTHON',
+      buggyCode: `arr = [1,2,3,4]\n\nfor i in range(4):\n    for j in range(4):\n        print(arr[i])\n\nsum = 0\nfor i in range(5):\n    sum += arr[i]\n\nif sum == 0:\n    pass\n\nx = 5\nwhile x >= 0:\n    print(x)`,
+      solution: `arr = [1,2,3,4]\n\nfor i in range(4):\n    print(arr[i], end="")\n\nsum = 0\nfor i in range(4):\n    sum += arr[i]\n\nif sum == 10:\n    print("Ten", end="")\n\nx = 5\nwhile x >= 0:\n    print(x, end="")\n    x -= 1`,
+      expected: '1234Ten543210',
+      order: 34,
+    },
+    {
+      title: 'Memory Pointer Loop',
+      category: 'PYTHON',
+      buggyCode: `i = 0\n\nfor i in range(5):\n    pass\n\nprint(i)\n\narr = [0]*5\nfor i in range(5):\n    arr[i] = i\n\ntotal = 0\nfor i in range(5):\n    total = total + arr[i]\n\nif total == 15:\n    print("Correct")\n\nz = 0\nwhile z < 5:\n    print(z)`,
+      solution: `for i in range(5):\n    print(i, end="")\n\narr = [0]*5\nfor i in range(5):\n    arr[i] = i\n\ntotal = 0\nfor i in range(5):\n    total = total + arr[i]\n\nif total == 10:\n    print("Correct", end="")\n\nz = 0\nwhile z < 5:\n    print(z, end="")\n    z += 1`,
+      expected: '01234Correct01234',
+      order: 35,
+    },
+    {
+      title: 'Allocation Function',
+      category: 'PYTHON',
+      buggyCode: `n = 5\narr = []\n\nfor i in range(n):\n    arr[i] = i * 3\n\nfor i in range(n+1):\n    print(arr[i])\n\nsum = 0\nfor i in range(n):\n    sum += arr[i]\n\nif sum == 30:\n    print("Sum correct")\n\nx\nif x == 0:\n    print("Zero")\n\ny = 20/0`,
+      solution: `n = 5\narr = []\n\nfor i in range(n):\n    arr.append(i * 3)\n\nfor i in range(n):\n    print(arr[i], end="")\n\nsum = 0\nfor i in range(n):\n    sum += arr[i]\n\nif sum == 30:\n    print("Sum correct", end="")\n\nx = 0\nif x == 0:\n    print("Zero", end="")`,
+      expected: '036912Sum correctZero',
+      order: 36,
+    },
+    {
+      title: 'Formula Processor',
+      category: 'PYTHON',
+      buggyCode: `n = 5\narr = [0]*5\n\nfor i in range(n):\n    arr[i] = i + 1\n\nfor i in range(n+1):\n    print(arr[i])\n\navg = 0\nfor i in range(n):\n    avg += arr[i]\n\navg = avg / n\n\nif avg = 3:\n    print("Average is 3")\n\nx = 0\nwhile x < 5:\n    print(x)`,
+      solution: `n = 5\narr = [0]*5\n\nfor i in range(n):\n    arr[i] = i + 1\n\nfor i in range(n):\n    print(arr[i], end="")\n\navg = 0\nfor i in range(n):\n    avg += arr[i]\n\navg = avg / n\n\nif avg == 3:\n    print("Average is 3", end="")\n\nx = 0\nwhile x < 5:\n    print(x, end="")\n    x += 1`,
+      expected: '12345Average is 301234',
+      order: 37,
+    },
+    {
+      title: 'Value Comparison Check',
+      category: 'PYTHON',
+      buggyCode: `arr = [1,2,3,4]\nn = 4\n\nfor i in range(n):\n    print(arr[i])\n\nmax_val\nfor i in range(n):\n    if arr[i] > max_val:\n        max_val = arr[i]\n\nprint("Max =", max_val\n\nj = 0\nwhile j < n:\n    print(j)\n\nz = 5/0`,
+      solution: `arr = [1,2,3,4]\nn = 4\n\nfor i in range(n):\n    print(arr[i], end="")\n\nmax_val = arr[0]\nfor i in range(n):\n    if arr[i] > max_val:\n        max_val = arr[i]\n\nprint("Max =", max_val, end="")\n\nj = 0\nwhile j < n:\n    print(j, end="")\n    j += 1`,
+      expected: '1234Max = 40123',
+      order: 38,
+    },
+    {
+      title: 'State Verification Loop',
+      category: 'PYTHON',
+      buggyCode: `arr = [1,2,3]\n\nfor i in range(4):\n    print(arr[i])\n\nsum = 0\nfor i in range(3):\n    sum += arr[i]\n\nif sum == 6:\n    pass\n\nx = 1\nwhile x <= 5:\n    print(x)\n\na\nif a < 0:\n    print("Negative")`,
+      solution: `arr = [1,2,3]\n\nfor i in range(3):\n    print(arr[i], end="")\n\nsum = 0\nfor i in range(3):\n    sum += arr[i]\n\nif sum == 6:\n    print("Six", end="")\n\nx = 1\nwhile x <= 5:\n    print(x, end="")\n    x += 1\n\na = -1\nif a < 0:\n    print("Negative", end="")`,
+      expected: '123Six12345Negative',
+      order: 39,
+    },
+    {
+      title: 'Array Data Extraction',
+      category: 'PYTHON',
+      buggyCode: `n = 5\narr = [0]*5\n\nfor i in range(n):\n    arr[i] = i\n\nfor i in range(n):\n    print(arr[i]\n\ntotal = 0\nfor i in range(n+1):\n    total += arr[i]\n\nif total == 10:\n    print("OK")\n\nx = 10\nwhile x > 0:\n    print(x)\n\ny = 10/0`,
+      solution: `n = 5\narr = [0]*5\n\nfor i in range(n):\n    arr[i] = i\n\nfor i in range(n):\n    print(arr[i], end="")\n\ntotal = 0\nfor i in range(n):\n    total += arr[i]\n\nif total == 10:\n    print("OK", end="")\n\nx = 10\nwhile x > 0:\n    print(x, end="")\n    x -= 1`,
+      expected: '01234OK10987654321',
+      order: 40,
+    },
+    {
+      title: 'Accumulator Function',
+      category: 'PYTHON',
+      buggyCode: `arr = []\n\nfor i in range(5):\n    arr[i] = i * 2\n\nfor i in range(5):\n    print(arr[i])\n\nsum = 0\nfor i in range(5):\n    sum += arr[i]\n\nif sum == 20:\n    print("Correct")\n\nk = 0\nwhile k < 5:\n    print(k)\n\nd = 0/0`,
+      solution: `arr = []\n\nfor i in range(5):\n    arr.append(i * 2)\n\nfor i in range(5):\n    print(arr[i], end="")\n\nsum = 0\nfor i in range(5):\n    sum += arr[i]\n\nif sum == 20:\n    print("Correct", end="")\n\nk = 0\nwhile k < 5:\n    print(k, end="")\n    k += 1`,
+      expected: '02468Correct01234',
+      order: 41,
     },
   ];
 
@@ -579,8 +741,6 @@ document.querySelector('.menu-icon').onclick = () => {
       },
     });
   }
-
-
 
   // 4. Initialize System State
   await prisma.systemState.upsert({

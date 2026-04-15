@@ -39,6 +39,15 @@ interface Team {
   createdAt: string;
 }
 
+// Auto-generate username from team name
+function generateUsername(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s_-]/g, '')
+    .replace(/\s+/g, '_');
+}
+
 export default function AdminTeams() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +60,6 @@ export default function AdminTeams() {
   // Create Form State
   const [newTeam, setNewTeam] = useState({
     name: '',
-    accessKey: '',
     password: '',
     members: ['', '']
   });
@@ -89,42 +97,49 @@ export default function AdminTeams() {
 
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
+    const accessKey = generateUsername(newTeam.name);
+    if (!accessKey) {
+      notify('error', 'Please enter a team name.');
+      return;
+    }
     try {
       const res = await fetchWithAuth('/admin/teams', {
         method: 'POST',
         body: JSON.stringify({
-          ...newTeam,
+          name: newTeam.name,
+          accessKey,
+          password: newTeam.password,
           members: newTeam.members.filter(m => m.trim() !== '')
         })
       });
 
       if (res.ok) {
-        notify('success', 'Squad deployed successfully.');
+        notify('success', 'Team created!');
         setShowCreateModal(false);
-        setNewTeam({ name: '', accessKey: '', password: '', members: ['', ''] });
+        setNewTeam({ name: '', password: '', members: ['', ''] });
         fetchTeams();
       } else {
         const data = await res.json();
-        notify('error', data.error || 'Uplink failed.');
+        notify('error', data.error || 'Failed to create team.');
       }
     } catch {
-      notify('error', 'Network failure.');
+      notify('error', 'Network error.');
     }
   };
 
   const handleDeleteTeam = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to decommission squad: ${name}?`)) return;
+    if (!confirm(`Are you sure you want to delete team: ${name}?`)) return;
 
     try {
       const res = await fetchWithAuth(`/admin/teams/${id}`, { method: 'DELETE' });
       if (res.ok) {
-        notify('success', 'Squad decommissioned.');
+        notify('success', 'Team deleted.');
         fetchTeams();
       } else {
-        notify('error', 'Decommissioning failed.');
+        notify('error', 'Failed to delete team.');
       }
     } catch {
-      notify('error', 'Network failure.');
+      notify('error', 'Network error.');
     }
   };
 
@@ -139,14 +154,14 @@ export default function AdminTeams() {
       });
 
       if (res.ok) {
-        notify('success', 'Access key credentials updated.');
+        notify('success', 'Password updated.');
         setShowResetModal(null);
         setResetPassword('');
       } else {
-        notify('error', 'Credential update failed.');
+        notify('error', 'Failed to update password.');
       }
     } catch {
-      notify('error', 'Network failure.');
+      notify('error', 'Network error.');
     }
   };
 
@@ -173,11 +188,11 @@ export default function AdminTeams() {
                 <Users className="text-primary" size={20} />
               </div>
               <h1 className="text-3xl font-black uppercase tracking-tighter italic">
-                Squad <span className="text-primary">Management</span>
+                Team <span className="text-primary">Management</span>
               </h1>
             </div>
             <p className="text-text/40 text-[10px] uppercase tracking-[4px] font-bold">
-              Aegis Command // Participant Oversight
+              Manage All Teams
             </p>
           </div>
 
@@ -186,10 +201,10 @@ export default function AdminTeams() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text/20 group-focus-within:text-primary transition-colors" size={16} />
               <input 
                 type="text"
-                placeholder="SEARCH SQUADS / KEYS..."
+                placeholder="Search teams..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-white/[0.03] border border-white/5 pl-10 pr-4 py-2.5 rounded-sm text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-primary/40 focus:bg-primary/5 transition-all w-full md:w-64"
+                className="bg-white/[0.03] border border-white/5 pl-10 pr-4 py-2.5 rounded-sm text-[10px] font-bold tracking-widest focus:outline-none focus:border-primary/40 focus:bg-primary/5 transition-all w-full md:w-64"
               />
             </div>
             <button 
@@ -197,16 +212,16 @@ export default function AdminTeams() {
               className="bg-primary text-black px-6 py-2.5 rounded-sm text-[10px] font-black uppercase tracking-[2px] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]"
             >
               <UserPlus size={16} />
-              Deploy Squad
+              Create Team
             </button>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <StatCard label="Total Squads" value={teams.length} icon={<Users size={16} />} color="primary" />
-          <StatCard label="Active Personnel" value={teams.reduce((acc, t) => acc + t.members.length, 0)} icon={<Shield size={16} />} color="danger" />
-          <StatCard label="Total Submissions" value={teams.reduce((acc, t) => acc + t._count.submissions, 0)} icon={<Plus size={16} />} color="primary" />
+          <StatCard label="Total Teams" value={teams.length} icon={<Users size={16} />} color="primary" />
+          <StatCard label="Total Members" value={teams.reduce((acc, t) => acc + t.members.length, 0)} icon={<Shield size={16} />} color="danger" />
+          <StatCard label="Total Answers" value={teams.reduce((acc, t) => acc + t._count.submissions, 0)} icon={<Plus size={16} />} color="primary" />
           <StatCard label="Total Bids" value={teams.reduce((acc, t) => acc + t._count.bids, 0)} icon={<Key size={16} />} color="danger" />
         </div>
 
@@ -216,9 +231,9 @@ export default function AdminTeams() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40">Squad Detail</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40">Access Link</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40 text-center">Resources</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40">Team Info</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40">Username</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40 text-center">Credits</th>
                   <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40 text-center">Activity</th>
                   <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-text/40 text-right">Actions</th>
                 </tr>
@@ -229,14 +244,14 @@ export default function AdminTeams() {
                     <td colSpan={5} className="px-6 py-24 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-[10px] font-bold uppercase tracking-[4px] text-text/20">Scanning Network...</p>
+                        <p className="text-[10px] font-bold uppercase tracking-[4px] text-text/20">Loading...</p>
                       </div>
                     </td>
                   </tr>
                 ) : filteredTeams.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-24 text-center text-text/20 uppercase text-xs font-bold tracking-widest">
-                      No Squads Detected in Sector
+                      No teams found
                     </td>
                   </tr>
                 ) : (
@@ -248,10 +263,10 @@ export default function AdminTeams() {
                             {team.name ? team.name[0].toUpperCase() : '?'}
                           </div>
                           <div>
-                            <div className="text-xs font-black uppercase tracking-tight mb-0.5 group-hover:text-primary transition-colors">{team.name}</div>
+                            <div className="text-xs font-black tracking-tight mb-0.5 group-hover:text-primary transition-colors">{team.name}</div>
                             <div className="flex gap-1">
                               {team.members.map((m, i) => (
-                                <span key={i} className="text-[8px] text-text/30 font-bold uppercase py-0.5 px-1 bg-white/5 rounded-[2px]">
+                                <span key={i} className="text-[8px] text-text/30 font-bold py-0.5 px-1 bg-white/5 rounded-[2px]">
                                   {m.name}
                                 </span>
                               ))}
@@ -277,7 +292,7 @@ export default function AdminTeams() {
                         <div className="flex justify-center gap-4">
                           <div className="flex flex-col items-center">
                             <span className="text-xs font-black text-text/60">{team._count.submissions}</span>
-                            <span className="text-[8px] text-text/20 uppercase font-bold">Heists</span>
+                            <span className="text-[8px] text-text/20 uppercase font-bold">Answers</span>
                           </div>
                           <div className="flex flex-col items-center">
                             <span className="text-xs font-black text-text/60">{team.strikes}</span>
@@ -290,14 +305,14 @@ export default function AdminTeams() {
                           <button 
                             onClick={() => setShowResetModal(team.id)}
                             className="p-2 bg-white/5 border border-white/5 rounded-sm text-text/40 hover:text-primary hover:border-primary/20 transition-all hover:bg-primary/5"
-                            title="Reset Credentials"
+                            title="Reset Password"
                           >
                             <Key size={14} />
                           </button>
                           <button 
                             onClick={() => handleDeleteTeam(team.id, team.name)}
                             className="p-2 bg-white/5 border border-white/5 rounded-sm text-text/40 hover:text-danger hover:border-danger/20 transition-all hover:bg-danger/5"
-                            title="Decommission Squad"
+                            title="Delete Team"
                           >
                             <Trash2 size={14} />
                           </button>
@@ -328,8 +343,8 @@ export default function AdminTeams() {
           <div className="bg-background border border-white/10 w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
             <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
               <div>
-                <h3 className="text-xl font-black uppercase tracking-tighter italic">Deploy <span className="text-primary">Squad</span></h3>
-                <p className="text-[8px] text-text/30 uppercase tracking-[3px] font-bold">Sector 4 Access Authorization</p>
+                <h3 className="text-xl font-black uppercase tracking-tighter italic">Create <span className="text-primary">Team</span></h3>
+                <p className="text-[8px] text-text/30 uppercase tracking-[3px] font-bold">Add a new team</p>
               </div>
               <button 
                 onClick={() => setShowCreateModal(false)}
@@ -340,33 +355,25 @@ export default function AdminTeams() {
             </div>
             
             <form onSubmit={handleCreateTeam} className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">Squad Callsign</label>
-                  <input 
-                    type="text"
-                    required
-                    placeholder="ALPHA UNIT"
-                    value={newTeam.name}
-                    onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/5 rounded-sm p-4 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-primary/40 transition-all font-geist-mono"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">Access Key ID</label>
-                  <input 
-                    type="text"
-                    required
-                    placeholder="KEY-123"
-                    value={newTeam.accessKey}
-                    onChange={(e) => setNewTeam({ ...newTeam, accessKey: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/5 rounded-sm p-4 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-primary/40 transition-all font-geist-mono text-primary"
-                  />
-                </div>
+              <div className="space-y-2">
+                <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">Team Name</label>
+                <input 
+                  type="text"
+                  required
+                  placeholder="Enter team name"
+                  value={newTeam.name}
+                  onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-sm p-4 text-sm focus:outline-none focus:border-primary/40 transition-all font-geist-mono"
+                />
+                {newTeam.name && (
+                  <p className="text-[10px] text-text/40 font-geist-mono">
+                    Username: <span className="text-primary font-bold">{generateUsername(newTeam.name)}</span>
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">Initial Password</label>
+                <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">Password</label>
                 <div className="relative">
                   <input 
                     type={showPass ? "text" : "password"}
@@ -374,7 +381,7 @@ export default function AdminTeams() {
                     placeholder="••••••••"
                     value={newTeam.password}
                     onChange={(e) => setNewTeam({ ...newTeam, password: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/5 rounded-sm p-4 pr-12 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-primary/40 transition-all font-geist-mono"
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-sm p-4 pr-12 text-sm focus:outline-none focus:border-primary/40 transition-all font-geist-mono"
                   />
                   <button 
                     type="button"
@@ -387,19 +394,19 @@ export default function AdminTeams() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">Personnel Assigned</label>
+                <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">Team Members</label>
                 {newTeam.members.map((member, i) => (
                   <div key={i} className="flex gap-2">
                     <input 
                       type="text"
-                      placeholder={`OPERATIVE ${i + 1}`}
+                      placeholder={`Member ${i + 1}`}
                       value={member}
                       onChange={(e) => {
                         const m = [...newTeam.members];
                         m[i] = e.target.value;
                         setNewTeam({ ...newTeam, members: m });
                       }}
-                      className="flex-1 bg-white/[0.03] border border-white/5 rounded-sm px-4 py-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-white/10 transition-all"
+                      className="flex-1 bg-white/[0.03] border border-white/5 rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-white/10 transition-all font-geist-mono"
                     />
                     {newTeam.members.length > 1 && (
                       <button 
@@ -420,7 +427,7 @@ export default function AdminTeams() {
                   onClick={() => setNewTeam({ ...newTeam, members: [...newTeam.members, ''] })}
                   className="text-[8px] font-black uppercase tracking-[2px] text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5 px-1 py-1"
                 >
-                  <Plus size={10} /> Add Operative
+                  <Plus size={10} /> Add Member
                 </button>
               </div>
 
@@ -430,13 +437,13 @@ export default function AdminTeams() {
                   onClick={() => setShowCreateModal(false)}
                   className="flex-1 px-6 py-4 rounded-sm text-[10px] font-black uppercase tracking-[2px] border border-white/5 text-text/40 hover:bg-white/5 transition-all"
                 >
-                  Abort
+                  Cancel
                 </button>
                 <button 
                   type="submit"
                   className="flex-1 px-6 py-4 rounded-sm text-[10px] font-black uppercase tracking-[2px] bg-primary text-black shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
-                  Confirm Deployment
+                  Create Team
                 </button>
               </div>
             </form>
@@ -450,8 +457,8 @@ export default function AdminTeams() {
           <div className="bg-background border border-white/10 w-full max-w-sm overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
             <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
               <div>
-                <h3 className="text-xl font-black uppercase tracking-tighter italic">Reset <span className="text-danger">Access</span></h3>
-                <p className="text-[8px] text-text/30 uppercase tracking-[3px] font-bold">Credential Override</p>
+                <h3 className="text-xl font-black uppercase tracking-tighter italic">Reset <span className="text-danger">Password</span></h3>
+                <p className="text-[8px] text-text/30 uppercase tracking-[3px] font-bold">Change Password</p>
               </div>
               <button 
                 onClick={() => setShowResetModal(null)}
@@ -463,7 +470,7 @@ export default function AdminTeams() {
             
             <form onSubmit={handleResetPassword} className="p-8 space-y-6">
               <div className="space-y-2">
-                <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">New Override Password</label>
+                <label className="text-[8px] text-text/40 uppercase tracking-[2px] font-black">New Password</label>
                 <div className="relative">
                   <input 
                     type={showPass ? "text" : "password"}
@@ -472,7 +479,7 @@ export default function AdminTeams() {
                     placeholder="••••••••"
                     value={resetPassword}
                     onChange={(e) => setResetPassword(e.target.value)}
-                    className="w-full bg-white/[0.03] border border-white/5 rounded-sm p-4 pr-12 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-danger/40 transition-all font-geist-mono"
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-sm p-4 pr-12 text-sm focus:outline-none focus:border-danger/40 transition-all font-geist-mono"
                   />
                   <button 
                     type="button"
@@ -496,7 +503,7 @@ export default function AdminTeams() {
                   type="submit"
                   className="flex-1 px-6 py-4 rounded-sm text-[10px] font-black uppercase tracking-[2px] bg-danger text-white shadow-[0_0_20px_rgba(255,0,0,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
-                  Reset Link
+                  Reset Password
                 </button>
               </div>
             </form>

@@ -32,7 +32,7 @@ export default function LoginPage() {
         // Set cookie for middleware
         document.cookie = `token=${data.token}; path=/; max-age=86400; SameSite=Strict`;
         toast.success('LINK ESTABLISHED: Welcome to the heist.');
-        
+
         // Role-based routing
         if (data.team.role === 'ADMIN') {
           router.push('/admin');
@@ -53,7 +53,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden grid-bg-subtle">
       <div className="scanline"></div>
       <div className="particle-bg"></div>
-      
+
       <div className="terminal-card w-full max-w-md z-10 p-12 border-white/5 animate-in fade-in zoom-in duration-700 ease-out">
         <div className="flex flex-col items-center mb-12">
           <div className="w-20 h-20 bg-primary/5 rounded-sm flex items-center justify-center mb-6 border border-primary/30 relative group overflow-hidden">
@@ -61,30 +61,30 @@ export default function LoginPage() {
             <Terminal className="text-primary glow-text relative z-10" size={32} />
           </div>
           <h1 className="text-4xl font-black text-white glow-text tracking-widest uppercase italic">Aegis <span className="text-primary not-italic">Terminal</span></h1>
-          <p className="text-[10px] text-text/30 mt-3 font-mono tracking-[4px] uppercase">Secure Link Authorization</p>
+          <p className="text-[10px] text-text/30 mt-3 font-mono tracking-[4px] uppercase">Login to your account</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-8">
           <div className="space-y-3">
-            <label className="text-primary/70 text-[9px] font-bold uppercase tracking-[3px]">Squad Access Key</label>
+            <label className="text-primary/70 text-[9px] font-bold uppercase tracking-[3px]">Username</label>
             <input
               type="text"
               value={accessKey}
               onChange={(e) => setAccessKey(e.target.value)}
               placeholder="PHANTOM_77"
-              className="w-full bg-white/[0.03] border border-white/10 p-4 rounded-sm focus:border-primary/50 focus:bg-primary/5 outline-none text-text transition-all placeholder:opacity-20 text-sm font-geist-mono tracking-tight"
+              className="w-full bg-white/[0.03] border border-white/10 p-4 rounded-sm focus:border-primary/50 focus:bg-primary/5 outline-none text-text transition-all placeholder:opacity-20 text-sm font-geist-mono"
               required
             />
           </div>
 
           <div className="space-y-3">
-            <label className="text-primary/70 text-[9px] font-bold uppercase tracking-[3px]">Encrypted Secret</label>
+            <label className="text-primary/70 text-[9px] font-bold uppercase tracking-[3px]">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-white/[0.03] border border-white/10 p-4 rounded-sm focus:border-primary/50 focus:bg-primary/5 outline-none text-text transition-all placeholder:opacity-20 text-sm font-geist-mono tracking-tight"
+              className="w-full bg-white/[0.03] border border-white/10 p-4 rounded-sm focus:border-primary/50 focus:bg-primary/5 outline-none text-text transition-all placeholder:opacity-20 text-sm font-geist-mono"
               required
             />
           </div>
@@ -94,13 +94,13 @@ export default function LoginPage() {
             disabled={isLoading}
             className="terminal-button w-full mt-4 disabled:opacity-50 py-4 text-xs"
           >
-            {isLoading ? 'Decrypting Uplink...' : 'Establish Connection'}
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <div className="mt-12 flex flex-col items-center gap-6">
           <Link href="/register" className="text-[9px] text-text/20 hover:text-primary transition-colors uppercase tracking-[4px] border-b border-transparent hover:border-primary/40 pb-1">
-            Request Operational Link
+            Don't have an account? Register here
           </Link>
           <div className="flex items-center gap-3 opacity-20">
             <div className="h-px w-8 bg-white"></div>

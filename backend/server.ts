@@ -40,32 +40,34 @@ app.use('/api/auction', auctionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/system', systemRoutes);
 app.use('/api/vault', vaultRoutes);
-
+app.use('/health', (req, res) => {
+    res.json({ message: 'OK' });
+});
 // 4. Start Sequence
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
     try {
         // Ensure global system state exists
-    const state = await (prisma as any).systemState.findUnique({
-      where: { id: 'CURRENT_STATE' }
-    });
-    
-    if (!state) {
-      await (prisma as any).systemState.create({
-        data: { id: 'CURRENT_STATE', currentPhase: 'AUCTION' }
-      });
-      console.log('🏁 System State Initialized: AUCTION');
-    }
-    const currentState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
+        const state = await (prisma as any).systemState.findUnique({
+            where: { id: 'CURRENT_STATE' }
+        });
+
+        if (!state) {
+            await (prisma as any).systemState.create({
+                data: { id: 'CURRENT_STATE', currentPhase: 'AUCTION' }
+            });
+            console.log('🏁 System State Initialized: AUCTION');
+        }
+        const currentState = await (prisma as any).systemState.findUnique({ where: { id: 'CURRENT_STATE' } });
         if (currentState?.currentPhase === 'CODING' && (currentState as any).codingStartTime) {
             const elapsed = Date.now() - new Date((currentState as any).codingStartTime).getTime();
             const remaining = (60 * 60 * 1000) - elapsed;
-            
+
             if (remaining > 0) {
                 // We need to import the timer logic or expose it from SystemController
                 // For simplicity, let's just trigger a logic block here
-                console.log(`⏰ Resuming coding timer. ${Math.floor(remaining/1000/60)}m remaining.`);
+                console.log(`⏰ Resuming coding timer. ${Math.floor(remaining / 1000 / 60)}m remaining.`);
                 setTimeout(async () => {
                     await (prisma as any).systemState.update({
                         where: { id: 'CURRENT_STATE' },

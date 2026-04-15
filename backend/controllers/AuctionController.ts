@@ -100,6 +100,18 @@ export const placeBid = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'BIDDING LOCKED: Your team has already acquired the maximum 4 problems.' });
     }
 
+    // 2.6. Prevent duplicate problem — team must not already own this snippet
+    const alreadyOwns = await (prisma as any).auctionRound.findFirst({
+      where: {
+        snippetId: auction.snippetId,
+        winnerId: teamId,
+        status: 'COMPLETED',
+      },
+    });
+    if (alreadyOwns) {
+      return res.status(400).json({ error: 'BIDDING LOCKED: Your team already owns this problem statement.' });
+    }
+
     // 3. Check minimum bid (1 floor, then +1 increments)
     const currentHighest = auction.bids[0]?.amount || 0;
     const minBid = currentHighest === 0 ? 1 : currentHighest + 1;
