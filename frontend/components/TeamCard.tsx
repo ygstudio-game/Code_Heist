@@ -10,10 +10,9 @@ interface TeamCardProps {
     isEliminated: boolean;
     role: string;
   };
-  adminView?: boolean;
 }
 
-export default function TeamCard({ team, adminView }: TeamCardProps) {
+export default function TeamCard({ team }: TeamCardProps) {
   return (
     <div className={`terminal-card overflow-hidden group ${team.isEliminated ? 'opacity-50 grayscale' : 'hover:border-primary/50'}`}>
       <div className="bg-surface p-4 border-b border-border flex justify-between items-center group-hover:bg-primary/5 transition-colors">
@@ -53,9 +52,7 @@ export default function TeamCard({ team, adminView }: TeamCardProps) {
 
       <div className="bg-[#0B0D14] p-3 flex justify-between items-center text-[8px] font-geist-mono text-text/30 uppercase tracking-[2px]">
         <span>{`// Sector: ${team.role === 'ADMIN' ? 'Command' : 'Infiltration'}`}</span>
-        <span className="text-primary/40 group-hover:text-primary transition-colors cursor-pointer">
-          {adminView ? 'Click to Manage' : 'View Dossier'}
-        </span>
+        <button className="text-primary/40 hover:text-primary transition-colors cursor-pointer">View Dossier</button>
       </div>
     </div>
   );
