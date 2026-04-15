@@ -100,7 +100,7 @@ export default function LoginPage() {
 
         <div className="mt-12 flex flex-col items-center gap-6">
           <Link href="/register" className="text-[9px] text-text/20 hover:text-primary transition-colors uppercase tracking-[4px] border-b border-transparent hover:border-primary/40 pb-1">
-            Don't have an account? Register here
+            Do not have an account? Register here
           </Link>
           <div className="flex items-center gap-3 opacity-20">
             <div className="h-px w-8 bg-white"></div>
